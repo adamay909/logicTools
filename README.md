@@ -88,3 +88,4 @@ This proof-checker is designed to run completely inside the browser so it is eas
 ### Copyright
 
 The Go, HTML, and CSS sources for this proof checker written by Masahiro Yamada. Licensed under the MIT License. You can get the source code at:
+https://github.com/adamay909/logicTools
