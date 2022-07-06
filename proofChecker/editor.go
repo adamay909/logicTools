@@ -19,7 +19,9 @@ func clearCanvas() {
 	waitSub = false
 	dom.GetWindow().Document().GetElementByID("inputArea").SetAttribute("style", "counter-reset: line "+strconv.Itoa(0)+";")
 	d, _ := assets.ReadFile("assets/html/startmessage.html")
-	setTextByID("inputArea", string(d))
+
+	bottom := `<div id="overlay" contenteditable tabindex=1 onclick="activateInput()"> type here </div>` + "\n"
+	setTextByID("inputArea", string(d)+bottom)
 	printMessage("")
 	return
 }
@@ -412,7 +414,9 @@ func typesetCanvas() {
 		s = `<div class="pline" id="line0"><div class="plnum"></div></div>`
 	}
 
-	setTextByID("inputArea", s)
+	bottom := `<div id="overlay" contenteditable tabindex=1 onclick="activateInput()"> type here </div>` + "\n"
+
+	setTextByID("inputArea", s+bottom)
 
 	dom.GetWindow().Document().GetElementByID("line0").GetElementsByClassName("plnum")[0].SetAttribute("onclick", "setOffset()")
 
@@ -439,7 +443,8 @@ func typesetDeriv() {
 		s = s + sn
 	}
 	s = `<div class="deriv">` + s + `</div>`
-	setTextByID("inputArea", s)
+	bottom := `<div id="overlay" contenteditable tabindex=1 onclick="activateInput()"> type here </div>` + "\n"
+	setTextByID("inputArea", s+bottom)
 	return
 }
 

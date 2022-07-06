@@ -59,6 +59,7 @@ div#editor {
 
 
 div#inputArea {
+ position: relative;
  display: block;
  counter-reset: line;
  height: 40em;
