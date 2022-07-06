@@ -10,14 +10,14 @@
       <button class="button" id="toggle" onclick="toggleSystem()" tabindex=0>Switch to Predicate Logic</button>
       <button class="button" id="togglethm" onclick="toggleTheorems()" tabindex=0>Allow Theorems</button>
 	  <!--      <button class="button" id="cliptype">Clipboard format</button> -->
-      <button class="button" id="toggleabout" onclick="toggleAbout()" tabindex=0>README</button>
+      <button class="button" id="togglereadme" onclick="toggleReadme()" tabindex=0>README</button>
    </div>
    <div id="editor">
-      <div id="inputArea" onclick="activateInput()" tabindex=0>
-      </div>
+	<div id="inputArea" tabindex=0></div>
+	  <div id="overlay" contenteditable tabindex=1 onclick="activateInput()"> type here </div>
       <div id="messages"></div>
    </div>
-   <div id="about" style="display: none"></div>
+   <div id="readme" style="display: none"></div>
    <div id="help" style="display: none"></div>
 </div>
 

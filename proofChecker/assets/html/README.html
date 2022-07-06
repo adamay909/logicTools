@@ -1,0 +1,89 @@
+<h3>Online proof checker</h3>
+<h3>The proof system</h3>
+<p>This proof checker is designed for working with the proof system Gentzen uses in his &quot;Die Wiederspruchsfreiheit der reinen Zahlentheorie&quot; (1936) that I use in my introductory formal logic course. A proof is stated as a series of sequents where each sequent must have exactly one formula as its succedent. It can be trivially converted to proofs in the style of Lemmon's <em>Beginning Logic</em> as well others influenced by him (e.g., Allen and Hand, <em>Logic Primer</em>). E.g., the following proof:</p>
+<ol>
+<li>P ⊢ P</li>
+<li>Q ⊢ Q</li>
+<li>P,Q ⊢ P and Q</li>
+</ol>
+<p>turns into the following in Lemmon's style:</p>
+<p>1 (1) P<br>
+2 (2) Q<br>
+1,2 (3) P and Q</p>
+<p>What we do is replace the turnstile with the line  number, and replace formulas on the antecedent side of each sequent with the appropriate line numbers (of course, you need to add appropriate annotations). One thing Gentzen's allows is the use of placeholders on the antecedent side of a sequent which can be useful (there is an example of that below).</p>
+<p>The proof system has 9 inference rules for sentential logic. In the system, you may:</p>
+<ul>
+<li><strong>Assumption Introduction (A)</strong> Infer s ⊢ s.</li>
+<li><strong>Conjunction Introduction (∧I)</strong> From Γ ⊢ s1 and ∆ ⊢ s2 , infer Γ, ∆ ⊢ s1 ∧ s2 .</li>
+<li><strong>Conjunction Elimination (∧E)</strong> From Γ ⊢ s1 ∧ s2 , infer Γ ⊢ s1 as well as
+Γ ⊢ s2 .</li>
+<li><strong>Disjunction Introduction (∨I)</strong> From Γ ⊢ s1 , infer Γ ⊢ s1 ∨ s2 as well as
+Γ ⊢ s2 ∨ s1 , for any s2 .</li>
+<li><strong>Disjunction Elimination (∨E)</strong> From Γ ⊢ s1 ∨ s2 and s1 , ∆ ⊢ s3 and
+s2 , Θ ⊢ s3 , infer Γ, ∆ , Θ ⊢ s3 .</li>
+<li><strong>Negation Introduction (¬I)</strong> From Γ, s1 ⊢ s2 and ∆, s1 ⊢ ¬s2 , infer
+Γ, ∆ ⊢ ¬s1 .</li>
+<li><strong>Negation Elimination (¬E)</strong> From Γ ⊢ ¬¬s, infer Γ ⊢ s.</li>
+<li><strong>Conditional Introduction (⊃I)</strong> From Γ , s1 ⊢ s2 , infer Γ ⊢ s1 ⊃ s2 .</li>
+<li><strong>Conditional Elimination (⊃E)</strong> From Γ ⊢ s1 ⊃ s2 and ∆ ⊢ s1 , infer Γ, ∆ ⊢ s2 .</li>
+</ul>
+<p>There are four more rules for predicate logic with quantifiers:</p>
+<ul>
+<li><strong>Universal Quantifier Introduction (∀I)</strong> Given a constant κ, from Γ ⊢ φ(κ)
+infer Γ ⊢ ∀υφ(υ), provided κ does not appear in any of the sentences
+in Γ .</li>
+<li><strong>Universal Quantifier Elimination (∀E)</strong> From Γ ⊢ ∀υφ(υ), infer Γ ⊢ φ(κ ),
+for any constant κ.</li>
+<li><strong>Existential Quantifier Introduction (∃I)</strong> Given a constant κ , infer from
+Γ ⊢ φ( κ) to Γ ⊢ ∃υφ(υ).</li>
+<li><strong>Existential Quantifier Elimination (∃E)</strong> From Γ ⊢ ∃υφ(υ) and ∆, φ (κ) ⊢ ψ,
+infer Γ, ∆ ⊢ ψ , provided κ does not appear in any of Γ, ∆ , and ψ.</li>
+</ul>
+<p>Finally, there are two rules for identity (Gentzen does not have these; he uses axioms governing the identity predicate):</p>
+<ul>
+<li><strong>Identity Introduction (=I)</strong> For any constant κ, infer ⊢ κ=κ.</li>
+<li><strong>Identity Elimination (=E)</strong> For any constants κ1 and κ2 , infer
+⊢ (κ1=κ2 ∧ φ(κ1)) ⊃ φ∗ (κ2) where φ∗ (κ2) is any formula you can
+obtain by substituting at least one instance of κ1 in φ with κ2 .</li>
+</ul>
+<p>For annotations, the proof checker requires you to use the abbreviations given in parentheses.</p>
+<p>There are three more rules for rewriting the antecedent side of sequents:</p>
+<ul>
+<li>You may reorder items within the antecedent of a sequent as you see fit.</li>
+<li>You may delete duplicate items within the antecedent of a sequent.</li>
+<li>You may add arbitrary items to the antecedent of a sequent.</li>
+</ul>
+<p>These sequent rewrite rules have no names. When you use them, just give the relevant line numbers in the annotations. The proof checker allows you to use the first two silently. E.g., instead of:</p>
+<ol>
+<li>P ⊢ P...A</li>
+<li>Q ⊢ Q...A</li>
+<li>P,Q ⊢ P∧Q...1,2,∧I</li>
+<li>P,Q,P ⊢ (P∧Q)∧P...1,3,∧I</li>
+<li>P,Q ⊢ (P∧Q)∧P...4</li>
+</ol>
+<p>you may, but are not required to, write:</p>
+<ol>
+<li>P ⊢ P...A</li>
+<li>Q ⊢ Q...A</li>
+<li>P,Q ⊢ P∧Q...1,2,∧I</li>
+<li>P,Q ⊢ (P∧Q)∧P...1,3,∧I</li>
+</ol>
+<p>But you are required to be explicit in the use of the third sequent rewrite rule. E.g., the following is not accepted by the proof checker:</p>
+<ol>
+<li>Γ ⊢P...premise</li>
+<li>Γ ⊢ Q⊃P...1,⊃I</li>
+</ol>
+<p>You must write the above as:</p>
+<ol>
+<li>Γ ⊢ P...premise</li>
+<li>Γ,Q ⊢ P...1</li>
+<li>Γ ⊢ Q⊃P...2,⊃I</li>
+</ol>
+<p>Notice the use of the keyword &quot;premise&quot; in the annotation. That is what you must use for a premise that is not an assumption (an assumption must take the form s ⊢ s).</p>
+<h3>The Editor</h3>
+<p>The editor is designed to give a WYSIWYG kind of experience: you can type the lines of a derivation given above as is with the help of a few key bindings. Check the help on how to do that.</p>
+<h3>Installation</h3>
+<p>This proof-checker is designed to run completely inside the browser so it is easy to host yourself so long as you are able to host static websites. The docs folder of the GitHub repository contains all the files you need.</p>
+<h3>Copyright</h3>
+<p>The Go, HTML, and CSS sources for this proof checker written by Masahiro Yamada. Licensed under the MIT License. You can get the source code at:
+https://github.com/adamay909/logicTools</p>

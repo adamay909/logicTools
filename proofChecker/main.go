@@ -66,10 +66,10 @@ func main() {
 	setTextByID("help", string(d))
 	dom.GetWindow().Document().GetElementByID("help").SetAttribute("style", "display: none")
 
-	d, _ = assets.ReadFile("assets/html/about.html")
+	d, _ = assets.ReadFile("assets/html/README.html")
 
-	setTextByID("about", string(d))
-	dom.GetWindow().Document().GetElementByID("about").SetAttribute("style", "display: none")
+	setTextByID("readme", string(d))
+	dom.GetWindow().Document().GetElementByID("readme").SetAttribute("style", "display: none")
 
 	dom.GetWindow().Document().GetElementByID("inputArea").SetAttribute("style", "counter-reset: line "+strconv.Itoa(0)+";")
 
@@ -81,10 +81,10 @@ func main() {
 	js.Global().Set("toggleTheorems", js.FuncOf(jsWrap(toggleTheorems)).Value)
 	js.Global().Set("activateInput", js.FuncOf(jsWrap(startInput)).Value)
 	js.Global().Set("toggleHelp", js.FuncOf(jsWrap(toggleHelp)).Value)
-	js.Global().Set("toggleAbout", js.FuncOf(jsWrap(toggleAbout)).Value)
+	js.Global().Set("toggleReadme", js.FuncOf(jsWrap(toggleReadme)).Value)
 	js.Global().Set("setOffset", js.FuncOf(jsWrap(setOffset)).Value)
 	js.Global().Set("toClipboard", js.FuncOf(jsWrap(toClipboard)).Value)
-	js.Global().Call("addEventListener", "keydown", js.FuncOf(jsWrap(typeformula)).Value)
+	js.Global().Call("addEventListener", "keydown", js.FuncOf(jsWrap(typeformula)).Value, true)
 
 	//finalize stuff
 	oPL = true
@@ -112,7 +112,7 @@ func clearInput() {
 
 func toggleSettings() {
 	if oABOUT {
-		toggleAbout()
+		toggleReadme()
 	}
 	stopInput()
 	oMENU = !oMENU
@@ -125,7 +125,7 @@ func toggleSettings() {
 	return
 }
 
-func toggleAbout() {
+func toggleReadme() {
 	stopInput()
 	oABOUT = !oABOUT
 	if oHELP {
@@ -133,12 +133,12 @@ func toggleAbout() {
 	}
 	if oABOUT {
 		setAttributeByID("editor", "style", "display: none")
-		setAttributeByID("about", "style", "display: inline")
+		setAttributeByID("readme", "style", "display: inline")
 		setAttributeByID("mainArea", "style", "grid-template-columns: 1fr 10fr")
 		return
 	}
 	setAttributeByID("editor", "style", "display: inline")
-	setAttributeByID("about", "style", "display: none")
+	setAttributeByID("readme", "style", "display: none")
 	setDisplay()
 }
 
