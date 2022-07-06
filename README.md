@@ -81,9 +81,13 @@ You must write the above as:
 
 Notice the use of the keyword "premise" in the annotation. That is what you must use for a premise that is not an assumption (an assumption must take the form s ⊢ s). 
 
+### The Editor
+
+The editor is designed to give a WYSIWYG kind of experience: you can type the lines of a derivation given above as is with the help of a few key bindings. Check the help on how to do that.
+
 ### Installation
 
-This proof-checker is designed to run completely inside the browser so it is easy to host yourself so long as you are able to host static websites. You'll need the index.html file and the files in the assets/ folder.
+This proof-checker is designed to run completely inside the browser so it is easy to host yourself so long as you are able to host static websites. The docs folder of the GitHub repository contains all the files you need.
 
 ### Copyright
 
