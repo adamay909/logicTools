@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+   <head>
+	<title>Proof checker</title>
+      <meta charset="utf-8" />
+      <meta name="description" content="Proof checker" />
+      <meta name="author" content="Masahiro Yamada" />
+      <meta name="copyright" content="© Masahiro Yamada" />
+	  <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon" />
+      <style></style>
+      <script src="assets/wasm_exec.js"></script>
+      <script>
+         const go = new Go();
+         WebAssembly.instantiateStreaming(fetch("assets/proofchecker.wasm"), go.importObject).then((result) => {go.run(result.instance);});
+      </script>
+   </head>
+   <body></body>
+</html>
+

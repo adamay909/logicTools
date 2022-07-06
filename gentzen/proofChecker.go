@@ -1,0 +1,412 @@
+package gentzen
+
+import (
+	"errors"
+	"log"
+	"strconv"
+	"strings"
+)
+
+//arugment lines are given as semicolon separated lists:
+//datum;succedent;lines used;inference rule
+//
+//inference rules are given by:ni,ne,ki,ke,di,de,ci,ce,a
+//
+
+type argLine struct {
+	seq   sequent
+	lines []int
+	inf   string
+}
+
+const (
+	ni = "ni"
+	ne = "ne"
+	ki = "ki"
+	ke = "ke"
+	di = "di"
+	de = "de"
+	ci = "ci"
+	ce = "ce"
+	a  = "a"
+	ui = "ui"
+	ue = "ue"
+	ei = "ei"
+	ee = "ee"
+	ii = "=i"
+	ie = "=e"
+)
+
+var checkLog strings.Builder
+var logger *log.Logger
+
+func checkDerivation(lines []string, offset int) bool {
+	var al []argLine
+	var hasE bool
+
+	//record if there is an error
+	aE := func(v bool) {
+		if v {
+			hasE = true
+		}
+	}
+
+	hasE = false
+	for k, i := range lines {
+		logger.SetPrefix("line " + strconv.Itoa(k+1) + ": ")
+		pl, err := parseArgline(i)
+		if err != nil {
+			logger.Print(err.Error())
+			hasE = true
+		}
+		al = append(al, pl)
+	}
+	if hasE {
+		return false
+	}
+
+	for i, l := range al {
+		logger.SetPrefix("line " + strconv.Itoa(i+1) + ": ")
+		//check the line references first
+		if !checkLineRef(l.inf, i+offset, offset, l.lines) {
+			hasE = true
+			continue
+		}
+
+		switch l.inf {
+		case a: //assumption
+			aE(!assumption(l.seq))
+
+		case ki: //conjunction intro
+			aE(!conjI(al[l.lines[0]-offset].seq, al[l.lines[1]-offset].seq, l.seq))
+
+		case ke: //conjunction elim
+			aE(!conjE(al[l.lines[0]-offset].seq, l.seq))
+
+		case di: //disjunction intro
+			aE(!disjI(al[l.lines[0]-offset].seq, l.seq))
+
+		case de: //disjunction elim
+			aE(!disjE(al[l.lines[0]-offset].seq, al[l.lines[1]-offset].seq, al[l.lines[2]-offset].seq, l.seq))
+
+		case ci: //conditional intro
+			aE(!condI(al[l.lines[0]-offset].seq, l.seq))
+
+		case ce: //conditional elim
+			aE(!condE(al[l.lines[0]-offset].seq, al[l.lines[1]-offset].seq, l.seq))
+
+		case ni: //negation intro
+			aE(!negI(al[l.lines[0]-offset].seq, al[l.lines[1]-offset].seq, l.seq))
+
+		case ne: //negation elim
+			aE(!negE(al[l.lines[0]-offset].seq, l.seq))
+
+		case ue: //universal elim
+			aE(!uniE(al[l.lines[0]-offset].seq, l.seq))
+
+		case ui: //universal intro
+			aE(!uniI(al[l.lines[0]-offset].seq, l.seq))
+
+		case ei: //existential intro
+			aE(!exI(al[l.lines[0]-offset].seq, l.seq))
+
+		case ee: //existential elimo
+			aE(!exE(al[l.lines[0]-offset].seq, al[l.lines[1]-offset].seq, l.seq))
+		case ii: //identity introduction
+			aE(!idI(l.seq))
+
+		case ie: //identity introduction
+			aE(!idE(l.seq))
+
+		case "premise": //premise
+
+		case "": //sequent rewrite
+			aE(!seqRewrite(l.seq, al[l.lines[0]-offset].seq, l.lines[0]))
+		default: //check if we are dealing with a theorem
+			aE(!oTHM)
+			aE(!theorem(l.seq, l.inf))
+		}
+	}
+	return !hasE
+}
+
+func parseArgline(s string) (al argLine, err error) {
+
+	s = strings.ReplaceAll(s, " ", "")
+	s = strings.ReplaceAll(s, "\t", "")
+
+	fields := strings.Split(s, ";")
+	//check we have enough fields
+	if len(fields) < 3 {
+		err = errors.New("you need: datum, succedent and at leat one of: line references, inference rule")
+		return
+	}
+
+	//check datum is ok
+	datums := strings.Split(fields[0], ",")
+	for _, d := range datums {
+		if len(d) < 1 {
+			continue
+		}
+		if d[:1] == `\` {
+			continue
+		}
+		_, err = ParseStrict(d)
+		if err != nil {
+			return
+		}
+	}
+
+	//check succedent is ok
+	if len(fields[1]) < 1 {
+		err = errors.New("Not a sequent")
+		return
+	}
+	if hasGreek(fields[1]) {
+		err = errors.New("Cannot have Greek letters in succedent")
+		return
+	}
+	_, err = ParseStrict(fields[1])
+	if err != nil {
+		return
+	}
+
+	al.seq.datum = fields[0]
+	al.seq.succedent = fields[1]
+	if len(fields) == 4 {
+		al.inf = fields[3]
+	}
+
+	if len(strings.TrimSpace(fields[2])) == 0 {
+		err = errors.New("you need: datum, succedent and at leat one of: line references, inference rule")
+		return
+	}
+
+	ln := strings.Split(fields[2], ",")
+
+	var i int
+	var e string
+
+	for i = 0; i < len(ln); i++ {
+		e = ln[i]
+		n, err := strconv.Atoi(e)
+		if err != nil {
+			break
+		}
+		al.lines = append(al.lines, n)
+	}
+
+	if len(ln[i:]) > 1 {
+		err = errors.New("You must have no more than one inference rule")
+		return
+	}
+	if len(ln[i:]) != 0 {
+		al.inf = strings.TrimSpace(ln[i])
+	}
+	return
+}
+
+func hasGreek(s string) bool {
+	return strings.Contains(s, `\`)
+}
+
+func printArgLine(s string) string {
+
+	al, _ := parseArgline(s)
+	datumstring := ""
+
+	if len(al.seq.datum) != 0 {
+
+		datums := strings.Split(al.seq.datum, ",")
+		for _, d := range datums {
+			if d[:1] == `\` {
+				datumstring = datumstring + d + `, `
+			} else {
+				datumstring = datumstring + printNodeInfix(Parse(d), mLatex) + `, `
+			}
+		}
+		datumstring = strings.TrimRight(datumstring, ", ")
+	}
+
+	assertumstring := printNodeInfix(Parse(al.seq.succedent), mLatex)
+	annotation := ""
+	if len(al.lines) > 0 {
+		for _, i := range al.lines {
+			annotation = annotation + strconv.Itoa(i) + `,`
+		}
+	}
+
+	annotation = annotation + symb(al.inf)
+
+	annotation = strings.TrimRight(annotation, ",")
+
+	out := `\ai{` + datumstring + `}{` + assertumstring + `}{` + annotation + `}` + "\n\n"
+
+	return out
+}
+
+func symb(s string) string {
+
+	switch s {
+	case "a":
+		return "A"
+
+	case "ni":
+		return `\negI`
+
+	case "ne":
+		return `\negE`
+
+	case "ki":
+		return `\conjI`
+
+	case "ke":
+		return `\conjE`
+
+	case "di":
+		return `\disjI`
+
+	case "de":
+		return `\disjE`
+
+	case "ci":
+		return `\condI`
+
+	case "ce":
+		return `\condE`
+
+	case "ui":
+		return `\uniI`
+
+	case "ue":
+		return `\uniE`
+
+	case "ei":
+		return `\exI`
+
+	case "ee":
+		return `\exE`
+
+	case "=i":
+		return `\iI`
+
+	case "=e":
+		return `\iE`
+
+	default:
+		return s
+	}
+}
+
+func lineSpec(infRule string) int {
+	switch infRule {
+	case a:
+		return 0
+	case ni:
+		return 2
+	case ne:
+		return 1
+	case ki:
+		return 2
+	case ke:
+		return 1
+	case di:
+		return 1
+	case de:
+		return 3
+	case ci:
+		return 1
+	case ce:
+		return 2
+	case ue:
+		return 1
+	case ui:
+		return 1
+	case ee:
+		return 2
+	case ei:
+		return 1
+	case ii:
+		return 0
+	case ie:
+		return 0
+	case "premise":
+		return 0
+	case "":
+		return 1
+	case "theorem":
+		return 0
+	default:
+		return -1
+	}
+}
+
+func checkLineRef(infRule string, cur int, offset int, lines []int) bool {
+	if oTHM {
+		for i := range theorems {
+			if infRule == theorems[i][0] || infRule == theorems[i][1] {
+				infRule = "theorem"
+				break
+			}
+		}
+	}
+
+	if lineSpec(infRule) == -1 {
+		logger.Print("unknown inference rule or theorem.")
+		return false
+	}
+
+	if len(lines) != lineSpec(infRule) {
+		logger.Print(fullName(infRule), " should refer to ", lineSpec(infRule), " lines")
+		return false
+	}
+
+	for n := range lines {
+		if lines[n] >= cur || lines[n] < offset {
+			logger.Print("illegel reference to line ", lines[n])
+			return false
+		}
+	}
+	return true
+}
+
+func fullName(i string) string {
+	switch i {
+	case a:
+		return "Assumption"
+	case ne:
+		return "Negation Elimination"
+	case ni:
+		return "Negation Introduction"
+	case de:
+		return "Disjunction Elimination"
+	case di:
+		return "Disjunction  Introduction"
+	case ke:
+		return "Conjunction Elimination"
+	case ki:
+		return "Conjunction Introduction"
+	case ce:
+		return "Conditional Elimination"
+	case ci:
+		return "Conditional Introduction"
+	case ue:
+		return "Universal Quantifier Elimination"
+	case ui:
+		return "Universal Quantifier Introduction"
+	case ee:
+		return "Existential Quantifier Elimination"
+	case ei:
+		return "Existential Quantifier Introduction"
+	case ie:
+		return "Identity Elimination"
+	case ii:
+		return "Identity Introduction"
+	default:
+		return i
+	}
+}
+
+func isTheorem(s sequent) bool {
+	return s.datum == ""
+}
