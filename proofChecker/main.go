@@ -100,6 +100,7 @@ func typeformula() {
 		return
 	}
 	o := js.Global().Get("event").Get("key")
+	js.Global().Get("overlay").Call("focus")
 	typeInput(o.String())
 	return
 }

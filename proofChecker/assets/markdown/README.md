@@ -83,7 +83,10 @@ Notice the use of the keyword "premise" in the annotation. That is what you must
 
 ### The Editor
 
-The editor is designed to give a WYSIWYG kind of experience: you can type the lines of a derivation given above as is with the help of a few key bindings. Check the help on how to do that.
+The editor is very primitive with limited functionality. You can move around with the arrow keys, home and end for moving to the start or end of line, and delete and backspace should work more or less normally. But no more advanced navigation around the input area and no copying and pasting and the like. Given the intended use, it should be enough (it works for me...). 
+
+The editor is designed to give a WYSIWYG kind of experience so that what you see on screen is pretty close to what you see in my course material. Some custom key bindings are needed for that. Check the help on how to input symbols.
+
 
 ### Installation
 

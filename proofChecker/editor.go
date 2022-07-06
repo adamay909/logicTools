@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"strconv"
 	"strings"
+	"syscall/js"
 
 	"honnef.co/go/js/dom/v2"
 )
@@ -20,7 +21,7 @@ func clearCanvas() {
 	dom.GetWindow().Document().GetElementByID("inputArea").SetAttribute("style", "counter-reset: line "+strconv.Itoa(0)+";")
 	d, _ := assets.ReadFile("assets/html/startmessage.html")
 
-	bottom := `<div id="overlay" contenteditable tabindex=1 onclick="activateInput()"> type here </div>` + "\n"
+	bottom := `<div id="overlay" contenteditable="true" tabindex=1 onclick="activateInput()"> dummy text </div>` + "\n"
 	setTextByID("inputArea", string(d)+bottom)
 	printMessage("")
 	return
@@ -414,7 +415,7 @@ func typesetCanvas() {
 		s = `<div class="pline" id="line0"><div class="plnum"></div></div>`
 	}
 
-	bottom := `<div id="overlay" contenteditable tabindex=1 onclick="activateInput()"> type here </div>` + "\n"
+	bottom := `<div id="overlay" contenteditable="true" tabindex=1 onclick="activateInput()"> dummy text </div>` + "\n"
 
 	setTextByID("inputArea", s+bottom)
 
@@ -422,6 +423,7 @@ func typesetCanvas() {
 
 	dom.GetWindow().Document().GetElementByID("line0").GetElementsByClassName("plnum")[0].SetAttribute("style", "cursor: grab")
 
+	js.Global().Get("overlay").Call("focus")
 }
 
 func typesetDeriv() {
@@ -443,8 +445,10 @@ func typesetDeriv() {
 		s = s + sn
 	}
 	s = `<div class="deriv">` + s + `</div>`
-	bottom := `<div id="overlay" contenteditable tabindex=1 onclick="activateInput()"> type here </div>` + "\n"
+	bottom := `<div id="overlay" contenteditable="true" tabindex=1 onclick="activateInput()"> dummy text </div>` + "\n"
 	setTextByID("inputArea", s+bottom)
+
+	js.Global().Get("overlay").Call("focus")
 	return
 }
 
