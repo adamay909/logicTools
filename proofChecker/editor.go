@@ -4,7 +4,6 @@ import (
 	_ "embed"
 	"strconv"
 	"strings"
-	"syscall/js"
 
 	"honnef.co/go/js/dom/v2"
 )
@@ -423,7 +422,7 @@ func typesetCanvas() {
 
 	dom.GetWindow().Document().GetElementByID("line0").GetElementsByClassName("plnum")[0].SetAttribute("style", "cursor: grab")
 
-	js.Global().Get("overlay").Call("focus")
+	focusInput()
 }
 
 func typesetDeriv() {
@@ -448,7 +447,7 @@ func typesetDeriv() {
 	bottom := `<div id="overlay" contenteditable="true" tabindex=1 onclick="activateInput()"> dummy text </div>` + "\n"
 	setTextByID("inputArea", s+bottom)
 
-	js.Global().Get("overlay").Call("focus")
+	focusInput()
 	return
 }
 

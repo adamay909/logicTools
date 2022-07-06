@@ -1,6 +1,10 @@
 package main
 
-import "strconv"
+import (
+	"strconv"
+
+	"github.com/adamay909/logicTools/gentzen"
+)
 
 func plainTextDeriv() string {
 
@@ -50,4 +54,22 @@ func plainText(s string) string {
 		}
 	}
 	return s
+}
+
+func latexOutput() string {
+
+	if arglines, ok := parseLines(canvas); ok {
+		return gentzen.PrintDeriv(arglines, oOffset)
+	}
+	output := ""
+	ln := strconv.Itoa(oOffset - 1)
+	output = `\begin{enumerate}\setcounter{enumi}{` + ln + `}` + "\n"
+
+	for _, l := range canvas {
+		if len(l) == 0 {
+			continue
+		}
+		output = output + `\item ` + plainOutput(l) + "\n"
+	}
+	return output + `\end{enumerate}` + "\n"
 }

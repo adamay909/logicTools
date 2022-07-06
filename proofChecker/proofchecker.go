@@ -4,7 +4,6 @@ import (
 	"errors"
 	"strconv"
 	"strings"
-	"syscall/js"
 
 	"github.com/adamay909/logicTools/gentzen"
 )
@@ -28,9 +27,6 @@ func checkDerivation() {
 
 	if gentzen.CheckDeriv(arglines, oOffset) {
 		printMessage("RESULTS:\n\n Good!" + gentzen.ShowLog())
-		if oPRIVATE {
-			js.Global().Get("navigator").Get("clipboard").Call("writeText", gentzen.PrintDeriv(arglines, oOffset))
-		}
 		return
 	}
 

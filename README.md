@@ -2,7 +2,7 @@
 
 ### The proof system
 
-This proof checker is designed for working with the proof system Gentzen uses in his "Die Wiederspruchsfreiheit der reinen Zahlentheorie" (1936) that I use in my introductory formal logic course. A proof is stated as a series of sequents where each sequent must have exactly one formula as its succedent. It can be trivially converted to proofs in the style of Lemmon's *Beginning Logic* as well others influenced by him (e.g., Allen and Hand, *Logic Primer*). E.g., the following proof:
+This proof checker is designed for working with the proof system Gentzen uses in his "Die Wiederspruchsfreiheit der reinen Zahlentheorie" (1936) that I use for teaching  my introductory formal logic course. A proof is stated as a series of sequents where each sequent must have exactly one formula as its succedent. It can be trivially converted to proofs in the style of Lemmon's *Beginning Logic* as well others influenced by him (e.g., Allen and Hand, *Logic Primer*). E.g., the following proof:
 1. P ⊢ P
 2. Q ⊢ Q
 3. P,Q ⊢ P and Q
@@ -85,8 +85,9 @@ Notice the use of the keyword "premise" in the annotation. That is what you must
 
 The editor is very primitive with limited functionality. You can move around with the arrow keys, home and end for moving to the start or end of line, and delete and backspace should work more or less normally. But no more advanced navigation around the input area and no copying and pasting and the like. Given the intended use, it should be enough (it works for me...). 
 
-The editor is designed to give a WYSIWYG kind of experience so that what you see on screen is pretty close to what you see in my course material. Some custom key bindings are needed for that. Check the help on how to input symbols.
+The editor is designed to give a WYSIWYG kind of experience so that what you see on screen is pretty close to what you see in my course material. Some custom key bindings are needed for that. Check the help on how to input symbols. You do need a physical keyboard.
 
+You can copy the contents of the input area using the "Copy to Clipboard" button. The default is to copy it in plain text. You can switch to Latex output using the toggle button under the settings (labeled "Clipboard:" followed by the current setting). The Latex output is customized for my own use preparing course material. If you want to make use of it, you will need the custom commands included with the source files in the source repository. 
 
 ### Installation
 
@@ -95,4 +96,4 @@ This proof-checker is designed to run completely inside the browser so it is eas
 ### Copyright
 
 The Go, HTML, and CSS sources for this proof checker written by Masahiro Yamada. Licensed under the MIT License. You can get the source code at:
-https://github.com/adamay909/logicTools
+[https://github.com/adamay909/logicTools](https://github.com/adamay909/logicTools)

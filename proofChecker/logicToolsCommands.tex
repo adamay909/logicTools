@@ -1,0 +1,64 @@
+\newcommand{\p}[1]{${#1}$}%for type setting formal stuff
+
+%negation
+\def\lnot{\ensuremath{\neg}} 
+
+%disjunction
+\def\lor{\ensuremath{\mathrel\vee}}
+
+%conjunction
+\def\land{\ensuremath{\mathrel\wedge}}
+
+%material implication
+\def\limplies{\ensuremath{\supset}}
+
+%universal quantifier
+\def\lforall{\ensuremath{\forall}}
+
+%existential quantifier
+\def\lthereis{\ensuremath{\exists}}
+
+%derivable
+\def\lproves{\ensuremath{\vdash}}
+
+%primitive Inference Rules
+\newcommand{\negI}{\ensuremath{\lnot}I}
+\newcommand{\negE}{\ensuremath{\lnot}E}
+
+\newcommand{\conjI}{\ensuremath{\land}I}
+\newcommand{\conjE}{\ensuremath{\land}E}
+
+\newcommand{\disjI}{\ensuremath{\lor}I}
+\newcommand{\disjE}{\ensuremath{\lor}E}
+
+
+\newcommand{\condI}{\ensuremath{\limplies}I}
+\newcommand{\condE}{\ensuremath{\limplies}E}
+
+
+\newcommand{\uniE}{\ensuremath{\lforall}E}
+\newcommand{\uniI}{\ensuremath{\lforall}I}
+
+\newcommand{\exE}{\ensuremath{\lthereis}E}
+\newcommand{\exI}{\ensuremath{\lthereis}I}
+
+
+\newcommand{\iI}{\ensuremath{=}I}
+\newcommand{\iE}{\ensuremath{=}E}
+
+%for typestting derivations
+\newenvironment{argumentN}[1][1]%
+{\begin{enumerate}\setcounter{enumi}{#1}
+\addtocounter{argnum}{-1}}{\end{enumerate}}
+
+
+% for typesetting a line in a derivation
+\newcommand{\sqA}[4][0.25]{\makebox[#1\textwidth][l]
+ {\ensuremath{#2}} \makebox[1em]
+{\lproves}\ \ensuremath{#3}\expl{#4}}
+
+% for quick typesetting of derivation lines
+\newcommand{\ai}[4][0.2]{\item \sqA[#1]{#2}{#3}{#4}} 
+
+
+

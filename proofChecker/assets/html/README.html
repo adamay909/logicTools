@@ -1,6 +1,6 @@
 <h3>Online proof checker</h3>
 <h3>The proof system</h3>
-<p>This proof checker is designed for working with the proof system Gentzen uses in his &quot;Die Wiederspruchsfreiheit der reinen Zahlentheorie&quot; (1936) that I use in my introductory formal logic course. A proof is stated as a series of sequents where each sequent must have exactly one formula as its succedent. It can be trivially converted to proofs in the style of Lemmon's <em>Beginning Logic</em> as well others influenced by him (e.g., Allen and Hand, <em>Logic Primer</em>). E.g., the following proof:</p>
+<p>This proof checker is designed for working with the proof system Gentzen uses in his &quot;Die Wiederspruchsfreiheit der reinen Zahlentheorie&quot; (1936) that I use for teaching  my introductory formal logic course. A proof is stated as a series of sequents where each sequent must have exactly one formula as its succedent. It can be trivially converted to proofs in the style of Lemmon's <em>Beginning Logic</em> as well others influenced by him (e.g., Allen and Hand, <em>Logic Primer</em>). E.g., the following proof:</p>
 <ol>
 <li>P ⊢ P</li>
 <li>Q ⊢ Q</li>
@@ -82,9 +82,10 @@ obtain by substituting at least one instance of κ1 in φ with κ2 .</li>
 <p>Notice the use of the keyword &quot;premise&quot; in the annotation. That is what you must use for a premise that is not an assumption (an assumption must take the form s ⊢ s).</p>
 <h3>The Editor</h3>
 <p>The editor is very primitive with limited functionality. You can move around with the arrow keys, home and end for moving to the start or end of line, and delete and backspace should work more or less normally. But no more advanced navigation around the input area and no copying and pasting and the like. Given the intended use, it should be enough (it works for me...).</p>
-<p>The editor is designed to give a WYSIWYG kind of experience so that what you see on screen is pretty close to what you see in my course material. Some custom key bindings are needed for that. Check the help on how to input symbols.</p>
+<p>The editor is designed to give a WYSIWYG kind of experience so that what you see on screen is pretty close to what you see in my course material. Some custom key bindings are needed for that. Check the help on how to input symbols. You do need a physical keyboard.</p>
+<p>You can copy the contents of the input area using the &quot;Copy to Clipboard&quot; button. The default is to copy it in plain text. You can switch to Latex output using the toggle button under the settings (labeled &quot;Clipboard:&quot; followed by the current setting). The Latex output is customized for my own use preparing course material. If you want to make use of it, you will need the custom commands included with the source files in the source repository.</p>
 <h3>Installation</h3>
 <p>This proof-checker is designed to run completely inside the browser so it is easy to host yourself so long as you are able to host static websites. The docs folder of the GitHub repository contains all the files you need.</p>
 <h3>Copyright</h3>
 <p>The Go, HTML, and CSS sources for this proof checker written by Masahiro Yamada. Licensed under the MIT License. You can get the source code at:
-https://github.com/adamay909/logicTools</p>
+<a href="https://github.com/adamay909/logicTools">https://github.com/adamay909/logicTools</a></p>

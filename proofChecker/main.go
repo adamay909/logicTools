@@ -42,6 +42,8 @@ var (
 
 	oABOUT = false
 
+	oLatexOutput = false
+
 	oOffset = 1
 
 	logConstBindings [][3]string
@@ -84,6 +86,8 @@ func main() {
 	js.Global().Set("toggleReadme", js.FuncOf(jsWrap(toggleReadme)).Value)
 	js.Global().Set("setOffset", js.FuncOf(jsWrap(setOffset)).Value)
 	js.Global().Set("toClipboard", js.FuncOf(jsWrap(toClipboard)).Value)
+	js.Global().Set("toggleClipboardType", js.FuncOf(jsWrap(toggleClipboardType)).Value)
+
 	js.Global().Call("addEventListener", "keydown", js.FuncOf(jsWrap(typeformula)).Value, true)
 
 	//finalize stuff
@@ -100,66 +104,17 @@ func typeformula() {
 		return
 	}
 	o := js.Global().Get("event").Get("key")
-	js.Global().Get("overlay").Call("focus")
 	typeInput(o.String())
 	return
+}
+
+func focusInput() {
+	js.Global().Get("overlay").Call("focus")
 }
 
 func clearInput() {
 	stopInput()
 	clearCanvas()
-	return
-}
-
-func toggleSettings() {
-	if oABOUT {
-		toggleReadme()
-	}
-	stopInput()
-	oMENU = !oMENU
-	if !oMENU {
-		setAttributeByID("settingsMenu", "style", "display: none")
-	} else {
-		setAttributeByID("settingsMenu", "style", "display: inline-block")
-	}
-	setDisplay()
-	return
-}
-
-func toggleReadme() {
-	stopInput()
-	oABOUT = !oABOUT
-	if oHELP {
-		toggleHelp()
-	}
-	if oABOUT {
-		setAttributeByID("editor", "style", "display: none")
-		setAttributeByID("readme", "style", "display: inline")
-		setAttributeByID("mainArea", "style", "grid-template-columns: 1fr 10fr")
-		return
-	}
-	setAttributeByID("editor", "style", "display: inline")
-	setAttributeByID("readme", "style", "display: none")
-	setDisplay()
-}
-
-func setDisplay() {
-	if oMENU && oHELP {
-		setAttributeByID("mainArea", "style", "grid-template-columns: 1fr 6fr 4fr")
-		return
-	}
-
-	if oMENU && !oHELP {
-		setAttributeByID("mainArea", "style", "grid-template-columns: 1fr 10fr")
-		return
-	}
-
-	if !oMENU && oHELP {
-		setAttributeByID("mainArea", "style", "grid-template-columns: 6fr 4fr")
-		return
-	}
-
-	setAttributeByID("mainArea", "style", "grid-template-columns: 100%")
 	return
 }
 
@@ -190,20 +145,91 @@ func togglePL() {
 }
 
 func toggleHelp() {
-	/*	if oABOUT {
-			return
-		}
-	*/
+	if oABOUT {
+		return
+	}
+
+	oHELP = !oHELP
 	stopInput()
-	if oHELP {
+	if !oHELP {
 		setTextByID("toggleHelp", "Show Help")
-		setAttributeByID("help", "style", "display: none")
+		hide("help")
 	} else {
 		setTextByID("toggleHelp", "Hide Help")
-		setAttributeByID("help", "style", "display: inline")
+		show("help")
 	}
-	oHELP = !oHELP
 	setDisplay()
+	return
+}
+
+func toggleSettings() {
+	if oABOUT {
+		toggleReadme()
+	}
+	stopInput()
+	oMENU = !oMENU
+	if !oMENU {
+		hide("settingsMenu")
+	} else {
+		show("settingsMenu")
+	}
+	setDisplay()
+	return
+}
+
+func toggleReadme() {
+	stopInput()
+	oABOUT = !oABOUT
+	if oABOUT {
+		hide("controls")
+		hide("editor")
+		hide("help")
+		show("readme")
+		return
+	}
+	show("editor")
+	show("controls")
+	hide("readme")
+	if oHELP {
+		show("help")
+	}
+	setDisplay()
+}
+
+func toggleClipboardType() {
+	stopInput()
+	oLatexOutput = !oLatexOutput
+	if oLatexOutput {
+		setTextByID("cliptype", "Clipboard: Latex")
+	} else {
+		setTextByID("cliptype", "Clipboard: text")
+	}
+	return
+}
+
+func setDisplay() {
+
+	if oABOUT {
+		setAttributeByID("mainArea", "style", "grid-template-columns: 1fr 10fr")
+		return
+	}
+
+	if oMENU && oHELP {
+		setAttributeByID("mainArea", "style", "grid-template-columns: 1fr 6fr 4fr")
+		return
+	}
+
+	if oMENU && !oHELP {
+		setAttributeByID("mainArea", "style", "grid-template-columns: 1fr 10fr")
+		return
+	}
+
+	if !oMENU && oHELP {
+		setAttributeByID("mainArea", "style", "grid-template-columns: 6fr 4fr")
+		return
+	}
+
+	setAttributeByID("mainArea", "style", "grid-template-columns: 100%")
 	return
 }
 
@@ -234,7 +260,11 @@ func toClipboard() {
 		return
 	}
 	stopInput()
-	js.Global().Get("navigator").Get("clipboard").Call("writeText", plainTextDeriv())
+	if oLatexOutput {
+		copyToClipboard(latexOutput())
+	} else {
+		copyToClipboard(plainTextDeriv())
+	}
 	return
 }
 
@@ -267,4 +297,17 @@ func jsWrap(f func()) (fn func(this js.Value, args []js.Value) any) {
 	}
 
 	return fn
+}
+
+func show(elem string) {
+	setAttributeByID(elem, "style", "display: inline-block")
+}
+
+func hide(elem string) {
+	setAttributeByID(elem, "style", "display: none")
+}
+
+func copyToClipboard(s string) {
+	js.Global().Get("navigator").Get("clipboard").Call("writeText", s)
+	return
 }
