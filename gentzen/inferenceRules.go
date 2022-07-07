@@ -10,7 +10,7 @@ type sequent struct {
 	datum, succedent string
 }
 
-var StrictCheck bool
+var strictCheck bool
 
 var theorems = [][]string{
 	{"Identity", "ID", ">pp"},
@@ -88,7 +88,7 @@ func condEhelper(seq1, seq2, seq3 sequent) (v bool, msg string) {
 		return
 	}
 
-	if StrictCheck {
+	if strictCheck {
 		if !equal(add(seq2.datum, seq1.datum), seq3.datum) {
 			msg = "datum of conclusion must be union of datums of premises"
 			return
@@ -124,7 +124,7 @@ func condI(seq1, seq2 sequent) bool {
 		logger.Print("consequent of conclusion must be succedent of premise")
 		return false
 	}
-	if StrictCheck {
+	if strictCheck {
 		if !equal(rm(seq1.datum, n2.subnode1.Formula()), seq2.datum) {
 			logger.Print("must remove one datum item")
 			return false
@@ -154,7 +154,7 @@ func conjE(seq1, seq2 sequent) bool {
 			return false
 		}
 	}
-	if StrictCheck {
+	if strictCheck {
 		if !equal(seq1.datum, seq2.datum) {
 			logger.Print("datum of conclusion must be same as datum of premise")
 			return false
@@ -190,7 +190,7 @@ func conjI(seq1, seq2, seq3 sequent) bool {
 		return false
 	}
 
-	if StrictCheck {
+	if strictCheck {
 		if !equal(add(seq1.datum, seq2.datum), seq3.datum) {
 			logger.Print("datum of conclusion must be union of datums of premise")
 			return false
@@ -219,7 +219,7 @@ func disjI(seq1, seq2 sequent) bool {
 		logger.Print("premise is not one of disjuncts")
 		return false
 	}
-	if StrictCheck {
+	if strictCheck {
 		if !equal(seq1.datum, seq2.datum) {
 			logger.Print("datum cannot change")
 			return false
@@ -343,7 +343,7 @@ func disjEhelper2(seq1, seq2, seq3, seq4 sequent) (v bool, msg string) {
 	d2 := n1.subnode2.Formula()
 	ndatum = rm(rm(ndatum, d1), d2)
 
-	if StrictCheck {
+	if strictCheck {
 		if !equal(ndatum, seq4.datum) {
 			msg = "datum of conclusion incorrect"
 			return
@@ -378,7 +378,7 @@ func negE(seq1, seq2 sequent) bool {
 		logger.Print("conclusion is not the elimnation of double negation")
 		return false
 	}
-	if StrictCheck {
+	if strictCheck {
 		if !equal(seq1.datum, seq2.datum) {
 			logger.Print("datum must remain same")
 			return false
@@ -446,7 +446,7 @@ func negIhelper(seq1, seq2, seq3 sequent) (v bool, msg string) {
 		msg = "conclusion must be in datums of both premises"
 		return
 	}
-	if StrictCheck {
+	if strictCheck {
 		if !equal(add(rm(seq1.datum, f), rm(seq2.datum, f)), seq3.datum) {
 			msg = "datum of conclusion incorrect"
 			return
@@ -466,7 +466,7 @@ func uniE(seq1, seq2 sequent) bool {
 	d1 := seq1.datum
 	d2 := seq2.datum
 
-	if StrictCheck {
+	if strictCheck {
 		if !equal(d1, d2) {
 			logger.Print("datum cannot change")
 			return false
@@ -495,7 +495,7 @@ func exI(seq1, seq2 sequent) bool {
 	d1 := seq1.datum
 	d2 := seq2.datum
 
-	if StrictCheck {
+	if strictCheck {
 		if !equal(d1, d2) {
 			logger.Print("datum cannot change")
 			return false
@@ -524,7 +524,7 @@ func uniI(seq1, seq2 sequent) bool {
 	d1 := seq1.datum
 	d2 := seq2.datum
 
-	if StrictCheck {
+	if strictCheck {
 		if !equal(d1, d2) {
 
 			logger.Print("datum cannot change")

@@ -1,3 +1,30 @@
+/*
+Package gentzen provides some tools for checking proofs (both porpositional logic and first order predicate logic with identity),, printing truth tables, syntax trees (propositional logic) as well as a few other tools for creating exercises and the like.
+
+The main entry points expect inputs as plain strings in the Polish notation. The default for the logical constants is non-standard:
+
+- negation: -
+- conjunction: ^
+- disjunction: V
+- conditional: >
+- universal quantifier: U
+- existential quantifier X
+
+This frees up some letters of the alphabet for other uses .You can switch to a more standard Polish notation with
+
+  SetStandardPolish(true)
+
+which will switch the notation to:
+
+- negation: N
+- conjunction: K
+- disjunction: A
+- conditional: C
+- universal quantifier: U
+- existential quantifier X
+
+There is a parser for an infix notation. That is designed to be used with the online proofchecker in github.com/adamay909/logicTools/proofChecker and requires a pseudo-tokenized input in the form of a slice of tokens.
+*/
 package gentzen
 
 import (
@@ -75,7 +102,7 @@ func SetAllowTheorems(v bool) {
 
 //SetStrict sets whether inferece rules should be checked strictly.
 func SetStrict(v bool) {
-	StrictCheck = v
+	strictCheck = v
 }
 
 /*

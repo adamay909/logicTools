@@ -64,6 +64,9 @@ func typeInput(key string) bool {
 
 	switch key {
 
+	case "Shift":
+		return true
+
 	case "Backspace":
 		backspace()
 
