@@ -81,6 +81,11 @@ You must write the above as:
 
 Notice the use of the keyword "premise" in the annotation. That is what you must use for a premise that is not an assumption (an assumption must take the form s ⊢ s). 
 
+
+### The Proof Checker
+
+The proof checker checks tells you whether each line is in accordance with the proof system. But it does not check whether you have managed to show what you set out to show. You'll have to check that yourself---usually a matter of inspecting the last line of your derivation, possibly in combination with the premises.
+
 ### The Editor
 
 The editor is very primitive with limited functionality. You can move around with the arrow keys, home and end for moving to the start or end of line, and delete and backspace should work more or less normally. But no more advanced navigation around the input area and no copying and pasting and the like. Given the intended use, it should be enough (it works for me...). 

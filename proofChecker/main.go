@@ -20,21 +20,9 @@ var oPRIVATE = true
 var indexHtml, helpHtml, styleCSS string
 
 var (
-	canvas [][]string
+	oPL = true
 
-	xpos, ypos int
-
-	waitTurnstile bool = false
-
-	waitESC bool = false
-
-	waitSub bool = false
-
-	overEnd = false
-
-	oPL = false
-
-	oTHM = false
+	oTHM = true
 
 	oHELP = false
 
@@ -44,14 +32,15 @@ var (
 
 	oLatexOutput = false
 
-	oOffset = 1
-
 	logConstBindings [][3]string
 
 	acceptInput = true
 )
 
+var dsp *console
+
 func main() {
+	dsp = new(console)
 
 	//load styles
 	d, _ := assets.ReadFile("assets/html/main.css")
@@ -73,7 +62,7 @@ func main() {
 	setTextByID("readme", string(d))
 	dom.GetWindow().Document().GetElementByID("readme").SetAttribute("style", "display: none")
 
-	dom.GetWindow().Document().GetElementByID("inputArea").SetAttribute("style", "counter-reset: line "+strconv.Itoa(0)+";")
+	//	dom.GetWindow().Document().GetElementByID("display").SetAttribute("style", "counter-reset: line "+strconv.Itoa(0)+";")
 
 	//setup JS stuff
 	js.Global().Set("toggleSettings", js.FuncOf(jsWrap(toggleSettings)).Value)
@@ -89,14 +78,28 @@ func main() {
 	js.Global().Set("toggleClipboardType", js.FuncOf(jsWrap(toggleClipboardType)).Value)
 
 	js.Global().Call("addEventListener", "keydown", js.FuncOf(jsWrap(typeformula)).Value, true)
+	//js.Global().Call("addEventListener", "input", js.FuncOf(jsWrap(typeformula)).Value, true)
 
 	//finalize stuff
+	dsp.clear()
+	display()
 	oPL = true
+	toggleTheorems()
 	togglePL()
+	toggleSettings()
 	setDisplay()
-	clearCanvas()
-
+	focusInput()
 	<-make(chan bool)
+}
+
+func display() {
+	dsp.format()
+	setTextByID("display", dsp.typeset())
+}
+
+func displayDerivation() {
+	dsp.formatDerivation()
+	setTextByID("display", dsp.typeset())
 }
 
 func typeformula() {
@@ -104,42 +107,49 @@ func typeformula() {
 		return
 	}
 	o := js.Global().Get("event").Get("key")
-	typeInput(o.String())
+
+	dsp.handleInput(o.String())
+	dsp.format()
+	setTextByID("display", dsp.typeset())
+	focusInput()
+	setTextByID("dummy", dsp.typeset())
 	return
 }
 
 func focusInput() {
-	js.Global().Get("overlay").Call("focus")
+	js.Global().Get("dummy").Call("focus")
 }
 
 func clearInput() {
+	dsp.clear()
+	setTextByID("setoffset", "First Line: "+strconv.Itoa(dsp.offset))
+	display()
+	focusInput()
 	stopInput()
-	clearCanvas()
-	return
 }
 
 func toggleTheorems() {
 	stopInput()
-	if oTHM {
-		setTextByID("togglethm", "Allow Theorems")
-	} else {
-		setTextByID("togglethm", "Prohibit Theorems")
-	}
 	oTHM = !oTHM
+	if oTHM {
+		setTextByID("togglethm", "With Theorems")
+	} else {
+		setTextByID("togglethm", "No Theorems")
+	}
 	gentzen.SetAllowTheorems(oTHM)
 	return
 }
 
 func togglePL() {
 	stopInput()
-	if oPL {
-		logConstBindings = connBindings
-		setTextByID("toggle", "switch to Predicate Logic")
-	} else {
-		logConstBindings = append(connBindings, plBindings...)
-		setTextByID("toggle", "switch to Sentential Logic")
-	}
 	oPL = !oPL
+	if oPL {
+		logConstBindings = append(connBindings, plBindings...)
+		setTextByID("toggle", "Predicate Logic")
+	} else {
+		logConstBindings = connBindings
+		setTextByID("toggle", "Sentential Logic")
+	}
 	gentzen.SetPL(oPL)
 	return
 }
@@ -244,15 +254,13 @@ func checkDeriv() {
 
 func setOffset() {
 
-	n, err := strconv.Atoi(js.Global().Call("prompt", "Number of first line", "1").String())
+	n, err := strconv.Atoi(js.Global().Call("prompt", "Number of first line", strconv.Itoa(dsp.offset)).String())
 	if err != nil {
 		return
 	}
-	oOffset = n
-	dom.GetWindow().Document().GetElementByID("inputArea").SetAttribute("style", "counter-reset: line "+strconv.Itoa(oOffset-1)+";")
-
-	typesetCanvas()
-	return
+	dsp.setOffset(n)
+	setTextByID("setoffset", "First Line: "+strconv.Itoa(dsp.offset))
+	display()
 }
 
 func toClipboard() {
@@ -271,12 +279,15 @@ func toClipboard() {
 func startInput() {
 
 	acceptInput = true
-	typesetCanvas()
+	dom.GetWindow().Document().GetElementByID("cursor").SetAttribute("class", "active")
+	display()
+
 }
 
 func stopInput() {
 
 	acceptInput = false
+	dom.GetWindow().Document().GetElementByID("cursor").SetAttribute("class", "inactive")
 
 }
 

@@ -49,16 +49,17 @@
 %for typestting derivations
 \newenvironment{argumentN}[1][1]%
 {\begin{enumerate}\setcounter{enumi}{#1}
-\addtocounter{argnum}{-1}}{\end{enumerate}}
+\addtocounter{enumi}{-1}}{\end{enumerate}}
 
 
 % for typesetting a line in a derivation
-\newcommand{\sqA}[4][0.25]{\makebox[#1\textwidth][l]
+
+
+\newcommand{\ai}[4][0.2]{\item \makebox[#1\textwidth][l]
  {\ensuremath{#2}} \makebox[1em]
 {\lproves}\ \ensuremath{#3}\expl{#4}}
 
-% for quick typesetting of derivation lines
-\newcommand{\ai}[4][0.2]{\item \sqA[#1]{#2}{#3}{#4}} 
+\newcommand{\expl}[1]{\hspace{2em} \dotfill #1}
 
 
 
