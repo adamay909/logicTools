@@ -3,7 +3,7 @@ package main
 type inputLine []string
 
 type console struct {
-	input      []inputLine
+	Input      []inputLine
 	xpos, ypos int
 	html       []string
 	modifier   string
@@ -41,11 +41,11 @@ func (d *console) handleInput(key string) {
 }
 
 func (d *console) checkOverhang() {
-	if len(d.input) == 0 {
+	if len(d.Input) == 0 {
 		d.overhang = true
 		return
 	}
-	if d.xpos == len(d.input[d.ypos]) {
+	if d.xpos == len(d.Input[d.ypos]) {
 		d.overhang = true
 	} else {
 		d.overhang = false
@@ -77,18 +77,18 @@ func (d *console) arrowUp() {
 		return
 	}
 	d.ypos--
-	if d.xpos > len(d.input[d.ypos]) {
+	if d.xpos > len(d.Input[d.ypos]) {
 		d.end()
 		d.arrowRight()
 	}
 }
 
 func (d *console) arrowDown() {
-	if d.ypos == len(d.input)-1 {
+	if d.ypos == len(d.Input)-1 {
 		return
 	}
 	d.ypos++
-	if d.xpos > len(d.input[d.ypos]) {
+	if d.xpos > len(d.Input[d.ypos]) {
 		d.end()
 		d.arrowRight()
 	}
@@ -142,7 +142,7 @@ func (d *console) deleteChar() {
 		if len(d.currentLine()) == 0 {
 			d.deleteLine()
 		} else {
-			d.input[d.ypos] = d.currentLine()[1:]
+			d.Input[d.ypos] = d.currentLine()[1:]
 		}
 		return
 	}
@@ -151,7 +151,7 @@ func (d *console) deleteChar() {
 		l2 = d.currentLine()[d.xpos+1:]
 	}
 
-	d.input[d.ypos] = append(l1, l2...)
+	d.Input[d.ypos] = append(l1, l2...)
 
 }
 
@@ -176,22 +176,22 @@ func (d *console) deleteLine() {
 		return
 	}
 
-	if d.ypos == len(d.input)-1 {
-		d.input = d.input[:d.ypos]
+	if d.ypos == len(d.Input)-1 {
+		d.Input = d.Input[:d.ypos]
 		d.arrowUp()
 		d.home()
 		return
 	}
 	if d.ypos == 0 {
-		d.input = d.input[1:]
+		d.Input = d.Input[1:]
 		d.arrowUp()
 		d.home()
 		return
 	}
-	l1 := d.input[:d.ypos]
-	l2 := d.input[d.ypos+1:]
-	d.input = nil
-	d.input = append(l1, l2...)
+	l1 := d.Input[:d.ypos]
+	l2 := d.Input[d.ypos+1:]
+	d.Input = nil
+	d.Input = append(l1, l2...)
 
 }
 
@@ -223,20 +223,20 @@ func (d *console) addNewline() {
 	var newlines []inputLine
 
 	for i := 0; i < d.ypos; i++ {
-		newlines = append(newlines, d.input[i])
+		newlines = append(newlines, d.Input[i])
 	}
 
 	newlines = append(newlines, frag1)
 	newlines = append(newlines, frag2)
 
-	if d.ypos < len(d.input)-1 {
-		for i := d.ypos + 1; i < len(d.input); i++ {
-			newlines = append(newlines, d.input[i])
+	if d.ypos < len(d.Input)-1 {
+		for i := d.ypos + 1; i < len(d.Input); i++ {
+			newlines = append(newlines, d.Input[i])
 		}
 	}
 
-	d.input = nil
-	d.input = newlines
+	d.Input = nil
+	d.Input = newlines
 	d.ypos++
 	d.xpos = 0
 	return
@@ -258,13 +258,13 @@ func (d *console) addChar(c string) {
 	for i := d.xpos; i < len(d.currentLine()); i++ {
 		n = append(n, d.currentLine()[i])
 	}
-	d.input[d.ypos] = n
+	d.Input[d.ypos] = n
 
 	d.xpos++
 }
 
 func (d *console) clear() {
-	d.input = nil
+	d.Input = nil
 	d.html = nil
 	d.xpos = 0
 	d.ypos = 0
@@ -275,14 +275,14 @@ func (d *console) clear() {
 }
 
 func (d *console) currentLine() inputLine {
-	if len(d.input) == 0 {
-		d.input = append(d.input, make(inputLine, 0))
+	if len(d.Input) == 0 {
+		d.Input = append(d.Input, make(inputLine, 0))
 	}
-	return d.input[d.ypos]
+	return d.Input[d.ypos]
 }
 
 func (d *console) empty() bool {
-	return len(d.input) == 0
+	return len(d.Input) == 0
 }
 
 func isModifier(k string) bool {

@@ -149,3 +149,20 @@ div#cursor.inactive {
      display: inline;
 }
 
+div#exerciseList {
+ display: none;
+ margin-left: 10em;
+ margin-top: 2em;
+}
+
+div.fileLink {
+ display: inline-block;
+ width: 8em;
+ border: ridge;
+}
+
+div.fileLink:hover {
+ background: lightgreen;
+ color: black;
+}
+

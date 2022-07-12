@@ -24,7 +24,7 @@ func parseLines(c []inputLine) (s []string, ok bool) {
 	for i, line := range c {
 
 		if len(line) == 0 {
-			if i+1 < length(dsp.input) {
+			if i+1 < length(dsp.Input) {
 				gentzen.WriteLog("You seem to have an empty line in the middle.", "line "+strconv.Itoa(i+1)+": ")
 				ok = false
 				return

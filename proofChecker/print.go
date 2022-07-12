@@ -10,7 +10,7 @@ func plainTextDeriv() string {
 
 	var r string
 
-	for n, l := range dsp.input {
+	for n, l := range dsp.Input {
 		if len(l) == 0 {
 			continue
 		}
@@ -57,15 +57,18 @@ func plainText(s string) string {
 }
 
 func latexOutput() string {
+	if dsp.empty() {
+		return ""
+	}
 
-	if arglines, ok := parseLines(dsp.input); ok {
+	if arglines, ok := parseLines(dsp.Input); ok {
 		return gentzen.PrintDeriv(arglines, dsp.offset)
 	}
 	output := ""
 	ln := strconv.Itoa(dsp.offset - 1)
 	output = `\begin{enumerate}\setcounter{enumi}{` + ln + `}` + "\n"
 
-	for _, l := range dsp.input {
+	for _, l := range dsp.Input {
 		if len(l) == 0 {
 			continue
 		}

@@ -3,6 +3,8 @@ package main
 import (
 	"embed"
 	_ "embed"
+	"encoding/json"
+	"fmt"
 	"strconv"
 	"syscall/js"
 
@@ -10,12 +12,12 @@ import (
 	"honnef.co/go/js/dom/v2"
 )
 
-//go:embed assets/html/*
+//go:embed assets/html/* assets/files
 var assets embed.FS
 
 //Enable some features for personal teaching material.
 //Not useful for general consumption.
-var oPRIVATE = true
+var oPRIVATE = false
 
 var indexHtml, helpHtml, styleCSS string
 
@@ -30,17 +32,41 @@ var (
 
 	oABOUT = false
 
-	oLatexOutput = false
+	oClipboard = 2
 
 	logConstBindings [][3]string
 
 	acceptInput = true
 )
 
+const (
+	oLatexOutput = 1
+	oTextOutput  = 0
+	oJsonOutput  = 2
+)
+
 var dsp *console
 
 func main() {
+
+	setupPage()
+	setupJS()
+
 	dsp = new(console)
+
+	//finalize stuff
+	dsp.clear()
+	display()
+	toggleClipboardType()
+	toggleTheorems()
+	togglePL()
+	toggleSettings()
+	setDisplay()
+	focusInput()
+	<-make(chan bool)
+}
+
+func setupPage() {
 
 	//load styles
 	d, _ := assets.ReadFile("assets/html/main.css")
@@ -48,7 +74,7 @@ func main() {
 	dom.GetWindow().Document().GetElementsByTagName("style")[0].SetInnerHTML(string(d))
 
 	//Populate the page
-	d, _ = assets.ReadFile("assets/html/index.html")
+	d, _ = assets.ReadFile("assets/html/body.html")
 
 	dom.GetWindow().Document().GetElementsByTagName("body")[0].SetInnerHTML(string(d))
 
@@ -62,34 +88,52 @@ func main() {
 	setTextByID("readme", string(d))
 	dom.GetWindow().Document().GetElementByID("readme").SetAttribute("style", "display: none")
 
-	//	dom.GetWindow().Document().GetElementByID("display").SetAttribute("style", "counter-reset: line "+strconv.Itoa(0)+";")
+	if !oPRIVATE {
+		setAttributeByID("loadExercise", "style", "display:none")
+	}
+}
 
-	//setup JS stuff
-	js.Global().Set("toggleSettings", js.FuncOf(jsWrap(toggleSettings)).Value)
-	js.Global().Set("clearInput", js.FuncOf(jsWrap(clearInput)).Value)
-	js.Global().Set("checkDerivation", js.FuncOf(jsWrap(checkDeriv)).Value)
-	js.Global().Set("toggleSystem", js.FuncOf(jsWrap(togglePL)).Value)
-	js.Global().Set("toggleTheorems", js.FuncOf(jsWrap(toggleTheorems)).Value)
-	js.Global().Set("activateInput", js.FuncOf(jsWrap(startInput)).Value)
-	js.Global().Set("toggleHelp", js.FuncOf(jsWrap(toggleHelp)).Value)
-	js.Global().Set("toggleReadme", js.FuncOf(jsWrap(toggleReadme)).Value)
-	js.Global().Set("setOffset", js.FuncOf(jsWrap(setOffset)).Value)
-	js.Global().Set("toClipboard", js.FuncOf(jsWrap(toClipboard)).Value)
-	js.Global().Set("toggleClipboardType", js.FuncOf(jsWrap(toggleClipboardType)).Value)
+func setupJS() {
 
 	js.Global().Call("addEventListener", "keydown", js.FuncOf(jsWrap(typeformula)).Value, true)
-	//js.Global().Call("addEventListener", "input", js.FuncOf(jsWrap(typeformula)).Value, true)
+	js.Global().Call("addEventListener", "click", js.FuncOf(jsWrap(onClick)).Value, true)
+}
 
-	//finalize stuff
-	dsp.clear()
-	display()
-	oPL = true
-	toggleTheorems()
-	togglePL()
-	toggleSettings()
-	setDisplay()
-	focusInput()
-	<-make(chan bool)
+func onClick() {
+
+	target := js.Global().Get("event").Get("target")
+	//	fmt.Println(target.Get("id"))
+	//	fmt.Println(target.Get("outerHTML"))
+	switch target.Get("id").String() {
+	case "toggleSettings":
+		toggleSettings()
+	case "check":
+		checkDeriv()
+	case "clearInput":
+		clearInput()
+	case "toClipboard":
+		toClipboard()
+	case "toggleHelp":
+		toggleHelp()
+	case "toggleSystem":
+		togglePL()
+	case "setOffset":
+		setOffset()
+	case "togglethm":
+		toggleTheorems()
+	case "cliptype":
+		toggleClipboardType()
+	case "togglereadme":
+		toggleReadme()
+	case "dummy":
+		startInput()
+	case "loadExercise":
+		toggleExercises()
+	default:
+		if target.Get("className").String() == "fileLink" {
+			loadFile(target.Get("innerHTML").String())
+		}
+	}
 }
 
 func display() {
@@ -122,8 +166,9 @@ func focusInput() {
 
 func clearInput() {
 	dsp.clear()
-	setTextByID("setoffset", "First Line: "+strconv.Itoa(dsp.offset))
+	setTextByID("setOffset", "First Line: "+strconv.Itoa(dsp.offset))
 	display()
+	printMessage("")
 	focusInput()
 	stopInput()
 }
@@ -145,10 +190,10 @@ func togglePL() {
 	oPL = !oPL
 	if oPL {
 		logConstBindings = append(connBindings, plBindings...)
-		setTextByID("toggle", "Predicate Logic")
+		setTextByID("toggleSystem", "Predicate Logic")
 	} else {
 		logConstBindings = connBindings
-		setTextByID("toggle", "Sentential Logic")
+		setTextByID("toggleSystem", "Sentential Logic")
 	}
 	gentzen.SetPL(oPL)
 	return
@@ -208,11 +253,18 @@ func toggleReadme() {
 
 func toggleClipboardType() {
 	stopInput()
-	oLatexOutput = !oLatexOutput
-	if oLatexOutput {
-		setTextByID("cliptype", "Clipboard: Latex")
+	if oPRIVATE {
+		oClipboard = (oClipboard + 1) % 3
 	} else {
+		oClipboard = (oClipboard + 1) % 2
+	}
+	switch oClipboard {
+	case oTextOutput:
 		setTextByID("cliptype", "Clipboard: text")
+	case oLatexOutput:
+		setTextByID("cliptype", "Clipboard: Latex")
+	case oJsonOutput:
+		setTextByID("cliptype", "Clipboard: json")
 	}
 	return
 }
@@ -259,7 +311,7 @@ func setOffset() {
 		return
 	}
 	dsp.setOffset(n)
-	setTextByID("setoffset", "First Line: "+strconv.Itoa(dsp.offset))
+	setTextByID("setOffset", "First Line: "+strconv.Itoa(dsp.offset))
 	display()
 }
 
@@ -268,11 +320,18 @@ func toClipboard() {
 		return
 	}
 	stopInput()
-	if oLatexOutput {
+	switch oClipboard {
+
+	case oLatexOutput:
 		copyToClipboard(latexOutput())
-	} else {
+
+	case oTextOutput:
 		copyToClipboard(plainTextDeriv())
+
+	case oJsonOutput:
+		copyToClipboard(marshalJson())
 	}
+
 	return
 }
 
@@ -321,4 +380,49 @@ func hide(elem string) {
 func copyToClipboard(s string) {
 	js.Global().Get("navigator").Get("clipboard").Call("writeText", s)
 	return
+}
+
+func toggleExercises() {
+	stopInput()
+	hide("controls")
+	hide("editor")
+	show("exerciseList")
+	files, err := assets.ReadDir("assets/files")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	if len(files) == 0 {
+		return
+	}
+	h := "<h3>Pick one to load</h3>"
+	for _, e := range files {
+		fmt.Println(e.Name())
+		h = h + `<div class="fileLink">` + e.Name() + `</div>`
+	}
+	setTextByID("exerciseList", h)
+}
+
+func loadFile(name string) {
+	stopInput()
+	name = "assets/files/" + name
+
+	d, err := assets.ReadFile(name)
+
+	if err != nil {
+		panic(err)
+	}
+
+	dsp.clear()
+
+	json.Unmarshal(d, dsp)
+	dsp.xpos, dsp.ypos = 0, 0
+	dsp.overhang = false
+	dsp.modifier = ""
+	show("controls")
+	show("editor")
+	hide("exerciseList")
+	display()
+	stopInput()
 }

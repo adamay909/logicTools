@@ -21,18 +21,18 @@ func (d *console) format() {
 
 	const dummyC = `<div id="cursor">&emsp;</div>`
 
-	for n := range d.input {
+	for n := range d.Input {
 		var dat, succ, annot []string
 		var tstl, dots string
 
-		tst := getTstIdx(d.input[n])
-		dot := getDotIdx(d.input[n])
+		tst := getTstIdx(d.Input[n])
+		dot := getDotIdx(d.Input[n])
 
 		ln := strconv.Itoa(n+d.offset) + `.&emsp;`
 
 		r := `<div class="ln">#ln#</div><div class="ddat">#dat#</div><div class="dtstl">#tstl#</div><div class="succ">#succ#</div><div class="dsep">#dot#</div><div class="dannot">#annot#</div>`
 
-		for i, e := range d.input[n] {
+		for i, e := range d.Input[n] {
 			var text string
 			text = plainText(e)
 			if n == d.ypos {
@@ -41,7 +41,7 @@ func (d *console) format() {
 				case i == d.xpos && d.modifier != "":
 					text = `<div id="cursor">` + d.modifier + `</div>` + text
 
-				case d.overhang && i == len(d.input[n])-1:
+				case d.overhang && i == len(d.Input[n])-1:
 					text = text + dummyC
 
 				case i == d.xpos:
@@ -73,7 +73,7 @@ func (d *console) format() {
 
 			annot = append(annot, text)
 		}
-		if n == d.ypos && len(d.input[n]) == 0 {
+		if n == d.ypos && len(d.Input[n]) == 0 {
 			dat = append(dat, dummyC)
 		}
 
@@ -98,8 +98,8 @@ func (d *console) formatDerivation() {
 	tstl := plainText(`\vdash`)
 	dots := plainText(`\ldots`)
 
-	for n := range d.input {
-		dat, succ, annot, err := parseLineDisplay(d.input[n])
+	for n := range d.Input {
+		dat, succ, annot, err := parseLineDisplay(d.Input[n])
 
 		if err != nil {
 			continue

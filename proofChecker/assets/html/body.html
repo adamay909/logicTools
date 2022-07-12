@@ -1,0 +1,37 @@
+  <div id="navbar">
+    <div id="menuButton">
+      <button class="button"   tabindex=
+      "0"><img src="assets/menuIcon.png" alt="settings" id="toggleSettings"/></button>
+    </div>
+
+    <div id="controls">
+      <button class="button" id="check"  tabindex="1">Check Derivation</button> 
+	  <button class="button" id="toClipboard" tabindexi="1">Copy to Clipboard</button> 
+	  <button class="button" id="clearInput" tabindex="1">Clear All</button> 
+	  <button class="button" id="toggleHelp" tabindex="1">Show Help</button>
+    </div>
+  </div>
+
+  <div id="mainArea" style="grid-template-columns: 1fr">
+    <div id="settingsMenu" style="display: none">
+      <button class="button" id="toggleSystem"  tabindex="0">Sentential Logic</button> 
+	  <button class="button" id="setOffset" tabindex="0">First Line: 1</button> <button class="button" id="togglethm"  tabindex="0">No Theorems</button> 
+	  <button class="button" id="cliptype"  tabindex="0">Clipboard: text</button>
+      <button class="button" id="loadExercise" tabindex="0">exercises</button>
+      <button class="button" id="togglereadme" tabindex="0">README</button>
+    </div>
+
+    <div id="editor">
+      <div id="display" tabindex="0"></div>
+
+      <div id="dummy" contenteditable="" tabindex="1"></div>
+
+      <div id="messages"></div>
+    </div>
+	<div id="exerciseList"></div>
+
+    <div id="readme" style="display: none"></div>
+
+    <div id="help" style="display: none"></div>
+  </div>
+

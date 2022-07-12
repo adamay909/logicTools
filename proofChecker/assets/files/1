@@ -1,0 +1,1 @@
+{"Input":[["P","\\vdash","P","\\ldots","A"],["Q","\\vdash","Q","\\ldots","A"],["P",",","Q","\\vdash","P","\\wedge","Q","\\ldots","1",",","2",",","\\wedge","I"],null]}

@@ -13,7 +13,7 @@ turns into the following in Lemmon's style:
 2 (2) Q  
 1,2 (3) P and Q  
 
-What we do is replace the turnstile with the line  number, and replace formulas on the antecedent side of each sequent with the appropriate line numbers (of course, you need to add appropriate annotations). One thing Gentzen's allows is the use of placeholders on the antecedent side of a sequent which can be useful (there is an example of that below).
+What we do is replace the turnstile with the line  number, and replace formulas on the antecedent side of each sequent with the appropriate line numbers (of course, you need to add appropriate annotations). One thing Gentzen's system allows is the use of placeholders on the antecedent side of a sequent which can be useful (there is an example of that below).
 
 The proof system has 9 inference rules for sentential logic. In the system, you may:
 - **Assumption Introduction (A)** Infer s ⊢ s.
@@ -84,15 +84,15 @@ Notice the use of the keyword "premise" in the annotation. That is what you must
 
 ### The Proof Checker
 
-The proof checker checks tells you whether each line is in accordance with the proof system. But it does not check whether you have managed to show what you set out to show. You'll have to check that yourself---usually a matter of inspecting the last line of your derivation, possibly in combination with the premises.
+The proof checker checks you whether each line is in accordance with the proof system. But it does not check whether you have managed to show what you set out to show. You'll have to check that yourself---usually a matter of inspecting the last line of your derivation, possibly in combination with the premises.
 
 ### The Editor
 
-The editor is very primitive with limited functionality. You can move around with the arrow keys, home and end for moving to the start or end of line, and delete and backspace should work more or less normally. But no more advanced navigation around the input area and no copying and pasting and the like. Given the intended use, it should be enough (it works for me...). 
+The editor is very primitive with limited functionality. You can move the cursor around with the arrow keys, home and end for moving to the start or end of line, and delete and backspace should work more or less normally. But no more advanced navigation around the input area, no position the cursor with your mouse,  and no copying and pasting and the like. Given the intended use, it should be enough (it works for me...). While it seems to work with the iOS on-screen keyboard (I have tried it on an iPad Air), it definitely does not work on an Android with an on-screen keyboard. You will need a physical keyboard (even on iOS, using the touch screen keyboard is going to be really slow). 
 
-The editor is designed to give a WYSIWYG kind of experience so that what you see on screen is pretty close to what you see in my course material. Some custom key bindings are needed for that. Check the help on how to input symbols. You do need a physical keyboard.
+The editor is designed to give a WYSIWYG kind of experience so that what you see on screen is pretty close to what you see in my course material. Some custom key bindings are needed for that. Check the help on how to input symbols. 
 
-You can copy the contents of the input area using the "Copy to Clipboard" button. The default is to copy it in plain text. You can switch to Latex output using the toggle button under the settings (labeled "Clipboard:" followed by the current setting). The Latex output is customized for my own use preparing course material. If you want to make use of it, you will need the custom commands included with the source files in the source repository. 
+You can copy the contents of the input area using the "Copy to Clipboard" button. The default is to copy it in plain text. You can switch to Latex output using the toggle button under the settings (labeled "Clipboard:" followed by the current setting). The Latex output is customized for my own use in preparing course material. If you want to make use of the Latex output, you will need the custom commands included with the source files in the source repository. 
 
 ### Installation
 

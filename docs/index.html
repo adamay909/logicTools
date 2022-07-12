@@ -13,6 +13,16 @@
          const go = new Go();
          WebAssembly.instantiateStreaming(fetch("assets/proofchecker.wasm"), go.importObject).then((result) => {go.run(result.instance);});
       </script>
+	  <script>
+	   async function getClip() {
+				output = "xxx"
+			   output = await   navigator.clipboard.readText().then(text => {
+					   return text;});
+			   console.log("clip: ",output);
+			   prompt("are you sure", "yes")
+			   return output;
+			  }
+	  </script>
    </head>
    <body></body>
 </html>
