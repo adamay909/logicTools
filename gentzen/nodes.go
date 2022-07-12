@@ -116,6 +116,31 @@ func (n *Node) IsUnary() bool {
 
 }
 
+func (n *Node) BracketClass() int {
+
+	c := 0
+
+	if n.IsAtomic() {
+		if oPL && n.parent != nil {
+			if n.parent.MainConnective() == uni || n.parent.MainConnective() == ex {
+				c++
+			}
+		}
+		return c
+	}
+
+	if n.IsUnary() {
+		c = n.subnode1.BracketClass()
+		return c
+	}
+
+	c = n.subnode1.BracketClass() + 1
+	if n.subnode2.BracketClass() > n.subnode1.BracketClass() {
+		c = n.subnode2.BracketClass() + 1
+	}
+	return c
+}
+
 func (n *Node) Class() int {
 
 	c := 1
@@ -190,29 +215,6 @@ func (n *Node) SetChild2(c *Node) {
 	return
 }
 
-func (n *Node) BracketClass() int {
-
-	t := ""
-	s := n.String()
-
-	for i := 0; i < len(s); i++ {
-		if s[i:i+1] == string(neg) {
-			continue
-		}
-		if s[i:i+1] == luni {
-			i++
-			continue
-		}
-		if s[i:i+1] == lex {
-			i++
-			continue
-		}
-		t = t + s[i:i+1]
-	}
-
-	return Parse(t).Class() - 1
-}
-
 func (n *Node) IsIdentity() bool {
 
 	if !n.IsAtomic() {
@@ -272,8 +274,9 @@ func (n *Node) String() string {
 func (n *Node) StringLatex() string {
 
 	return printNodeInfix(n, mLatex)
+	//	return fixBrackets(printNodeInfix(n, mLatex), mLatex)
 
-	//	return printNodeLatex(n)
+	//		return printNodeLatex(n)
 }
 
 //StringLatex return Latex string for n.

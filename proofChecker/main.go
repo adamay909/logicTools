@@ -17,7 +17,7 @@ var assets embed.FS
 
 //Enable some features for personal teaching material.
 //Not useful for general consumption.
-var oPRIVATE = false
+var oPRIVATE = true
 
 var indexHtml, helpHtml, styleCSS string
 

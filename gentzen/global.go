@@ -26,6 +26,7 @@ const (
 	mLatex      printMode = 1
 	mPlainLatex printMode = 2
 	mPlainText  printMode = 3
+	mSimple     printMode = 4
 )
 
 var brackets = [][2]string{
@@ -33,15 +34,15 @@ var brackets = [][2]string{
 	{"(", ")"},
 	{"[", "]"},
 	{`\{`, `\}`},
-	{`\big(`, `\big)`},
-	{`\big[`, `\big]`},
-	{`\big\{`, `\big\}`},
+	//	{`\big(`, `\big)`},
+	//	{`\big[`, `\big]`},
+	//	{`\big\{`, `\big\}`},
 	{`\Big(`, `\Big)`},
 	{`\Big[`, `\Big]`},
 	{`\Big\{`, `\Big\}`},
-	{`\bigg(`, `\bigg)`},
-	{`\bigg[`, `\bigg]`},
-	{`\bigg\{`, `\bigg\}`},
+	//	{`\bigg(`, `\bigg)`},
+	//	{`\bigg[`, `\bigg]`},
+	//	{`\bigg\{`, `\bigg\}`},
 	{`\Bigg(`, `\Bigg)`},
 	{`\Bigg[`, `\Bigg]`},
 	{`\Bigg\{`, `\Bigg\}`},

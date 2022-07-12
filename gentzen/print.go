@@ -43,6 +43,9 @@ func printNodeInfix(n *Node, m printMode) (s string) {
 	if m == mPlainText {
 		br = append(brackets[:3], [2]string{`{`, `}`})
 	}
+	if m == mSimple {
+		br = brackets[:2]
+	}
 
 	switch {
 
@@ -89,26 +92,15 @@ func printNodeInfix(n *Node, m printMode) (s string) {
 		return s
 	}
 
-	if n.MainConnective() == neg {
-		if n.subnode1.IsAtomic() {
-			if n.parent.MainConnective() == uni || n.parent.MainConnective() == ex {
-				return br[1][0] + s + brackets[1][1]
-			}
-		}
+	if n.IsUnary() {
 		return s
 	}
-
-	if n.IsAtomic() {
-		if n.parent.MainConnective() == uni || n.parent.MainConnective() == ex {
-			return br[1][0] + s + brackets[1][1]
-		}
-		return s
-	}
-
 	var ob1, ob2 string
-	blevel := n.BracketClass()
+	var blevel int
 
-	if blevel+2 > len(br) {
+	blevel = n.BracketClass()
+
+	if blevel+1 == len(br) {
 		ob1 = br[len(br)-1][0]
 		ob2 = br[len(br)-1][1]
 	} else {
@@ -213,6 +205,9 @@ func (seq sequent) StringLatex() string {
 
 func (n *Node) connectiveDisplay(m printMode) string {
 	var s string
+	if m == mSimple {
+		m = mPlainText
+	}
 	for _, c := range connectives {
 		if string(n.MainConnective()) == c[0] {
 			s = c[int(m)]
