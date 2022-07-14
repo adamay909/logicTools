@@ -1,3 +1,7 @@
+To enable editing, click on the rectangular input area (try different points if necessary). If input is active, the frame will turn blue and the cursor starts blinking.
+ 
+The only way to move around the input area is through the keyboard (arrow keys, home, 
+and end).
 
 How to input logical symbols:
 - &#x00AC; : &emsp; - (the minus sign)
@@ -18,13 +22,9 @@ How to input logical symbols:
 The following letters cannot be used for sentence, predicate, and term letters:
 v, V, U, and X.
 
-Inference rules must be specified by the abbreviations used in the text for the course. 
+Inference rules must be specified by abbreviations (see README).
 
-Theorems, if allowed, must be specified by the abbreviations used in the text for the course.
-
-When you click on one of the buttons at the top, the editor will stop accepting further input. You can resume input by clicking on the editor window.
+Theorems, if allowed, must be specified by abbreviations (see README).
 
 If you need to start counting the lines at something other than 1, click on the first line number and you will be prompted for the desired number for the first line.
-
-The editor will reformat on the fly all lines you are not currently editing. Some optional brackets may be removed or inserted as the case may be for readability purposes. If the reformatting does not happen, there is something wrong with your input.  
 

@@ -584,7 +584,7 @@ func exE(seq1, seq2, seq3 sequent) bool {
 		logger.Print(msg2)
 		return false
 	}
-	logger.Print(msg2)
+	logger.Print(msg1)
 	return false
 
 }
@@ -594,7 +594,7 @@ func exEhelper(seq1, seq2, seq3 sequent) (v bool, msg string) {
 	v = false
 
 	if Parse(seq1.succedent).MainConnective() != ex {
-		msg = "none of the premises have  existential generalization in succedent"
+		msg = "no existential generalization in premise"
 		return
 	}
 
@@ -649,6 +649,19 @@ func exEhelper(seq1, seq2, seq3 sequent) (v bool, msg string) {
 		}
 		if Parse(d).hasTerm(kappa) {
 			msg = kappa + " may not appear in any datum items"
+			return
+		}
+	}
+	if strictCheck {
+		if !equal(add(strings.Join(datums1, ","), strings.Join(datums2, ",")), seq3.datum) {
+			msg = "datum of conclusion must be union of datums of premise"
+			v = false
+			return
+		}
+	} else {
+		if !equal(datumReduce(add(strings.Join(datums1, ","), strings.Join(datums2, ","))), datumReduce(seq3.datum)) {
+			msg = "datum of conclusion must be union of datums of premise"
+			v = false
 			return
 		}
 	}

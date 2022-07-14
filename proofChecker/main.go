@@ -4,7 +4,7 @@ import (
 	"embed"
 	_ "embed"
 	"encoding/json"
-	"fmt"
+	"sort"
 	"strconv"
 	"syscall/js"
 
@@ -12,7 +12,7 @@ import (
 	"honnef.co/go/js/dom/v2"
 )
 
-//go:embed assets/html/* assets/files
+//go:embed assets/html/* assets/files assets/samples
 var assets embed.FS
 
 //Enable some features for personal teaching material.
@@ -104,8 +104,8 @@ func setupJS() {
 func onClick() {
 
 	target := js.Global().Get("event").Get("target")
-	fmt.Println(target.Get("id"))
-	fmt.Println(target.Get("outerHTML"))
+	//fmt.Println(target.Get("id"))
+	//fmt.Println(target.Get("outerHTML"))
 	switch target.Get("id").String() {
 	case "toggleSettings":
 		toggleSettings()
@@ -131,6 +131,8 @@ func onClick() {
 		startInput()
 	case "loadExercise":
 		toggleExercises()
+	case "loadSamples":
+		toggleSamples()
 	case "toggleadvanced":
 		toggleAdvanced()
 	case "backButton":
@@ -141,7 +143,10 @@ func onClick() {
 		getInput()
 	default:
 		if target.Get("className").String() == "fileLink" {
-			loadFile(target.Get("innerHTML").String())
+			loadFile(target.Get("innerHTML").String(), "exercises")
+		}
+		if target.Get("className").String() == "sampleLink" {
+			loadFile(target.Get("innerHTML").String(), "samples")
 		}
 	}
 }
@@ -179,6 +184,7 @@ func clearInput() {
 	setTextByID("setOffset", "First Line: "+strconv.Itoa(dsp.Offset))
 	display()
 	printMessage("")
+	hide("messages")
 	focusInput()
 	stopInput()
 }
@@ -191,6 +197,7 @@ func toggleTheorems() {
 	} else {
 		setTextByID("togglethm", "No Theorems")
 	}
+	dsp.Theorems = oTHM
 	gentzen.SetAllowTheorems(oTHM)
 	return
 }
@@ -205,6 +212,7 @@ func togglePL() {
 		logConstBindings = connBindings
 		setTextByID("toggleSystem", "Sentential Logic")
 	}
+	dsp.SystemPL = oPL
 	gentzen.SetPL(oPL)
 	return
 }
@@ -273,9 +281,9 @@ func toggleClipboardType() {
 	case oTextOutput:
 		setTextByID("cliptype", "Clipboard: text")
 	case oLatexOutput:
-		setTextByID("cliptype", "Clipboard: Latex")
+		setTextByID("cliptype", "Clipboard: LaTeX")
 	case oJsonOutput:
-		setTextByID("cliptype", "Clipboard: json")
+		setTextByID("cliptype", "Clipboard: JSON")
 	}
 	return
 }
@@ -349,15 +357,16 @@ func toClipboard() {
 func startInput() {
 
 	acceptInput = true
+	display()
 	setAttributeByID("cursor", "class", "active")
 	setAttributeByID("display", "style", "border-color: blue")
-	display()
 
 }
 
 func stopInput() {
 
 	acceptInput = false
+	display()
 	setAttributeByID("cursor", "class", "inactive")
 	setAttributeByID("display", "style", "border-color:lightgrey")
 
@@ -403,7 +412,7 @@ func toggleExercises() {
 	show("backButton")
 	files, err := assets.ReadDir("assets/files")
 	if err != nil {
-		fmt.Println(err)
+		//fmt.Println(err)
 		return
 	}
 
@@ -412,15 +421,50 @@ func toggleExercises() {
 	}
 	h := "<h3>Pick one to load</h3>"
 	for _, e := range files {
-		fmt.Println(e.Name())
+		//		fmt.Println(e.Name())
 		h = h + `<div class="fileLink">` + e.Name() + `</div>`
 	}
 	setTextByID("exerciseList", h)
 }
 
-func loadFile(name string) {
+func toggleSamples() {
 	stopInput()
-	name = "assets/files/" + name
+	hide("console")
+	show("extra")
+	show("exerciseList")
+	show("backButton")
+	files, err := assets.ReadDir("assets/samples")
+	if err != nil {
+		//		fmt.Println(err)
+		return
+	}
+
+	if len(files) == 0 {
+		return
+	}
+
+	order := func(i, j int) bool {
+		return sort.StringsAreSorted([]string{files[i].Name(), files[j].Name()})
+	}
+
+	sort.Slice(files, order)
+
+	h := "<h3>Pick one to load</h3>"
+	for _, e := range files {
+		//fmt.Println(e.Name())
+		h = h + `<div class="sampleLink">` + e.Name() + `</div>`
+	}
+	setTextByID("exerciseList", h)
+}
+
+func loadFile(name string, t string) {
+	stopInput()
+	if t == "exercises" {
+		name = "assets/files/" + name
+	}
+	if t == "samples" {
+		name = "assets/samples/" + name
+	}
 
 	d, err := assets.ReadFile(name)
 
@@ -434,10 +478,18 @@ func loadFile(name string) {
 	dsp.xpos, dsp.ypos = 0, 0
 	dsp.overhang = false
 	dsp.modifier = ""
+	if dsp.SystemPL != oPL {
+		togglePL()
+	}
+	if dsp.Theorems != oTHM {
+		toggleTheorems()
+	}
 	show("console")
 	hide("backButton")
 	hide("exerciseList")
 	hide("extra")
+	printMessage("")
+	hide("messages")
 	display()
 	stopInput()
 }
@@ -464,6 +516,8 @@ func getInput() {
 	dsp.clear()
 	dsp.Input = lines
 	display()
+	printMessage("")
+	hide("messages")
 	hide("textinput")
 	hide("extra")
 	hide("backButton")

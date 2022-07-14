@@ -103,6 +103,15 @@ div#dummy{
  opacity: 0;
 }
 
+div#messages{
+ display: none;
+ width: 80%;
+    margin: 0.5em;
+    padding-left: 0.5em;
+ border-color: red;
+ border: ridge;
+ border-radius: 30px;
+}
 
 div#cursor{ 
  display: inline;
@@ -174,6 +183,19 @@ div.fileLink:hover {
  color: black;
 }
 
+div.sampleLink {
+ display: inline-block;
+ width: 8em;
+    margin:0.5em;
+    padding: 0.2em;
+    padding-left:1em;
+ border: ridge;
+}
+
+div.sampleLink:hover {
+ background: lightgreen;
+ color: black;
+}
 div#extra {
  display: none;
  margin: 2em;
@@ -202,12 +224,12 @@ div#settingsMenu>button {
     width: 80%;
     height: 4em;
     margin: 0.2em;
-        border-radius: 40%;
+        border-radius: 30px;
 }
 
 div#settingsMenu > button#toggleSystem{
 margin-top: 2em;
-    border-radius: 50%;}
+}
 
 
 div#settingsMenu > button#loadExercise{
@@ -236,4 +258,7 @@ div#advancedstuff >button{
     width: 100%;
 }
 
+div#textinput {
+ display: none;
+}
 

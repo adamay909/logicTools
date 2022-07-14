@@ -1,6 +1,6 @@
 <h3>Online proof checker</h3>
 <h3>The proof system</h3>
-<p>This proof checker is designed for working with the proof system Gentzen uses in his &quot;Die Wiederspruchsfreiheit der reinen Zahlentheorie&quot; (1936) that I use for teaching  my introductory formal logic course. A proof is stated as a series of sequents where each sequent must have exactly one formula as its succedent. It can be trivially converted to proofs in the style of Lemmon's <em>Beginning Logic</em> as well others influenced by him  like Allen and Hand, <em>Logic Primer</em> (no surprise here since Lemmon's system is, as he says, Gentzen's). E.g., the following proof:</p>
+<p>This proof checker is designed for working with the proof system Gentzen uses in his &quot;Die Wiederspruchsfreiheit der reinen Zahlentheorie&quot; (1936) that I use for teaching  my introductory formal logic course. A proof is stated as a series of sequents where each sequent must have exactly one formula as its succedent. It can be trivially converted to and from proofs in the style of Lemmon's <em>Beginning Logic</em> as well others influenced by him  like Allen and Hand's <em>Logic Primer</em> (no surprise here since Lemmon's system is, as he says, Gentzen's). E.g., the following proof:</p>
 <ol>
 <li>P ⊢ P</li>
 <li>Q ⊢ Q</li>
@@ -80,12 +80,34 @@ obtain by substituting at least one instance of κ1 in φ with κ2 .</li>
 <li>Γ ⊢ Q⊃P...2,⊃I</li>
 </ol>
 <p>Notice the use of the keyword &quot;premise&quot; in the annotation. That is what you must use for a premise that is not an assumption (an assumption must take the form s ⊢ s).</p>
+<h4>Theorems</h4>
+<p>You can change the settings to allow a small number of theorems. They are:</p>
+<ul>
+<li><strong>Identity (ID)</strong> p⊃p</li>
+<li><strong>Non-Contradiction (NC)</strong> ¬(p∧¬p)</li>
+<li><strong>Excluded Middle (EM)</strong> p∨¬p</li>
+<li><strong>Contraposition (CP)</strong> (p⊃q)⊃(¬q⊃¬p)</li>
+<li><strong>Implication (IM)</strong> (p⊃q)⊃(¬p⊃q)</li>
+<li><strong>Elimination (EL)</strong> (p∨q)⊃(¬p⊃q)</li>
+<li><strong>DeMorgan 1 (DM1)</strong> ¬(p∨q)⊃(¬p∧¬q)</li>
+<li><strong>DeMorgan 2 (DM2)</strong> ¬(p∧q)⊃(¬p∨¬q)</li>
+<li><strong>DeMorgan 3 (DM3)</strong> (¬p∨¬q)⊃¬(p∧q)</li>
+<li><strong>DeMorgan 4 (DM4)</strong> (¬p∧¬q)⊃¬(p∨q)</li>
+</ul>
+<p>You can use theorems in the following sort of way:</p>
+<ol>
+<li>⊢(s∨t)⊃(s∨t)...ID</li>
+<li>⊢[(s∨t)⊃(s∨t)]⊃[¬(s∨t)∨(s∨t)]...IM</li>
+<li>⊢¬(s∨t)∨(s∨t)...1,2,⊃E</li>
+</ol>
+<p>The proof checker will recognize instances of the allowed theorems.</p>
 <h3>The Proof Checker</h3>
 <p>The proof checker checks you whether each line is in accordance with the proof system. But it does not check whether you have managed to show what you set out to show. You'll have to check that yourself---usually a matter of inspecting the last line of your derivation, possibly in combination with the premises.</p>
+<p>You may have to go through several rounds of checking and fixing a derivation because the proof checker does not always list all the problems at once.</p>
 <h3>The Editor</h3>
-<p>The editor is very primitive with limited functionality. You can move the cursor around with the arrow keys, home and end for moving to the start or end of line, and delete and backspace should work more or less normally. But no more advanced navigation around the input area, no positioning the cursor with your mouse,  and no copying and pasting and the like. Given the intended use, it should be enough (it works for me...). While it seems to work with the iOS on-screen keyboard (I have tried it on an iPad Air), it definitely does not work on an Android with an on-screen keyboard. You will need a physical keyboard (even on iOS, using the touch screen keyboard is going to be really slow).</p>
-<p>The editor is designed to give a WYSIWYG kind of experience so that what you see on screen is pretty close to what you see in my course material. Some custom key bindings are needed for that. Check the help on how to input symbols.</p>
-<p>You can copy the contents of the input area using the &quot;Copy to Clipboard&quot; button. The default is to copy it in plain text. You can switch to Latex output using the toggle button under the settings (labeled &quot;Clipboard:&quot; followed by the current setting). The Latex output is customized for my own use in preparing course material. If you want to make use of the Latex output, you will need the custom commands included with the source files in the source repository.</p>
+<p>The editor is very primitive with limited functionality. You can move the cursor around with the arrow keys, home and end for moving to the start or end of line, and delete and backspace should work more or less normally (sometimes more, sometimes less...). But no more advanced navigation around the input area, no positioning the cursor with your mouse,  and no copying and pasting and the like. Given the intended use, it should be enough (it works for me...). While it seems to work with the iOS on-screen keyboard (I have tried it on an iPad Air), it definitely does not work on an Android with an on-screen keyboard. You will need a physical keyboard (even on iOS, using the touch screen keyboard is going to be really slow).</p>
+<p>The editor is designed to be as transparent as possible: symbols should be easy to type and students should not have to worry about how what's on the screen corresponds to what they see in the course material. Some special key combinations are used to facilitate typing symbol. Check the help on how to input symbols.</p>
+<p>You can copy the contents of the input area using the &quot;Copy to Clipboard&quot; button.</p>
 <h3>Installation</h3>
 <p>This proof-checker is designed to run completely inside the browser so it is easy to host yourself so long as you are able to host static websites. The docs folder of the GitHub repository contains all the files you need.</p>
 <h3>Copyright</h3>

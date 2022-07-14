@@ -138,7 +138,7 @@ func parseArgline(s string) (al argLine, err error) {
 	fields := strings.Split(s, ";")
 	//check we have enough fields
 	if len(fields) < 3 {
-		err = errors.New("you need: datum, succedent and at leat one of: line references, inference rule")
+		err = errors.New("you need: datum, succedent and at least one of: line references, inference rule")
 		return
 	}
 
@@ -178,7 +178,7 @@ func parseArgline(s string) (al argLine, err error) {
 	}
 
 	if len(strings.TrimSpace(fields[2])) == 0 {
-		err = errors.New("you need: datum, succedent and at leat one of: line references, inference rule")
+		err = errors.New("you need: datum, succedent and at least one of: line references, inference rule")
 		return
 	}
 
@@ -220,7 +220,7 @@ func printArgLine(s string, m printMode) string {
 		datums := strings.Split(al.seq.datum, ",")
 		for _, d := range datums {
 			if d[:1] == `\` {
-				datumstring = datumstring + d + `, `
+				datumstring = datumstring + runeOf(d, m) + `, `
 			} else {
 				datumstring = datumstring + printNodeInfix(Parse(d), m) + `, `
 			}
@@ -228,7 +228,7 @@ func printArgLine(s string, m printMode) string {
 		datumstring = strings.TrimRight(datumstring, ", ")
 	}
 
-	assertumstring := printNodeInfix(Parse(al.seq.succedent), m)
+	succstring := printNodeInfix(Parse(al.seq.succedent), m)
 	annotation := ""
 	if len(al.lines) > 0 {
 		for _, i := range al.lines {
@@ -243,19 +243,34 @@ func printArgLine(s string, m printMode) string {
 	var resp string
 
 	if m == mLatex {
-		resp = `\ai{` + datumstring + `}{` + assertumstring + `}{` + annotation + `}` + "\n\n"
+		resp = `\ai{` + datumstring + `}{` + succstring + `}{` + annotation + `}` + "\n\n"
 	}
 	if m == mPlainText {
-		resp = datumstring + `⊢` + assertumstring + `...` + annotation
+		resp = strings.ReplaceAll(datumstring+`⊢`+succstring+`...`+annotation, " ", "")
 	}
 	return resp
 }
 
 func symb(s string, m printMode) string {
-
+	s = strings.TrimSpace(s)
 	for _, i := range infRules {
 		if i[0] == s {
 			return i[m]
+		}
+	}
+	return s
+}
+
+func runeOf(s string, m printMode) string {
+	var n int
+	if m == mLatex {
+		n = 1
+	} else {
+		n = 2
+	}
+	for _, e := range greekBindings {
+		if e[1] == s {
+			return e[n]
 		}
 	}
 	return s

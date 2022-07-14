@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -27,6 +28,7 @@ func getArglines(c []inputLine) (s []string, ok bool) {
 			if i+1 < length(dsp.Input) {
 				gentzen.WriteLog("You seem to have an empty line in the middle.", "line "+strconv.Itoa(i+1)+": ")
 				ok = false
+				fmt.Println("here1")
 				return
 			}
 			break
@@ -42,6 +44,7 @@ func getArglines(c []inputLine) (s []string, ok bool) {
 		datum, succ, annot, err := parseLine(line, raw)
 		if err != nil {
 			gentzen.WriteLog(err.Error(), "line "+strconv.Itoa(i+1)+": ")
+			ok = false
 		}
 
 		s = append(s, datum+";"+succ+";"+replaceInfrules(annot))

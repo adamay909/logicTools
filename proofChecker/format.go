@@ -55,7 +55,7 @@ func (d *console) formatHTML(cursor bool) {
 
 	if len(d.html) == 0 {
 		ln := strconv.Itoa(0+d.Offset) + `.&emsp;`
-		r := `<div class="ln">` + ln + `</div><div class="ddat"><div id="cursor">&ensp;</div></div><div class="dtstl"></div><div class="succ"></div><div class="dsep"></div><div class="dannot"></div>`
+		r := `<div class="ln">` + ln + `</div><div class="ddat"><div id="cursor">&thinsp;</div></div><div class="dtstl"></div><div class="succ"></div><div class="dsep"></div><div class="dannot"></div>`
 		d.html = append(d.html, r)
 	}
 }

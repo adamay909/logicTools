@@ -2,7 +2,7 @@
 
 ### The proof system
 
-This proof checker is designed for working with the proof system Gentzen uses in his "Die Wiederspruchsfreiheit der reinen Zahlentheorie" (1936) that I use for teaching  my introductory formal logic course. A proof is stated as a series of sequents where each sequent must have exactly one formula as its succedent. It can be trivially converted to proofs in the style of Lemmon's *Beginning Logic* as well others influenced by him  like Allen and Hand, *Logic Primer* (no surprise here since Lemmon's system is, as he says, Gentzen's). E.g., the following proof:
+This proof checker is designed for working with the proof system Gentzen uses in his "Die Wiederspruchsfreiheit der reinen Zahlentheorie" (1936) that I use for teaching  my introductory formal logic course. A proof is stated as a series of sequents where each sequent must have exactly one formula as its succedent. It can be trivially converted to and from proofs in the style of Lemmon's *Beginning Logic* as well others influenced by him  like Allen and Hand's *Logic Primer* (no surprise here since Lemmon's system is, as he says, Gentzen's). E.g., the following proof:
 1. P ⊢ P
 2. Q ⊢ Q
 3. P,Q ⊢ P and Q
@@ -81,18 +81,45 @@ You must write the above as:
 
 Notice the use of the keyword "premise" in the annotation. That is what you must use for a premise that is not an assumption (an assumption must take the form s ⊢ s). 
 
+#### Theorems
+
+You can change the settings to allow a small number of theorems. They are:
+
+- **Identity (ID)** p⊃p
+- **Non-Contradiction (NC)** ¬(p∧¬p) 
+- **Excluded Middle (EM)** p∨¬p
+- **Contraposition (CP)** (p⊃q)⊃(¬q⊃¬p)
+- **Implication (IM)** (p⊃q)⊃(¬p⊃q)
+- **Elimination (EL)** (p∨q)⊃(¬p⊃q)
+- **DeMorgan 1 (DM1)** ¬(p∨q)⊃(¬p∧¬q)
+- **DeMorgan 2 (DM2)** ¬(p∧q)⊃(¬p∨¬q)
+- **DeMorgan 3 (DM3)** (¬p∨¬q)⊃¬(p∧q)
+- **DeMorgan 4 (DM4)** (¬p∧¬q)⊃¬(p∨q)
+
+You can use theorems in the following sort of way:
+
+1. ⊢(s∨t)⊃(s∨t)...ID
+2. ⊢[(s∨t)⊃(s∨t)]⊃[¬(s∨t)∨(s∨t)]...IM
+3. ⊢¬(s∨t)∨(s∨t)...1,2,⊃E
+
+The proof checker will recognize instances of the allowed theorems.
+ 
+
+
 
 ### The Proof Checker
 
-The proof checker checks you whether each line is in accordance with the proof system. But it does not check whether you have managed to show what you set out to show. You'll have to check that yourself---usually a matter of inspecting the last line of your derivation, possibly in combination with the premises.
+ The proof checker checks you whether each line is in accordance with the proof system. But it does not check whether you have managed to show what you set out to show. You'll have to check that yourself---usually a matter of inspecting the last line of your derivation, possibly in combination with the premises.
+
+You may have to go through several rounds of checking and fixing a derivation because the proof checker does not always list all the problems at once.
 
 ### The Editor
 
-The editor is very primitive with limited functionality. You can move the cursor around with the arrow keys, home and end for moving to the start or end of line, and delete and backspace should work more or less normally. But no more advanced navigation around the input area, no positioning the cursor with your mouse,  and no copying and pasting and the like. Given the intended use, it should be enough (it works for me...). While it seems to work with the iOS on-screen keyboard (I have tried it on an iPad Air), it definitely does not work on an Android with an on-screen keyboard. You will need a physical keyboard (even on iOS, using the touch screen keyboard is going to be really slow). 
+The editor is very primitive with limited functionality. You can move the cursor around with the arrow keys, home and end for moving to the start or end of line, and delete and backspace should work more or less normally (sometimes more, sometimes less...). But no more advanced navigation around the input area, no positioning the cursor with your mouse,  and no copying and pasting and the like. Given the intended use, it should be enough (it works for me...). While it seems to work with the iOS on-screen keyboard (I have tried it on an iPad Air), it definitely does not work on an Android with an on-screen keyboard. You will need a physical keyboard (even on iOS, using the touch screen keyboard is going to be really slow). 
 
-The editor is designed to give a WYSIWYG kind of experience so that what you see on screen is pretty close to what you see in my course material. Some custom key bindings are needed for that. Check the help on how to input symbols. 
+The editor is designed to be as transparent as possible: symbols should be easy to type and students should not have to worry about how what's on the screen corresponds to what they see in the course material. Some special key combinations are used to facilitate typing symbol. Check the help on how to input symbols. 
 
-You can copy the contents of the input area using the "Copy to Clipboard" button. The default is to copy it in plain text. You can switch to Latex output using the toggle button under the settings (labeled "Clipboard:" followed by the current setting). The Latex output is customized for my own use in preparing course material. If you want to make use of the Latex output, you will need the custom commands included with the source files in the source repository. 
+You can copy the contents of the input area using the "Copy to Clipboard" button.
 
 ### Installation
 

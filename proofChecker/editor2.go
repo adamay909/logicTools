@@ -5,6 +5,8 @@ type inputLine []string
 type console struct {
 	Title           string
 	Input           []inputLine
+	SystemPL        bool
+	Theorems        bool
 	xpos, ypos      int
 	xprev, yprev    int
 	xcuror, ycursor int
