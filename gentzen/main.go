@@ -229,7 +229,7 @@ func PrintDerivText(lines []string, offset int) (out string) {
 
 	for i := range lines {
 
-		out = strconv.Itoa(i+offset) + `. ` + out + printArgLine(lines[i], mPlainText) + "\n"
+		out = out + strconv.Itoa(i+offset) + `. ` + printArgLine(lines[i], mPlainText) + "\n"
 	}
 
 	return out
