@@ -13,7 +13,7 @@ var (
 	separator = `\ldots`
 )
 
-func parseLines(c []inputLine) (s []string, ok bool) {
+func getArglines(c []inputLine) (s []string, ok bool) {
 
 	ok = true
 
@@ -31,14 +31,20 @@ func parseLines(c []inputLine) (s []string, ok bool) {
 			}
 			break
 		}
-		datum, succ, annot, err := parseLine(line)
+
+		err := isArgline(line)
 		if err != nil {
 			gentzen.WriteLog(err.Error(), "line "+strconv.Itoa(i+1)+": ")
 			ok = false
 			continue
 		}
+		raw := true
+		datum, succ, annot, err := parseLine(line, raw)
+		if err != nil {
+			gentzen.WriteLog(err.Error(), "line "+strconv.Itoa(i+1)+": ")
+		}
 
-		s = append(s, datum+";"+succ+";"+annot)
+		s = append(s, datum+";"+succ+";"+replaceInfrules(annot))
 
 	}
 	return
@@ -53,18 +59,25 @@ func length(l []inputLine) int {
 	}
 	return 0
 }
-func parseLine(raw []string) (datum, succ, annot string, err error) {
+func parseLine(l []string, raw bool) (datum, succ, annot string, err error) {
 
-	if len(raw) == 0 {
+	p1, _, p2, _, p3 := parseNsplit(l, raw)
+
+	datum = spaceyStringOf(p1)
+	succ = spaceyStringOf(p2)
+	annot = spaceyStringOf(p3)
+
+	if strings.TrimSpace(datum+succ+annot) == "" {
+		err = errors.New("need to have at least succedent and annotation")
 		return
 	}
+
+	if succ == "" {
+		err = errors.New("need to have succedent")
+		return
+	}
+
 	var formula *gentzen.Node
-
-	datum, succ, annot, err = splitLine(raw)
-
-	if err != nil {
-		return
-	}
 
 	//Deal with datum
 	data := strings.Split(datum, ",")
@@ -94,88 +107,32 @@ func parseLine(raw []string) (datum, succ, annot string, err error) {
 	}
 	succ = formula.String()
 
-	//deal with annotation
-	annot = replaceInfrules(annot)
-
 	return
 }
 
-func parseLineDisplay(raw []string) (datum, succ, annot string, err error) {
+func isArgline(l []string) error {
 
-	if len(raw) == 0 {
-		err = errors.New("nothing there")
-		return
-	}
-	var formula *gentzen.Node
+	var err error
 
-	datum, succ, _, err = splitLine(raw)
-
-	if err != nil {
-		return
-	}
-
-	//Deal with datum
-	data := strings.Split(datum, ",")
-	datum = ""
-	for _, e := range data {
-		f := strings.TrimSpace(e)
-		if len(f) == 0 {
-			continue
-		}
-		if isGreekLetter(f) {
-			datum = datum + plainText(f) + ","
-			continue
-		}
-		formula, err = gentzen.InfixParser(tk(e))
-		if err != nil {
-			return
-		}
-		datum = datum + formula.StringPlain() + ","
-	}
-	datum = strings.TrimSuffix(datum, ",")
-
-	//Deal with succedent
-
-	formula, err = gentzen.InfixParser(tk(succ))
-	if err != nil {
-		return
-	}
-	succ = formula.StringPlain()
-
-	an := split(raw, `\ldots`)[1]
-
-	for _, e := range an {
-		annot = annot + plainText(e)
-	}
-	return
-}
-func splitLine(raw []string) (datum, succ, annot string, err error) {
-
-	s := strings.Join(raw, " ")
+	s := strings.Join(l, " ")
 
 	if strings.Count(s, `\vdash`) != 1 {
 		err = errors.New("malformed derivation line")
-		return
+		return err
 	}
 
 	if strings.Count(s, `\ldots`) != 1 {
 		err = errors.New("malformed derivation line")
-		return
+		return err
 	}
 
 	if strings.Index(s, `\vdash`) > strings.Index(s, `\ldots`) {
 		err = errors.New("Malformed derivation line")
-		return
+		return err
 	}
-
-	datum = strings.Split(s, `\vdash`)[0]
-
-	succ = strings.Split(strings.Split(s, `\vdash`)[1], `\ldots`)[0]
-
-	annot = strings.Split(strings.Split(s, `\vdash`)[1], `\ldots`)[1]
-
-	return
+	return err
 }
+
 func split(s []string, cut string) [][]string {
 
 	var resp [][]string

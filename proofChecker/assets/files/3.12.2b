@@ -1,0 +1,1 @@
+{"Title":"Fill in whatever is missing","Input":[["\\Gamma","\\vdash","P","\\vee","Q","\\ldots","p","r","e","m","i","s","e"],["P","\\vdash","\\ldots","A"],["P","\\vdash","\\ldots","\\vee","I"],["Q","\\vdash","Q","\\ldots","A"],["Q","\\vdash","\\ldots","4",",","\\vee","I"],["\\Gamma","\\vdash","Q","\\vee","P","\\ldots","1",",","3",",","5",",","\\vee","E"],null,null],"Offset":1}

@@ -54,7 +54,9 @@ button#toggleSettings:hover {
   background-color: lightgreen;
 }
 
-
+div#console{
+    width: 100%;
+}
 div#mainArea {
  position: relative;
  display: grid;
@@ -67,6 +69,7 @@ div#settingsMenu {
 div#settingsMenu > .button {
 width: 100%;
 font-size: 1em;
+margin-top: 0.25em;
 }
 
 div#settingsMenu >.button:hover{
@@ -84,7 +87,9 @@ div#editor {
 div#display {
  position: relative;
  height: 40em;
- outline: solid;
+ border: solid;
+ border-width:1.5px;
+    margin-left: 0.5em;
  overflow-y: scroll;
 }
 
@@ -158,6 +163,9 @@ div#exerciseList {
 div.fileLink {
  display: inline-block;
  width: 8em;
+    margin:0.5em;
+    padding: 0.2em;
+    padding-left:1em;
  border: ridge;
 }
 
@@ -165,4 +173,67 @@ div.fileLink:hover {
  background: lightgreen;
  color: black;
 }
+
+div#extra {
+ display: none;
+ margin: 2em;
+}
+
+button#backButton { 
+display: none;
+ font-size: 1.5em; 
+ background: lightcyan;
+ position: fixed;
+ top: 0;
+ left: 0;
+ color: black;
+}
+
+button#backButton:hover {
+background: red;
+}
+    
+
+div#readme {
+ margin-left: 8em;
+}
+
+div#settingsMenu>button {
+    width: 80%;
+    height: 4em;
+    margin: 0.2em;
+        border-radius: 40%;
+}
+
+div#settingsMenu > button#toggleSystem{
+margin-top: 2em;
+    border-radius: 50%;}
+
+
+div#settingsMenu > button#loadExercise{
+margin-top: 2em;
+}
+
+div#settingsMenu > button#toggleadvanced {
+   color: red;
+    background-color: white;
+    font-size: 0.8em;
+    margin-top: 2em;
+}
+div#settingsMenu > button#toggleadvanced:hover {
+   color: red;
+    background-color: pink;
+    font-size: 0.8em;
+    margin-top: 2em;
+}
+
+
+div#advancedstuff {
+    display: none;
+    font-size: 0.6em;
+}
+div#advancedstuff >button{
+    width: 100%;
+}
+
 

@@ -1,71 +1,83 @@
 package main
 
+import (
+	"errors"
+)
+
+type tkType int
+
+const (
+	tkraw tkType = 0
+	tktex tkType = 1
+	tktxt tkType = 2
+)
+
 var (
 	keyBindings = [][3]string{
-		[3]string{`A`, `A`, ``},
-		[3]string{`B`, `B`, ``},
-		[3]string{`C`, `C`, ``},
-		[3]string{`D`, `D`, ``},
-		[3]string{`E`, `E`, ``},
-		[3]string{`F`, `F`, ``},
-		[3]string{`G`, `G`, ``},
-		[3]string{`H`, `H`, ``},
-		[3]string{`I`, `I`, ``},
-		[3]string{`J`, `J`, ``},
-		[3]string{`K`, `K`, ``},
-		[3]string{`L`, `L`, ``},
-		[3]string{`M`, `M`, ``},
-		[3]string{`N`, `N`, ``},
-		[3]string{`O`, `O`, ``},
-		[3]string{`P`, `P`, ``},
-		[3]string{`Q`, `Q`, ``},
-		[3]string{`R`, `R`, ``},
-		[3]string{`S`, `S`, ``},
-		[3]string{`T`, `T`, ``},
-		[3]string{`W`, `W`, ``},
-		[3]string{`Y`, `Y`, ``},
-		[3]string{`Z`, `Z`, ``},
-		[3]string{`a`, `a`, ``},
-		[3]string{`b`, `b`, ``},
-		[3]string{`c`, `c`, ``},
-		[3]string{`d`, `d`, ``},
-		[3]string{`e`, `e`, ``},
-		[3]string{`f`, `f`, ``},
-		[3]string{`g`, `g`, ``},
-		[3]string{`h`, `h`, ``},
-		[3]string{`i`, `i`, ``},
-		[3]string{`j`, `j`, ``},
-		[3]string{`k`, `k`, ``},
-		[3]string{`l`, `l`, ``},
-		[3]string{`m`, `m`, ``},
-		[3]string{`n`, `n`, ``},
-		[3]string{`o`, `o`, ``},
-		[3]string{`p`, `p`, ``},
-		[3]string{`q`, `q`, ``},
-		[3]string{`r`, `r`, ``},
-		[3]string{`s`, `s`, ``},
-		[3]string{`t`, `t`, ``},
-		[3]string{`u`, `u`, ``},
-		[3]string{`w`, `w`, ``},
-		[3]string{`x`, `x`, ``},
-		[3]string{`y`, `y`, ``},
-		[3]string{`z`, `z`, ``},
-		[3]string{`1`, `1`, ``},
-		[3]string{`2`, `2`, ``},
-		[3]string{`3`, `3`, ``},
-		[3]string{`4`, `4`, ``},
-		[3]string{`5`, `5`, ``},
-		[3]string{`6`, `6`, ``},
-		[3]string{`7`, `7`, ``},
-		[3]string{`8`, `8`, ``},
-		[3]string{`9`, `9`, ``},
-		[3]string{`0`, `0`, ``},
+		[3]string{`A`, `A`, `A`},
+		[3]string{`B`, `B`, `B`},
+		[3]string{`C`, `C`, `C`},
+		[3]string{`D`, `D`, `D`},
+		[3]string{`E`, `E`, `E`},
+		[3]string{`F`, `F`, `F`},
+		[3]string{`G`, `G`, `G`},
+		[3]string{`H`, `H`, `H`},
+		[3]string{`I`, `I`, `I`},
+		[3]string{`J`, `J`, `J`},
+		[3]string{`K`, `K`, `K`},
+		[3]string{`L`, `L`, `L`},
+		[3]string{`M`, `M`, `M`},
+		[3]string{`N`, `N`, `N`},
+		[3]string{`O`, `O`, `O`},
+		[3]string{`P`, `P`, `P`},
+		[3]string{`Q`, `Q`, `Q`},
+		[3]string{`R`, `R`, `R`},
+		[3]string{`S`, `S`, `S`},
+		[3]string{`T`, `T`, `T`},
+		[3]string{`W`, `W`, `W`},
+		[3]string{`Y`, `Y`, `Y`},
+		[3]string{`Z`, `Z`, `Z`},
+		[3]string{`a`, `a`, `a`},
+		[3]string{`b`, `b`, `b`},
+		[3]string{`c`, `c`, `c`},
+		[3]string{`d`, `d`, `d`},
+		[3]string{`e`, `e`, `e`},
+		[3]string{`f`, `f`, `f`},
+		[3]string{`g`, `g`, `g`},
+		[3]string{`h`, `h`, `h`},
+		[3]string{`i`, `i`, `i`},
+		[3]string{`j`, `j`, `j`},
+		[3]string{`k`, `k`, `k`},
+		[3]string{`l`, `l`, `l`},
+		[3]string{`m`, `m`, `m`},
+		[3]string{`n`, `n`, `n`},
+		[3]string{`o`, `o`, `o`},
+		[3]string{`p`, `p`, `p`},
+		[3]string{`q`, `q`, `q`},
+		[3]string{`r`, `r`, `r`},
+		[3]string{`s`, `s`, `s`},
+		[3]string{`t`, `t`, `t`},
+		[3]string{`u`, `u`, `u`},
+		[3]string{`w`, `w`, `w`},
+		[3]string{`x`, `x`, `x`},
+		[3]string{`y`, `y`, `y`},
+		[3]string{`z`, `z`, `z`},
+		[3]string{`1`, `1`, `1`},
+		[3]string{`2`, `2`, `2`},
+		[3]string{`3`, `3`, `3`},
+		[3]string{`4`, `4`, `4`},
+		[3]string{`5`, `5`, `5`},
+		[3]string{`6`, `6`, `6`},
+		[3]string{`7`, `7`, `7`},
+		[3]string{`8`, `8`, `8`},
+		[3]string{`9`, `9`, `9`},
+		[3]string{`0`, `0`, `0`},
 	}
 
 	punctBindings = [][3]string{
-		[3]string{`(`, `(`, ``},
-		[3]string{`)`, `)`, ``},
-		[3]string{`,`, `,`, ``},
+		[3]string{`(`, `(`, `(`},
+		[3]string{`)`, `)`, `)`},
+		[3]string{`,`, `,`, `,`},
 		[3]string{`.`, `\ldots`, `...`},
 	}
 
@@ -80,7 +92,7 @@ var (
 	plBindings = [][3]string{
 		[3]string{`U`, `\forall`, "\u2200"},
 		[3]string{`X`, `\exists`, "\u2203"},
-		[3]string{"=", "=", ""},
+		[3]string{"=", "=", "="},
 	}
 
 	turnstileBindings = [][3]string{
@@ -88,16 +100,10 @@ var (
 	}
 
 	greekBindings = [][3]string{
-		[3]string{`\A`, `A`, ""},
-		[3]string{`\B`, `B`, `B`},
 		[3]string{`\G`, `\Gamma`, "\u0393"},
 		[3]string{`\D`, `\Delta`, "\u0394"},
-		[3]string{`\E`, `E`, "E"},
-		[3]string{`\Z`, `Z`, "Z"},
 		[3]string{`\T`, `\Theta`, "\u0398"},
 		[3]string{`\L`, `\Lambda`, "\u039b"},
-		[3]string{`\M`, `M`, "M"},
-		[3]string{`\N`, `N`, "N"},
 		[3]string{`\X`, `\Xi`, "\u039e"},
 		[3]string{`\P`, `\Pi`, "\u03a0"},
 		[3]string{`\R`, `\Rho`, "\u03a1"},
@@ -132,3 +138,32 @@ var (
 		[3]string{`\w`, `\omega`, "\u03c9"},
 	}
 )
+
+var allBindings [][3]string
+
+func init() {
+	allBindings = combineBindings(keyBindings, punctBindings, connBindings, plBindings, turnstileBindings, greekBindings)
+}
+
+func tkOf(s string, srctype, dsttype tkType, b [][3]string) (tk string, err error) {
+
+	for _, e := range b {
+		if s == e[srctype] {
+			tk = e[dsttype]
+			return
+		}
+	}
+	err = errors.New("Not Found")
+	return
+}
+
+func combineBindings(b ...[][3]string) [][3]string {
+
+	var r [][3]string
+
+	for _, e := range b {
+		r = append(r, e...)
+	}
+
+	return r
+}

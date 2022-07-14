@@ -210,7 +210,7 @@ func hasGreek(s string) bool {
 	return strings.Contains(s, `\`)
 }
 
-func printArgLine(s string) string {
+func printArgLine(s string, m printMode) string {
 
 	al, _ := parseArgline(s)
 	datumstring := ""
@@ -222,13 +222,13 @@ func printArgLine(s string) string {
 			if d[:1] == `\` {
 				datumstring = datumstring + d + `, `
 			} else {
-				datumstring = datumstring + printNodeInfix(Parse(d), mLatex) + `, `
+				datumstring = datumstring + printNodeInfix(Parse(d), m) + `, `
 			}
 		}
 		datumstring = strings.TrimRight(datumstring, ", ")
 	}
 
-	assertumstring := printNodeInfix(Parse(al.seq.succedent), mLatex)
+	assertumstring := printNodeInfix(Parse(al.seq.succedent), m)
 	annotation := ""
 	if len(al.lines) > 0 {
 		for _, i := range al.lines {
@@ -236,66 +236,29 @@ func printArgLine(s string) string {
 		}
 	}
 
-	annotation = annotation + symb(al.inf)
+	annotation = annotation + symb(al.inf, m)
 
 	annotation = strings.TrimRight(annotation, ",")
 
-	out := `\ai{` + datumstring + `}{` + assertumstring + `}{` + annotation + `}` + "\n\n"
+	var resp string
 
-	return out
+	if m == mLatex {
+		resp = `\ai{` + datumstring + `}{` + assertumstring + `}{` + annotation + `}` + "\n\n"
+	}
+	if m == mPlainText {
+		resp = datumstring + `⊢` + assertumstring + `...` + annotation
+	}
+	return resp
 }
 
-func symb(s string) string {
+func symb(s string, m printMode) string {
 
-	switch s {
-	case "a":
-		return "A"
-
-	case "ni":
-		return `\negI`
-
-	case "ne":
-		return `\negE`
-
-	case "ki":
-		return `\conjI`
-
-	case "ke":
-		return `\conjE`
-
-	case "di":
-		return `\disjI`
-
-	case "de":
-		return `\disjE`
-
-	case "ci":
-		return `\condI`
-
-	case "ce":
-		return `\condE`
-
-	case "ui":
-		return `\uniI`
-
-	case "ue":
-		return `\uniE`
-
-	case "ei":
-		return `\exI`
-
-	case "ee":
-		return `\exE`
-
-	case "=i":
-		return `\iI`
-
-	case "=e":
-		return `\iE`
-
-	default:
-		return s
+	for _, i := range infRules {
+		if i[0] == s {
+			return i[m]
+		}
 	}
+	return s
 }
 
 func lineSpec(infRule string) int {

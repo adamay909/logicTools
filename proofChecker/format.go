@@ -7,121 +7,124 @@ import (
 
 func (d *console) typeset() string {
 
-	html := `<div id="deriv">`
-	if len(d.html) == 0 {
-		html = html + "start typing"
-	} else {
-		html = html + strings.Join(d.html, "\n")
+	var html string
+	if d.Title != "" {
+		html = `<h3 id="extitle">` + d.Title + `</h3>`
 	}
+	html = html + `<div id="deriv">`
+	html = html + strings.Join(d.html, "\n")
 	return html + `</div>`
 }
 
 func (d *console) format() {
+	cursor := true
+	d.formatHTML(cursor)
+}
+
+func (d *console) formatDerivation() {
+	cursor := false
+	d.formatHTML(cursor)
+}
+
+func (d *console) formatHTML(cursor bool) {
+
 	d.html = nil
 
-	const dummyC = `<div id="cursor">&emsp;</div>`
-
-	for n := range d.Input {
+	for n, l := range d.Input {
 		var dat, succ, annot []string
-		var tstl, dots string
 
-		tst := getTstIdx(d.Input[n])
-		dot := getDotIdx(d.Input[n])
+		if cursor && n == d.ypos {
+			l = setCursor(d, d.Input[n])
+		}
+		raw := true
+		dat, tstl, succ, dots, annot := parseNsplit(l, !raw)
 
-		ln := strconv.Itoa(n+d.offset) + `.&emsp;`
+		ln := strconv.Itoa(n+d.Offset) + `.&emsp;`
 
 		r := `<div class="ln">#ln#</div><div class="ddat">#dat#</div><div class="dtstl">#tstl#</div><div class="succ">#succ#</div><div class="dsep">#dot#</div><div class="dannot">#annot#</div>`
 
-		for i, e := range d.Input[n] {
-			var text string
-			text = plainText(e)
-			if n == d.ypos {
-				switch {
-
-				case i == d.xpos && d.modifier != "":
-					text = `<div id="cursor">` + d.modifier + `</div>` + text
-
-				case d.overhang && i == len(d.Input[n])-1:
-					text = text + dummyC
-
-				case i == d.xpos:
-					text = `<div id="cursor">` + text + `</div>`
-
-				default:
-				}
-			}
-
-			if i < tst {
-				dat = append(dat, text)
-				continue
-			}
-
-			if i == tst {
-				tstl = text
-				continue
-			}
-
-			if i < dot {
-				succ = append(succ, text)
-				continue
-			}
-
-			if i == dot {
-				dots = text
-				continue
-			}
-
-			annot = append(annot, text)
-		}
-		if n == d.ypos && len(d.Input[n]) == 0 {
-			dat = append(dat, dummyC)
-		}
-
 		r = strings.Replace(r, `#ln#`, ln, 1)
 		r = strings.Replace(r, `#dat#`, stringOf(dat), 1)
-		r = strings.Replace(r, `#tstl#`, tstl, 1)
+		r = strings.Replace(r, `#tstl#`, stringOf(tstl), 1)
 		r = strings.Replace(r, `#succ#`, stringOf(succ), 1)
-		r = strings.Replace(r, `#dot#`, dots, 1)
+		r = strings.Replace(r, `#dot#`, stringOf(dots), 1)
 		r = strings.Replace(r, `#annot#`, stringOf(annot), 1)
 
 		d.html = append(d.html, r)
 	}
+
 	if len(d.html) == 0 {
-		ln := strconv.Itoa(0+d.offset) + `.&emsp;`
-		r := `<div class="ln">` + ln + `</div><div class="ddat"><div id="cursor">&emsp;</div></div><div class="dtstl"></div><div class="succ"></div><div class="dsep"></div><div class="dannot"></div>`
+		ln := strconv.Itoa(0+d.Offset) + `.&emsp;`
+		r := `<div class="ln">` + ln + `</div><div class="ddat"><div id="cursor">&ensp;</div></div><div class="dtstl"></div><div class="succ"></div><div class="dsep"></div><div class="dannot"></div>`
 		d.html = append(d.html, r)
 	}
 }
 
-func (d *console) formatDerivation() {
-	d.html = nil
-	tstl := plainText(`\vdash`)
-	dots := plainText(`\ldots`)
+func setCursor(d *console, l []string) []string {
 
-	for n := range d.Input {
-		dat, succ, annot, err := parseLineDisplay(d.Input[n])
+	rv := insertCursor(l, d.xpos)
+	return rv
+}
 
-		if err != nil {
+func unsetCursor(l []string) []string {
+	const cursor = `<div id="cursor">&thinsp;</div>`
+	var rv []string
+
+	for _, e := range l {
+		if e == cursor {
+			continue
+		}
+		rv = append(rv, e)
+	}
+	return rv
+}
+
+func insertCursor(l []string, p int) []string {
+
+	var m []string
+	const cursor = `<div id="cursor">&thinsp;</div>`
+	m = append(m, l[:p]...)
+	m = append(m, cursor)
+	m = append(m, l[p:]...)
+	return m
+}
+
+func parseNsplit(l inputLine, raw bool) (dat, tstl, succ, dots, annot []string) {
+
+	tst := getTstIdx(l)
+	dot := getDotIdx(l)
+
+	for i, e := range l {
+		var text string
+		if !raw {
+			text = plainText(e)
+		} else {
+			text = e
+		}
+
+		if i < tst {
+			dat = append(dat, text)
 			continue
 		}
 
-		ln := strconv.Itoa(n+d.offset) + `.&emsp;`
+		if i == tst {
+			tstl = append(tstl, text)
+			continue
+		}
 
-		r := `<div class="ln">#ln#</div><div class="ddat">#dat#</div><div class="dtstl">#tstl#</div><div class="succ">#succ#</div><div class="dsep">#dot#</div><div class="dannot">#annot#</div>`
-		r = strings.Replace(r, `#ln#`, ln, 1)
-		r = strings.Replace(r, `#dat#`, dat, 1)
-		r = strings.Replace(r, `#tstl#`, tstl, 1)
-		r = strings.Replace(r, `#succ#`, succ, 1)
-		r = strings.Replace(r, `#dot#`, dots, 1)
-		r = strings.Replace(r, `#annot#`, annot, 1)
+		if i < dot {
+			succ = append(succ, text)
+			continue
+		}
 
-		d.html = append(d.html, r)
+		if i == dot {
+			dots = append(dots, text)
+			continue
+		}
+
+		annot = append(annot, text)
 	}
-	if len(d.html) == 0 {
-		ln := strconv.Itoa(0+d.offset) + `.&emsp;`
-		r := `<div class="ln">` + ln + `</div><div class="ddat"><div id="cursor">&emsp;</div></div><div class="dtstl"></div><div class="succ"></div><div class="dsep"></div><div class="dannot"></div>`
-		d.html = append(d.html, r)
-	}
+	return
 }
 
 func getTstIdx(l []string) int {
@@ -155,4 +158,8 @@ func getDotIdx(l []string) int {
 
 func stringOf(src []string) string {
 	return strings.Join(src, "")
+}
+
+func spaceyStringOf(src []string) string {
+	return strings.Join(src, " ")
 }

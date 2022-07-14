@@ -199,10 +199,10 @@ func IsWff(s string) bool {
 //PrintDeriv prints the derivation given by lines
 //as latex formatted derivation.
 func PrintDeriv(lines []string, offset int) (out string) {
-	seq1, err := parseArgline(lines[0])
-	seq2, err := parseArgline(lines[len(lines)-1])
+	seq1, err1 := parseArgline(lines[0])
+	seq2, err2 := parseArgline(lines[len(lines)-1])
 
-	if err == nil {
+	if err1 == nil && err2 == nil {
 		if seq2.seq.datum == "" {
 			out = out + `%Prove \p{` + seq2.seq.StringLatex() + "}\n\n"
 		} else {
@@ -215,10 +215,22 @@ func PrintDeriv(lines []string, offset int) (out string) {
 
 	for i := range lines {
 
-		out = out + printArgLine(lines[i])
+		out = out + printArgLine(lines[i], mLatex)
 	}
 
 	out = out + `\end{argumentN}` + "\n\n"
+
+	return out
+}
+
+//PrintDeriv prints the derivation given by lines
+//as latex formatted derivation.
+func PrintDerivText(lines []string, offset int) (out string) {
+
+	for i := range lines {
+
+		out = strconv.Itoa(i+offset) + `. ` + out + printArgLine(lines[i], mPlainText) + "\n"
+	}
 
 	return out
 }

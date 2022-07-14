@@ -15,7 +15,7 @@ func checkDerivation() {
 	gentzen.SetStrict(false)
 	gentzen.ClearLog()
 
-	arglines, ok := parseLines(dsp.Input)
+	arglines, ok := getArglines(dsp.Input)
 	if !ok {
 		printMessage("RESULTS:\n\n" + gentzen.ShowLog())
 		return
@@ -23,7 +23,7 @@ func checkDerivation() {
 
 	displayDerivation()
 
-	if gentzen.CheckDeriv(arglines, dsp.offset) {
+	if gentzen.CheckDeriv(arglines, dsp.Offset) {
 		printMessage("RESULTS:\n\n Good!" + gentzen.ShowLog())
 		return
 	}

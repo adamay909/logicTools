@@ -62,6 +62,24 @@ var connectivesPL = [][]string{
 	{string(ident), `\mathbin{=}`, `\mathbin{=}`, `=`},
 }
 
+var infRules = [][]string{
+	{`a`, `A`, `A`, `A`},
+	{` ki`, `\conjI`, `\conjI`, "\u2227I"},
+	{` ke`, `\conjE`, `\conjE`, "\u2227E"},
+	{` di`, `\disjI`, `\disjI`, "\u2228I"},
+	{` de`, `\disjE`, `\disjE`, "\u2228E"},
+	{` ni`, `\negI`, `\negI`, "\u00acI"},
+	{` ne`, `\negE`, `\negE`, "\u00acE"},
+	{` ci`, `\condI`, `\condI`, "\u2283I"},
+	{` ce`, `\condE`, `\condE`, "\u2283E"},
+	{` ui`, `\uniI`, `\uniI`, "\u2200I"},
+	{` ue`, `\uniE`, `\uniE`, "\u2200E"},
+	{` ei`, `\exI`, `\exI`, "\u2203I"},
+	{` ee`, `\exE`, `\exE`, "\u2203E"},
+	{` =i`, `\iI`, `\iI`, `=I`},
+	{` =e`, `\iE`, `\iE`, `=E`},
+}
+
 var connectives [][]string
 
 //SetStandardPolish sets whether to use more standard notations for the

@@ -3,12 +3,15 @@ package main
 type inputLine []string
 
 type console struct {
-	Input      []inputLine
-	xpos, ypos int
-	html       []string
-	modifier   string
-	overhang   bool
-	offset     int
+	Title           string
+	Input           []inputLine
+	xpos, ypos      int
+	xprev, yprev    int
+	xcuror, ycursor int
+	html            []string
+	modifier        string
+	overhang        bool
+	Offset          int
 }
 
 const (
@@ -24,6 +27,9 @@ const (
 )
 
 func (d *console) handleInput(key string) {
+
+	d.xprev = d.xpos
+	d.yprev = d.ypos
 
 	if key == "Shift" {
 		return
@@ -53,7 +59,6 @@ func (d *console) checkOverhang() {
 }
 
 func (d *console) cursorMovement(m string) {
-
 	switch m {
 	case up:
 		d.arrowUp()
@@ -77,10 +82,13 @@ func (d *console) arrowUp() {
 		return
 	}
 	d.ypos--
-	if d.xpos > len(d.Input[d.ypos]) {
-		d.end()
-		d.arrowRight()
-	}
+	d.home()
+	/*
+	   if d.xpos > len(d.Input[d.ypos]) {
+	   		d.end()
+	   		d.arrowRight()
+	   	}
+	*/
 }
 
 func (d *console) arrowDown() {
@@ -88,10 +96,13 @@ func (d *console) arrowDown() {
 		return
 	}
 	d.ypos++
-	if d.xpos > len(d.Input[d.ypos]) {
-		d.end()
-		d.arrowRight()
-	}
+	d.home()
+	/*
+	   if d.xpos > len(d.Input[d.ypos]) {
+	   		d.end()
+	   		d.arrowRight()
+	   			}
+	*/
 }
 
 func (d *console) arrowLeft() {
@@ -204,8 +215,9 @@ func (d *console) insertion(m string) {
 	case enter:
 		d.addNewline()
 	default:
-		if ok, target := among(m, keyBindings, punctBindings, logConstBindings, turnstileBindings, greekBindings); ok {
-			d.addChar(target)
+		tk, err := tkOf(m, tkraw, tktex, allBindings)
+		if err == nil {
+			d.addChar(tk)
 		}
 	}
 }
@@ -270,7 +282,8 @@ func (d *console) clear() {
 	d.ypos = 0
 	d.overhang = true
 	d.modifier = ""
-	d.offset = 1
+	d.Offset = 1
+	d.Title = ""
 
 }
 
@@ -292,17 +305,5 @@ func isModifier(k string) bool {
 }
 
 func (d *console) setOffset(n int) {
-	d.offset = n
-}
-
-func among(s string, bindings ...[][3]string) (bool, string) {
-
-	for _, b := range bindings {
-		for _, e := range b {
-			if s == e[0] {
-				return true, e[1]
-			}
-		}
-	}
-	return false, ""
+	d.Offset = n
 }

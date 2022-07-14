@@ -7,18 +7,23 @@ import (
 )
 
 func plainTextDeriv() string {
+	if dsp.empty() {
+		return ""
+	}
 
-	var r string
+	if arglines, ok := getArglines(dsp.Input); ok {
+		return gentzen.PrintDerivText(arglines, dsp.Offset)
+	}
+	output := ""
 
-	for n, l := range dsp.Input {
+	for i, l := range dsp.Input {
 		if len(l) == 0 {
 			continue
 		}
-
-		r = r + strconv.Itoa(n+1) + ". " + plainOutput(l) + "\n"
+		output = strconv.Itoa(i+dsp.Offset) + plainOutput(l) + "\n"
 	}
+	return output + "\n"
 
-	return r
 }
 
 func plainOutput(s []string) string {
@@ -34,23 +39,9 @@ func plainOutput(s []string) string {
 
 func plainText(s string) string {
 
-	allBindings := [][][3]string{
-		keyBindings,
-		punctBindings,
-		connBindings,
-		plBindings,
-		turnstileBindings,
-		greekBindings,
-	}
-
-	for _, b := range allBindings {
-		for _, e := range b {
-			if s == e[1] {
-				if e[2] != "" {
-					return e[2]
-				}
-				return s
-			}
+	for _, e := range allBindings {
+		if s == e[tktex] {
+			return e[tktxt]
 		}
 	}
 	return s
@@ -61,11 +52,11 @@ func latexOutput() string {
 		return ""
 	}
 
-	if arglines, ok := parseLines(dsp.Input); ok {
-		return gentzen.PrintDeriv(arglines, dsp.offset)
+	if arglines, ok := getArglines(dsp.Input); ok {
+		return gentzen.PrintDeriv(arglines, dsp.Offset)
 	}
 	output := ""
-	ln := strconv.Itoa(dsp.offset - 1)
+	ln := strconv.Itoa(dsp.Offset - 1)
 	output = `\begin{enumerate}\setcounter{enumi}{` + ln + `}` + "\n"
 
 	for _, l := range dsp.Input {

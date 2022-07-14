@@ -34,6 +34,8 @@ var (
 
 	oClipboard = 2
 
+	oAdvanced = false
+
 	logConstBindings [][3]string
 
 	acceptInput = true
@@ -102,8 +104,8 @@ func setupJS() {
 func onClick() {
 
 	target := js.Global().Get("event").Get("target")
-	//	fmt.Println(target.Get("id"))
-	//	fmt.Println(target.Get("outerHTML"))
+	fmt.Println(target.Get("id"))
+	fmt.Println(target.Get("outerHTML"))
 	switch target.Get("id").String() {
 	case "toggleSettings":
 		toggleSettings()
@@ -129,6 +131,14 @@ func onClick() {
 		startInput()
 	case "loadExercise":
 		toggleExercises()
+	case "toggleadvanced":
+		toggleAdvanced()
+	case "backButton":
+		backToNormal()
+	case "textInput":
+		inputFromText()
+	case "submitInput":
+		getInput()
 	default:
 		if target.Get("className").String() == "fileLink" {
 			loadFile(target.Get("innerHTML").String())
@@ -166,7 +176,7 @@ func focusInput() {
 
 func clearInput() {
 	dsp.clear()
-	setTextByID("setOffset", "First Line: "+strconv.Itoa(dsp.offset))
+	setTextByID("setOffset", "First Line: "+strconv.Itoa(dsp.Offset))
 	display()
 	printMessage("")
 	focusInput()
@@ -234,21 +244,22 @@ func toggleSettings() {
 
 func toggleReadme() {
 	stopInput()
-	oABOUT = !oABOUT
-	if oABOUT {
-		hide("controls")
-		hide("editor")
-		hide("help")
-		show("readme")
-		return
-	}
-	show("editor")
-	show("controls")
+	hide("console")
+	show("extra")
+	show("readme")
+	show("backButton")
+	return
+}
+
+func backToNormal() {
+	stopInput()
+	dom.GetWindow().Document().GetElementByID("textinputarea").(*dom.HTMLTextAreaElement).SetValue("")
+	hide("backButton")
 	hide("readme")
-	if oHELP {
-		show("help")
-	}
-	setDisplay()
+	hide("textinput")
+	hide("exerciseList")
+	hide("extra")
+	show("console")
 }
 
 func toggleClipboardType() {
@@ -306,12 +317,12 @@ func checkDeriv() {
 
 func setOffset() {
 
-	n, err := strconv.Atoi(js.Global().Call("prompt", "Number of first line", strconv.Itoa(dsp.offset)).String())
+	n, err := strconv.Atoi(js.Global().Call("prompt", "Number of first line", strconv.Itoa(dsp.Offset)).String())
 	if err != nil {
 		return
 	}
 	dsp.setOffset(n)
-	setTextByID("setOffset", "First Line: "+strconv.Itoa(dsp.offset))
+	setTextByID("setOffset", "First Line: "+strconv.Itoa(dsp.Offset))
 	display()
 }
 
@@ -338,7 +349,8 @@ func toClipboard() {
 func startInput() {
 
 	acceptInput = true
-	dom.GetWindow().Document().GetElementByID("cursor").SetAttribute("class", "active")
+	setAttributeByID("cursor", "class", "active")
+	setAttributeByID("display", "style", "border-color: blue")
 	display()
 
 }
@@ -346,7 +358,8 @@ func startInput() {
 func stopInput() {
 
 	acceptInput = false
-	dom.GetWindow().Document().GetElementByID("cursor").SetAttribute("class", "inactive")
+	setAttributeByID("cursor", "class", "inactive")
+	setAttributeByID("display", "style", "border-color:lightgrey")
 
 }
 
@@ -384,9 +397,10 @@ func copyToClipboard(s string) {
 
 func toggleExercises() {
 	stopInput()
-	hide("controls")
-	hide("editor")
+	hide("console")
+	show("extra")
 	show("exerciseList")
+	show("backButton")
 	files, err := assets.ReadDir("assets/files")
 	if err != nil {
 		fmt.Println(err)
@@ -420,9 +434,53 @@ func loadFile(name string) {
 	dsp.xpos, dsp.ypos = 0, 0
 	dsp.overhang = false
 	dsp.modifier = ""
-	show("controls")
-	show("editor")
+	show("console")
+	hide("backButton")
 	hide("exerciseList")
+	hide("extra")
 	display()
 	stopInput()
+}
+
+func inputFromText() {
+
+	stopInput()
+	hide("console")
+	show("extra")
+	show("textinput")
+	show("backButton")
+
+}
+
+func getInput() {
+	stopInput()
+	s := dom.GetWindow().Document().GetElementByID("textinputarea").(*dom.HTMLTextAreaElement).Value()
+	lines, err := text2data(s)
+	if err != nil {
+		js.Global().Call("alert", err.Error())
+		return
+	}
+	dom.GetWindow().Document().GetElementByID("textinputarea").(*dom.HTMLTextAreaElement).SetValue("")
+	dsp.clear()
+	dsp.Input = lines
+	display()
+	hide("textinput")
+	hide("extra")
+	hide("backButton")
+	show("console")
+	stopInput()
+
+}
+
+func toggleAdvanced() {
+
+	stopInput()
+	oAdvanced = !oAdvanced
+
+	if oAdvanced {
+		show("advancedstuff")
+	} else {
+		hide("advancedstuff")
+	}
+	return
 }
