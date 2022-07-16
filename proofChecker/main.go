@@ -143,6 +143,10 @@ func onClick() {
 		getInput()
 	case "randomExercise":
 		generateRandomExercise()
+	case "nextExercise":
+		generateRandomExercise()
+	case "quitExercise":
+		endRandomExercise()
 	default:
 		if target.Get("className").String() == "fileLink" {
 			loadFile(target.Get("innerHTML").String(), "exercises")
