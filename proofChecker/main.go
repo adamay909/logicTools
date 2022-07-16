@@ -141,6 +141,8 @@ func onClick() {
 		inputFromText()
 	case "submitInput":
 		getInput()
+	case "randomExercise":
+		generateRandomExercise()
 	default:
 		if target.Get("className").String() == "fileLink" {
 			loadFile(target.Get("innerHTML").String(), "exercises")
@@ -424,6 +426,8 @@ func toggleExercises() {
 		//		fmt.Println(e.Name())
 		h = h + `<div class="fileLink">` + e.Name() + `</div>`
 	}
+	h = h + `<div id="randomExercise">Random Exercise</div>`
+
 	setTextByID("exerciseList", h)
 }
 

@@ -49,6 +49,23 @@ func (n *Node) Child2() (m *Node, ok bool) {
 	return n.subnode2, ok
 }
 
+func (n *Node) Child1Must() (m *Node) {
+	var k *Node
+	if _, ok := n.Child1(); !ok {
+		return k
+	}
+
+	return n.subnode1
+}
+
+func (n *Node) Child2Must() (m *Node) {
+	var k *Node
+	if _, ok := n.Child2(); !ok {
+		return k
+	}
+	return n.subnode2
+}
+
 //Parent returns parent of n. If n has no parent, ok is false.
 func (n *Node) Parent() (m *Node, ok bool) {
 
@@ -60,6 +77,14 @@ func (n *Node) Parent() (m *Node, ok bool) {
 	ok = true
 
 	return n.parent, ok
+}
+
+func (n *Node) ParentMust() (m *Node) {
+	var k *Node
+	if _, ok := n.Parent(); !ok {
+		return k
+	}
+	return n.parent
 }
 
 func (n *Node) RmFlag(f string) {
@@ -116,21 +141,51 @@ func (n *Node) IsUnary() bool {
 
 }
 
+func (n *Node) IsQuantifier() bool {
+	return n.MainConnective() == uni || n.MainConnective() == ex
+}
+
+func (n *Node) IsNegation() bool {
+	return n.MainConnective() == neg
+}
+
+func (n *Node) IsConditional() bool {
+	return n.MainConnective() == cond
+}
+
+func (n *Node) IsConjunction() bool {
+	return n.MainConnective() == conj
+}
+
+func (n *Node) IsDisjunction() bool {
+	return n.MainConnective() == disj
+}
+
 func (n *Node) BracketClass() int {
 
 	c := 0
 
 	if n.IsAtomic() {
 		if oPL && n.parent != nil {
-			if n.parent.MainConnective() == uni || n.parent.MainConnective() == ex {
+			if n.parent.IsQuantifier() {
 				c++
 			}
 		}
 		return c
 	}
 
-	if n.IsUnary() {
+	if n.IsQuantifier() {
 		c = n.subnode1.BracketClass()
+		return c
+	}
+
+	if n.IsNegation() {
+		c = n.subnode1.BracketClass()
+		if oPL && n.parent != nil {
+			if n.parent.IsQuantifier() {
+				c++
+			}
+		}
 		return c
 	}
 

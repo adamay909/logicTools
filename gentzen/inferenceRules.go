@@ -1,7 +1,6 @@
 package gentzen
 
 import (
-	"fmt"
 	"sort"
 	"strings"
 )
@@ -572,9 +571,7 @@ func exE(seq1, seq2, seq3 sequent) bool {
 
 	v1, msg1 := exEhelper(seq1, seq2, seq3)
 
-	fmt.Println("result 1 ", v1, msg1)
 	v2, msg2 := exEhelper(seq2, seq1, seq3)
-	fmt.Println("result 2 ", v2)
 
 	if v1 || v2 {
 		return true
@@ -625,7 +622,6 @@ func exEhelper(seq1, seq2, seq3 sequent) (v bool, msg string) {
 	}
 
 	datums1 := strings.Split(seq1.datum, ",")
-	fmt.Println("looking for ", kappa)
 	for _, d := range datums1 {
 		if len(d) == 0 {
 			continue

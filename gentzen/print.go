@@ -92,15 +92,22 @@ func printNodeInfix(n *Node, m printMode) (s string) {
 		return s
 	}
 
-	if n.IsUnary() {
+	if n.IsQuantifier() {
 		return s
 	}
+	/*
+		if n.IsNegation() {
+			if !n.parent.IsQuantifier() {
+				return s
+			}
+		}
+	*/
 	var ob1, ob2 string
 	var blevel int
 
 	blevel = n.BracketClass()
 
-	if blevel+1 == len(br) {
+	if blevel+1 >= len(br) {
 		ob1 = br[len(br)-1][0]
 		ob2 = br[len(br)-1][1]
 	} else {

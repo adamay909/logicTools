@@ -2,7 +2,6 @@ package gentzen
 
 import (
 	"math/rand"
-	"time"
 )
 
 var (
@@ -22,8 +21,6 @@ var (
 
 func genRand(m, d int) string {
 
-	rand.Seed(int64(time.Now().Nanosecond()))
-
 	if m > len(atomicE) {
 		m = len(atomicE)
 	}
@@ -34,7 +31,7 @@ func genRand(m, d int) string {
 
 	s = "P"
 
-	for Parse(s).ConnectiveCount() < d {
+	for Parse(s).ConnectiveCount() < (d / 2) {
 		s2 = ""
 		for _, c := range s {
 			s2 = s2 + replace(string(c), cand)

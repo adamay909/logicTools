@@ -60,6 +60,10 @@ func (d *console) formatHTML(cursor bool) {
 	}
 }
 
+func (d *console) setTitle(t string) {
+	d.Title = t
+}
+
 func setCursor(d *console, l []string) []string {
 
 	rv := insertCursor(l, d.xpos)

@@ -157,6 +157,17 @@ func tkOf(s string, srctype, dsttype tkType, b [][3]string) (tk string, err erro
 	return
 }
 
+func textOf(s string) string {
+
+	r, err := tkOf(s, tkraw, tktxt, allBindings)
+
+	if err != nil {
+		return s
+	}
+
+	return r
+}
+
 func combineBindings(b ...[][3]string) [][3]string {
 
 	var r [][3]string
