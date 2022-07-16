@@ -46,7 +46,7 @@ func generateRandomExercise() {
 
 	show("controls2")
 
-	setTextByID("controls2", `<button class="controls" id="nextExercise">Next</div><button class="controls" id="quitExercise">Exit</button>`)
+	setTextByID("controls2", `<button class="button" id="nextExercise">Next</div><button class="button" id="quitExercise">Exit</button>`)
 
 	hide("messages")
 

@@ -139,6 +139,8 @@ button.controls:hover{
  color: black;
  background-color: lightgreen;
 }
+
+
 div#cursor{ 
  display: inline;
  animation:blinker 0.75s linear infinite;
