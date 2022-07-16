@@ -143,6 +143,10 @@ func onClick() {
 		getInput()
 	case "randomExercise":
 		generateRandomExercise()
+	case "nextExercise":
+		generateRandomExercise()
+	case "quitExercise":
+		endRandomExercise()
 	default:
 		if target.Get("className").String() == "fileLink" {
 			loadFile(target.Get("innerHTML").String(), "exercises")
@@ -270,6 +274,7 @@ func backToNormal() {
 	hide("exerciseList")
 	hide("extra")
 	show("console")
+	show("dummy")
 }
 
 func toggleClipboardType() {
@@ -347,7 +352,8 @@ func toClipboard() {
 		copyToClipboard(latexOutput())
 
 	case oTextOutput:
-		copyToClipboard(plainTextDeriv())
+		withTitle := true
+		copyToClipboard(plainTextDeriv(withTitle))
 
 	case oJsonOutput:
 		copyToClipboard(marshalJson())
@@ -409,6 +415,7 @@ func copyToClipboard(s string) {
 func toggleExercises() {
 	stopInput()
 	hide("console")
+	hide("dummy")
 	show("extra")
 	show("exerciseList")
 	show("backButton")
@@ -489,6 +496,7 @@ func loadFile(name string, t string) {
 		toggleTheorems()
 	}
 	show("console")
+	show("dummy")
 	hide("backButton")
 	hide("exerciseList")
 	hide("extra")
@@ -511,13 +519,14 @@ func inputFromText() {
 func getInput() {
 	stopInput()
 	s := dom.GetWindow().Document().GetElementByID("textinputarea").(*dom.HTMLTextAreaElement).Value()
-	lines, err := text2data(s)
+	lines, title, err := text2data(s)
 	if err != nil {
 		js.Global().Call("alert", err.Error())
 		return
 	}
 	dom.GetWindow().Document().GetElementByID("textinputarea").(*dom.HTMLTextAreaElement).SetValue("")
 	dsp.clear()
+	dsp.Title = title
 	dsp.Input = lines
 	display()
 	printMessage("")

@@ -30,7 +30,9 @@ package gentzen
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"strconv"
+	"time"
 )
 
 var (
@@ -41,6 +43,7 @@ var (
 
 func init() {
 
+	rand.Seed(int64(time.Now().Nanosecond()))
 	connectives = append(connectivesSL, connectivesPL...)
 	logger = log.New(&checkLog, "", 0)
 

@@ -2,11 +2,25 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 )
 
-func text2data(text string) (resp []inputLine, err error) {
+func text2data(text string) (resp []inputLine, title string, err error) {
+
+	if strings.Contains(text, "<") {
+		err = errors.New("illegal character in input")
+		return
+	}
+	lines := strings.Split(text, "\n")
+	if strings.HasPrefix(lines[0], "[[TITLE:") && strings.HasSuffix(lines[0], "]]") {
+		title = strings.TrimPrefix(lines[0], "[[TITLE:")
+		title = strings.TrimSuffix(title, "]]")
+		lines = lines[1:]
+		fmt.Println("got title")
+	}
+	text = strings.Join(lines, "\n")
 
 	text = strings.ReplaceAll(text, " ", "")
 	text = strings.ReplaceAll(text, "[", "(")
@@ -14,8 +28,7 @@ func text2data(text string) (resp []inputLine, err error) {
 	text = strings.ReplaceAll(text, "{", "(")
 	text = strings.ReplaceAll(text, "}", ")")
 
-	lines := strings.Split(text, "\n")
-
+	lines = strings.Split(text, "\n")
 	for i, l := range lines {
 		if len(l) < 1 {
 			break
