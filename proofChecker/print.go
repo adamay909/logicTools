@@ -6,15 +6,21 @@ import (
 	"github.com/adamay909/logicTools/gentzen"
 )
 
-func plainTextDeriv() string {
+func plainTextDeriv(withTitle bool) string {
 	if dsp.empty() {
 		return ""
 	}
 
-	if arglines, ok := getArglines(dsp.Input); ok {
-		return gentzen.PrintDerivText(arglines, dsp.Offset)
-	}
 	output := ""
+
+	if withTitle && dsp.Title != "" {
+		output = output + "[[TITLE:" + dsp.Title + "]]" + "\n"
+	}
+
+	if arglines, ok := getArglines(dsp.Input); ok {
+		output = output + gentzen.PrintDerivText(arglines, dsp.Offset)
+		return output
+	}
 
 	for i, l := range dsp.Input {
 		if len(l) == 0 {

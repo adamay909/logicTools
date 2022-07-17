@@ -121,6 +121,23 @@ div#controls2{
 }
 
 
+button.controls{
+ display: inline-block;
+ font-size: 1.2em;
+ text-align: center;
+ background-color: lightgrey;
+ border: double;
+ border-radius: 20px;
+ border-width: 1px;
+ margin-left: 5em;
+ margin-right: 5em;
+}
+
+button.controls:hover{
+ display: inline-block;
+ color: black;
+ background-color: lightgreen;
+}
 div#cursor{ 
  display: inline;
  animation:blinker 0.75s linear infinite;

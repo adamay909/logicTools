@@ -50,12 +50,14 @@ func genRand(m, d int) string {
 func generateCandidates(m int) []string {
 
 	var r []string
+	perm := rand.Perm(len(atomicE))
 
-	for _, s1 := range atomicE[:m] {
+	for _, n1 := range perm[:m] {
+		s1 := atomicE[n1]
 
 		r = append(r, string(lneg)+s1)
-		for _, s2 := range atomicE[:m] {
-
+		for _, n2 := range perm[:m] {
+			s2 := atomicE[n2]
 			for _, c := range connectivesSL {
 
 				if c[0] == lneg {

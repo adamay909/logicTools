@@ -46,7 +46,7 @@ func generateRandomExercise() {
 
 	show("controls2")
 
-	setTextByID("controls2", `<button class="button" id="nextExercise">Next</div><button class="button" id="quitExercise">Exit</button>`)
+	setTextByID("controls2", `<button class="controls" id="nextExercise">Next</div><button class="controls" id="quitExercise">Exit</button>`)
 
 	hide("messages")
 
@@ -77,7 +77,17 @@ func randomTautology() string {
 			continue
 		}
 
-		if !gentzen.Parse(s).IsConditional() {
+		sn := gentzen.Parse(s)
+
+		if !sn.IsConditional() {
+			continue
+		}
+
+		if gentzen.IsTautology(sn.Child2Must().String()) {
+			continue
+		}
+
+		if sn.Child1Must().String() == sn.Child2Must().String() {
 			continue
 		}
 
