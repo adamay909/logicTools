@@ -131,6 +131,7 @@ button.controls{
  border-width: 1px;
  margin-left: 5em;
  margin-right: 5em;
+ padding: 0.5em;
 }
 
 button.controls:hover{
@@ -194,7 +195,7 @@ div#exerciseList {
  margin-top: 2em;
 }
 
-div.fileLink {
+button.fileLink {
  display: inline-block;
  width: 8em;
     margin:0.5em;
@@ -203,12 +204,12 @@ div.fileLink {
  border: ridge;
 }
 
-div.fileLink:hover {
+button.fileLink:hover {
  background: lightgreen;
  color: black;
 }
 
-div#randomExercise {
+button#randomExercise {
  display: inline-block;
  width: 8em;
     margin:0.5em;
@@ -217,12 +218,12 @@ div#randomExercise {
  border: ridge;
 }
 
-div#randomExercise:hover {
+button#randomExercise:hover {
  background: lightgreen;
  color: black;
 }
 
-div.sampleLink {
+button.sampleLink {
  display: inline-block;
  width: 8em;
     margin:0.5em;
@@ -231,7 +232,7 @@ div.sampleLink {
  border: ridge;
 }
 
-div.sampleLink:hover {
+button.sampleLink:hover {
  background: lightgreen;
  color: black;
 }

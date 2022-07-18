@@ -431,9 +431,9 @@ func toggleExercises() {
 	h := "<h3>Pick one to load</h3>"
 	for _, e := range files {
 		//		fmt.Println(e.Name())
-		h = h + `<div class="fileLink">` + e.Name() + `</div>`
+		h = h + `<button class="fileLink" tabindex=0>` + e.Name() + `</button>`
 	}
-	h = h + `<div id="randomExercise">Random Exercise</div>`
+	h = h + `<button id="randomExercise" tabindex=0>Random Exercise</button>`
 
 	setTextByID("exerciseList", h)
 }
@@ -463,7 +463,7 @@ func toggleSamples() {
 	h := "<h3>Pick one to load</h3>"
 	for _, e := range files {
 		//fmt.Println(e.Name())
-		h = h + `<div class="sampleLink">` + e.Name() + `</div>`
+		h = h + `<button class="sampleLink" tabindex=0>` + e.Name() + `</button>`
 	}
 	setTextByID("exerciseList", h)
 }
