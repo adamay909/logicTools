@@ -20,9 +20,15 @@ div#navbar{
  display: flex;
 }
 
-div.controls{
- display: inline-flex;
+div#controls {
+    display: inline-flex;
+    margin-left:1em;
 }
+
+div#cursorControls{
+ display: none;
+ margin-left: auto;
+ }
 
 .button#check{
  background-color: lightcyan;
@@ -302,4 +308,6 @@ div#advancedstuff >button{
 div#textinput {
  display: none;
 }
+
+
 

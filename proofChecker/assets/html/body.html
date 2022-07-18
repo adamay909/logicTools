@@ -6,13 +6,19 @@
     </div>
 
     <div id="controls">
-      <button class="button" id="check"  tabindex="1">Check Derivation</button> 
-	  <button class="button" id="clearInput" tabindex="1">Clear All</button> 
-	  <button class="button" id="toClipboard" tabindexi="1">Copy to Clipboard</button> 
-	  <button class="button" id="toggleHelp" tabindex="1">Show Help</button>
-    </div>
-  </div>
-
+      <button class="button" id="check"  tabindex="0">Check Derivation</button> 
+	  <button class="button" id="clearInput" tabindex="0">Clear All</button> 
+	  <button class="button" id="toClipboard" tabindex="0">Copy to Clipboard</button> 
+	  <button class="button" id="toggleHelp" tabindex="0">Show Help</button>
+	</div>
+	<div id="cursorControls">
+	 <button class="button" tabindex="0" class="cursorkey" id="delete">DEL</button>
+	 <button class="button" tabindex="0" class="cursorkey" id="arrowLeft">&#8592;</button>
+	 <button class="button" tabindex="0" class="cursorkey" id="arrowUp">&#8593;</button>
+	 <button class="button" tabindex="0" class="cursorkey" id="arrowDown">&#8595;</button>
+	 <button class="button" tabindex="0" class="cursorkey" id="arrowRight">&#8594;</button>
+	</div>
+	</div>
   <div id="mainArea" style="grid-template-columns: 1fr">
     <div id="settingsMenu" style="display: none">
       <button class="button" id="toggleSystem"  tabindex="0">Sentential Logic</button> 
@@ -21,17 +27,18 @@
       <button class="button" id="loadSamples" tabindex="0">examples</button>
 
       <button class="button" id="togglereadme" tabindex="0">README</button>
-	  <button class="button" id="toggleadvanced">Advanced Stuff</button>
+	  <button class="button" id="toggleadvanced" tabindex="0">Advanced Stuff</button>
 	  <div id="advancedstuff">
 	  <button class="button" id="cliptype"  tabindex="0">Clipboard: text</button>
       <button class="button" id="textInput" tabindex="0">input text</button>
+      <button class="button" id="showCursorKeys" tabindex="0">show arrow keys</button>
 	</div>
     </div>
 
     <div id="editor">
       <div id="display" tabindex="0"></div>
 
-      <div id="dummy" contenteditable="" tabindex="1"></div>
+      <div id="dummy" contenteditable="" tabindex="0"></div>
 	<div id="controls2"></div>
       <div id="messages"></div>
     </div>
