@@ -171,7 +171,6 @@ func (d *console) deleteChar() {
 func (d *console) backspace() {
 	if d.xpos == 0 && d.overhang && d.ypos > 0 {
 		d.deleteLine()
-		d.arrowUp()
 		d.end()
 		d.arrowRight()
 		return
@@ -285,7 +284,9 @@ func (d *console) clear() {
 	d.overhang = true
 	d.modifier = ""
 	d.Offset = 1
-	d.Title = ""
+	if !oExercises {
+		d.Title = ""
+	}
 
 }
 

@@ -78,7 +78,7 @@ func condEhelper(seq1, seq2, seq3 sequent) (v bool, msg string) {
 	}
 
 	if n1.subnode1.Formula() != n2.Formula() {
-		msg = "antecedent of conditional does not match subsequent of other line"
+		msg = "antecedent of conditional does not match succedent of other line"
 		return
 	}
 
@@ -115,7 +115,7 @@ func condI(seq1, seq2 sequent) bool {
 	}
 
 	if !contains(n2.subnode1.Formula(), seq1.datum) {
-		logger.Print("antecedentt of conclusion must be in datum of premise")
+		logger.Print("antecedent of conclusion must be in datum of premise")
 		return false
 	}
 

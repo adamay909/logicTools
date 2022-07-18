@@ -32,6 +32,8 @@ var (
 
 	oABOUT = false
 
+	oExercises = false
+
 	oClipboard = 2
 
 	oAdvanced = false
@@ -147,6 +149,19 @@ func onClick() {
 		generateRandomExercise()
 	case "quitExercise":
 		endRandomExercise()
+
+	case "arrowUp":
+		handleInput("ArrowUp")
+	case "arrowDown":
+		handleInput("ArrowDown")
+	case "arrowLeft":
+		handleInput("ArrowLeft")
+	case "arrowRight":
+		handleInput("ArrowRight")
+	case "delete":
+		handleInput("Delete")
+	case "showCursorKeys":
+		showArrowKeys()
 	default:
 		if target.Get("className").String() == "fileLink" {
 			loadFile(target.Get("innerHTML").String(), "exercises")
@@ -171,9 +186,14 @@ func typeformula() {
 	if !acceptInput {
 		return
 	}
-	o := js.Global().Get("event").Get("key")
+	input := js.Global().Get("event").Get("key")
 
-	dsp.handleInput(o.String())
+	handleInput(input.String())
+}
+
+func handleInput(s string) {
+
+	dsp.handleInput(s)
 	dsp.format()
 	setTextByID("display", dsp.typeset())
 	focusInput()
@@ -550,4 +570,8 @@ func toggleAdvanced() {
 		hide("advancedstuff")
 	}
 	return
+}
+
+func showArrowKeys() {
+	show("cursorControls")
 }

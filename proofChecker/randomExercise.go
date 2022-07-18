@@ -4,6 +4,7 @@ import "github.com/adamay909/logicTools/gentzen"
 
 func generateRandomExercise() {
 
+	oExercises = true
 	var p1, p2, c *gentzen.Node
 	s := gentzen.Parse(randomTautology())
 
@@ -55,6 +56,8 @@ func generateRandomExercise() {
 }
 
 func endRandomExercise() {
+
+	oExercises = false
 
 	dsp.clear()
 
