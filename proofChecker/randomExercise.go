@@ -2,11 +2,35 @@ package main
 
 import "github.com/adamay909/logicTools/gentzen"
 
+var exN int
+
+func nextExercise() string {
+
+	if exN > len(tautologies) {
+		genRandomTautology()
+	}
+	exN++
+	return tautologies[exN-1]
+}
+
+func prevExercise() string {
+
+	if exN < 1 {
+		exN = 1
+	}
+	exN--
+	return tautologies[exN-1]
+
+}
+
 func generateRandomExercise() {
+	if oPL {
+		togglePL()
+	}
 
 	oExercises = true
 	var p1, p2, c *gentzen.Node
-	s := gentzen.Parse(randomTautology())
+	s := gentzen.Parse(genRandomTautology())
 
 	p1 = gentzen.Parse(s.Child1Must().String())
 	if p1.IsConjunction() {
@@ -70,7 +94,7 @@ func endRandomExercise() {
 
 var tautologies = []string{`>PP`}
 
-func randomTautology() string {
+func genRandomTautology() string {
 
 	var s string
 
@@ -102,9 +126,7 @@ func randomTautology() string {
 	}
 
 	tautologies = append(tautologies, s)
-
 	return s
-
 }
 
 func contains(s []string, e string) bool {

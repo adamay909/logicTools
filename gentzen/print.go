@@ -95,13 +95,13 @@ func printNodeInfix(n *Node, m printMode) (s string) {
 	if n.IsQuantifier() {
 		return s
 	}
-	/*
-		if n.IsNegation() {
-			if !n.parent.IsQuantifier() {
-				return s
-			}
+
+	if n.IsNegation() {
+		if !n.parent.IsQuantifier() {
+			return s
 		}
-	*/
+	}
+
 	var ob1, ob2 string
 	var blevel int
 

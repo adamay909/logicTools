@@ -1,19 +1,25 @@
 package main
 
+import (
+	"strconv"
+	"syscall/js"
+)
+
 type inputLine []string
 
 type console struct {
-	Title           string
-	Input           []inputLine
-	SystemPL        bool
-	Theorems        bool
-	xpos, ypos      int
-	xprev, yprev    int
-	xcuror, ycursor int
-	html            []string
-	modifier        string
-	overhang        bool
-	Offset          int
+	Title               string
+	Input               []inputLine
+	SystemPL            bool
+	Theorems            bool
+	xpos, ypos          int
+	xprev, yprev        int
+	xcuror, ycursor     int
+	html                []string
+	modifier            string
+	overhang            bool
+	Offset              int
+	viewTop, viewBottom int
 }
 
 const (
@@ -85,12 +91,9 @@ func (d *console) arrowUp() {
 	}
 	d.ypos--
 	d.home()
-	/*
-	   if d.xpos > len(d.Input[d.ypos]) {
-	   		d.end()
-	   		d.arrowRight()
-	   	}
-	*/
+	/*	if d.ypos == d.viewTop {
+		d.scrollUp()
+	}*/
 }
 
 func (d *console) arrowDown() {
@@ -99,12 +102,9 @@ func (d *console) arrowDown() {
 	}
 	d.ypos++
 	d.home()
-	/*
-	   if d.xpos > len(d.Input[d.ypos]) {
-	   		d.end()
-	   		d.arrowRight()
-	   			}
-	*/
+	/*	if d.ypos == d.viewBottom {
+		d.scrollDown()
+	}*/
 }
 
 func (d *console) arrowLeft() {
@@ -256,11 +256,6 @@ func (d *console) addNewline() {
 }
 
 func (d *console) addChar(c string) {
-	// 	if xpos == len(d.currentLine()) {
-	//	d.input[d.ypos] = append(d.currentLine(), c)
-	//	d.xpos++
-	//	return
-	//  }
 
 	var n inputLine
 
@@ -281,6 +276,8 @@ func (d *console) clear() {
 	d.html = nil
 	d.xpos = 0
 	d.ypos = 0
+	d.viewTop = 0
+	d.viewBottom = 25
 	d.overhang = true
 	d.modifier = ""
 	d.Offset = 1
@@ -309,4 +306,32 @@ func isModifier(k string) bool {
 
 func (d *console) setOffset(n int) {
 	d.Offset = n
+}
+
+func (d *console) scrollDown() {
+	if dsp.viewTop == 2 {
+		return
+	}
+
+	//	displayHeight, _ := strconv.Atoi(js.Global().Get("display").Get("clientheight").String())
+	//	lh := displayHeight / 26
+
+	js.Global().Get("display").Call("scrollBy", []map[string]string{map[string]string{"top": "32"}, map[string]string{"left": "0"}, map[string]string{"behavior": "auto"}})
+
+	dsp.viewBottom = dsp.viewBottom + 2
+	dsp.viewTop = dsp.viewTop + 2
+}
+
+func (d *console) scrollUp() {
+	if dsp.viewTop == 2 {
+		return
+	}
+
+	displayHeight, _ := strconv.Atoi(js.Global().Get("display").Get("clientheight").String())
+	lh := displayHeight / 26
+
+	js.Global().Get("display").Call("scrollBy", []int{0, lh * 2})
+
+	dsp.viewBottom = dsp.viewBottom - 2
+	dsp.viewTop = dsp.viewTop - 2
 }

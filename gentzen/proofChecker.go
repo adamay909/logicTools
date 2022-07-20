@@ -171,8 +171,8 @@ func parseArgline(s string) (al argLine, err error) {
 		return
 	}
 
-	al.seq.datum = fields[0]
-	al.seq.succedent = fields[1]
+	al.seq.datum = strings.TrimSpace(fields[0])
+	al.seq.succedent = strings.TrimSpace(fields[1])
 	if len(fields) == 4 {
 		al.inf = fields[3]
 	}

@@ -106,8 +106,8 @@ func setupJS() {
 func onClick() {
 
 	target := js.Global().Get("event").Get("target")
-	//fmt.Println(target.Get("id"))
-	//fmt.Println(target.Get("outerHTML"))
+	//	fmt.Println(target.Get("id"))
+	//	fmt.Println(target.Get("outerHTML"))
 	switch target.Get("id").String() {
 	case "toggleSettings":
 		toggleSettings()
@@ -175,11 +175,14 @@ func onClick() {
 func display() {
 	dsp.format()
 	setTextByID("display", dsp.typeset())
+	setTextByID("dummy", dsp.typeset())
 }
 
 func displayDerivation() {
 	dsp.formatDerivation()
 	setTextByID("display", dsp.typeset())
+	setTextByID("dummy", dsp.typeset())
+
 }
 
 func typeformula() {
