@@ -53,20 +53,9 @@ var dsp *console
 
 func main() {
 
-	setupPage()
 	setupJS()
+	resetDisplay()
 
-	dsp = new(console)
-
-	//finalize stuff
-	dsp.clear()
-	display()
-	toggleClipboardType()
-	toggleTheorems()
-	togglePL()
-	toggleSettings()
-	setDisplay()
-	focusInput()
 	<-make(chan bool)
 }
 
@@ -106,9 +95,12 @@ func setupJS() {
 func onClick() {
 
 	target := js.Global().Get("event").Get("target")
-	//fmt.Println(target.Get("id"))
-	//fmt.Println(target.Get("outerHTML"))
+	//	fmt.Println(target.Get("id"))
+	//	fmt.Println(target.Get("outerHTML"))
 	switch target.Get("id").String() {
+	case "dummy":
+		startInput()
+
 	case "toggleSettings":
 		toggleSettings()
 	case "check":
@@ -119,34 +111,42 @@ func onClick() {
 		toClipboard()
 	case "toggleHelp":
 		toggleHelp()
+
 	case "toggleSystem":
 		togglePL()
 	case "setOffset":
 		setOffset()
 	case "togglethm":
 		toggleTheorems()
-	case "cliptype":
-		toggleClipboardType()
 	case "togglereadme":
 		toggleReadme()
-	case "dummy":
-		startInput()
+
 	case "loadExercise":
 		toggleExercises()
 	case "loadSamples":
 		toggleSamples()
+	case "reset":
+		resetDisplay()
+
 	case "toggleadvanced":
 		toggleAdvanced()
-	case "backButton":
-		backToNormal()
+	case "cliptype":
+		toggleClipboardType()
 	case "textInput":
 		inputFromText()
+	case "showCursorKeys":
+		showArrowKeys()
+
+	case "backButton":
+		backToNormal()
+
 	case "submitInput":
 		getInput()
-	case "randomExercise":
-		generateRandomExercise()
+
 	case "nextExercise":
-		generateRandomExercise()
+		nextProblem()
+	case "prevExercise":
+		prevProblem()
 	case "quitExercise":
 		endRandomExercise()
 
@@ -160,8 +160,7 @@ func onClick() {
 		handleInput("ArrowRight")
 	case "delete":
 		handleInput("Delete")
-	case "showCursorKeys":
-		showArrowKeys()
+
 	default:
 		if target.Get("className").String() == "fileLink" {
 			loadFile(target.Get("innerHTML").String(), "exercises")
@@ -175,11 +174,14 @@ func onClick() {
 func display() {
 	dsp.format()
 	setTextByID("display", dsp.typeset())
+	setTextByID("dummy", dsp.typeset())
 }
 
 func displayDerivation() {
 	dsp.formatDerivation()
 	setTextByID("display", dsp.typeset())
+	setTextByID("dummy", dsp.typeset())
+
 }
 
 func typeformula() {
@@ -198,6 +200,7 @@ func handleInput(s string) {
 	setTextByID("display", dsp.typeset())
 	focusInput()
 	setTextByID("dummy", dsp.typeset())
+	scrollDisplay()
 	return
 }
 
@@ -213,6 +216,41 @@ func clearInput() {
 	hide("messages")
 	focusInput()
 	stopInput()
+}
+
+func resetDisplay() {
+
+	oPL = true
+	oTHM = true
+	oHELP = false
+	oMENU = false
+	oABOUT = false
+	oExercises = false
+	oClipboard = 2
+	oAdvanced = false
+
+	var cons console
+
+	dsp = &cons
+
+	setupPage()
+
+	dsp.SystemPL = oPL
+	dsp.Theorems = oTHM
+	dsp.overhang = false
+	dsp.Offset = 1
+	dsp.viewTop = 0
+	dsp.viewBottom = 20
+	//finalize stuff
+	display()
+	toggleClipboardType()
+	toggleTheorems()
+	togglePL()
+	toggleSettings()
+	setDisplay()
+	focusInput()
+	exercises = nil
+	expos = 0
 }
 
 func toggleTheorems() {
@@ -453,7 +491,7 @@ func toggleExercises() {
 		//		fmt.Println(e.Name())
 		h = h + `<button class="fileLink" tabindex=0>` + e.Name() + `</button>`
 	}
-	h = h + `<button id="randomExercise" tabindex=0>Random Exercise</button>`
+	h = h + `<p><button class="fileLink" id="nextExercise" tabindex=0>Random Exercises</button></p>`
 
 	setTextByID("exerciseList", h)
 }
