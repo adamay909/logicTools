@@ -432,7 +432,7 @@ func listSentences(nodes []*Node) []string {
 	return l
 }
 
-func removeDuplicates(old []string) []string {
+func _removeDuplicates(old []string) []string {
 
 	var l []string
 
@@ -443,7 +443,7 @@ func removeDuplicates(old []string) []string {
 	l = append(l, old[0])
 
 	for i := 1; i < len(old); i++ {
-		if in(old[i], l) {
+		if slicesContains(l, old[i]) {
 			continue
 		}
 		l = append(l, old[i])
@@ -525,7 +525,7 @@ func getColumns(s string) []string {
 
 	l := listSentences(nodes)
 
-	l = removeDuplicates(l)
+	l = slicesCleanDuplicates(l)
 
 	l = reorderSentences(l)
 	//

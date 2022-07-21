@@ -14,7 +14,7 @@ type console struct {
 	Theorems            bool
 	xpos, ypos          int
 	xprev, yprev        int
-	xcuror, ycursor     int
+	xcursor, ycursor    int
 	html                []string
 	modifier            string
 	overhang            bool
@@ -91,9 +91,6 @@ func (d *console) arrowUp() {
 	}
 	d.ypos--
 	d.home()
-	/*	if d.ypos == d.viewTop {
-		d.scrollUp()
-	}*/
 }
 
 func (d *console) arrowDown() {
@@ -102,9 +99,6 @@ func (d *console) arrowDown() {
 	}
 	d.ypos++
 	d.home()
-	/*	if d.ypos == d.viewBottom {
-		d.scrollDown()
-	}*/
 }
 
 func (d *console) arrowLeft() {
@@ -276,6 +270,9 @@ func (d *console) clear() {
 	d.html = nil
 	d.xpos = 0
 	d.ypos = 0
+	d.xprev, d.yprev = 0, 0
+	d.xcursor, d.ycursor = 0, 0
+	d.html = nil
 	d.viewTop = 0
 	d.viewBottom = 25
 	d.overhang = true
@@ -285,6 +282,11 @@ func (d *console) clear() {
 		d.Title = ""
 	}
 
+}
+
+func (d *console) reset() {
+	d.clear()
+	d.Title = ""
 }
 
 func (d *console) currentLine() inputLine {

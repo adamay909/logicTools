@@ -39,6 +39,7 @@ const (
 
 var checkLog strings.Builder
 var logger *log.Logger
+var strictCheck bool
 
 func checkDerivation(lines []string, offset int) bool {
 	var al []argLine
@@ -171,8 +172,8 @@ func parseArgline(s string) (al argLine, err error) {
 		return
 	}
 
-	al.seq.datum = strings.TrimSpace(fields[0])
-	al.seq.succedent = strings.TrimSpace(fields[1])
+	al.seq.d = datum(strings.TrimSpace(fields[0]))
+	al.seq.s = plshFormula(strings.TrimSpace(fields[1]))
 	if len(fields) == 4 {
 		al.inf = fields[3]
 	}
@@ -215,9 +216,9 @@ func printArgLine(s string, m printMode) string {
 	al, _ := parseArgline(s)
 	datumstring := ""
 
-	if len(al.seq.datum) != 0 {
+	if len(al.seq.d) != 0 {
 
-		datums := strings.Split(al.seq.datum, ",")
+		datums := al.seq.datumSlice()
 		for _, d := range datums {
 			if d[:1] == `\` {
 				datumstring = datumstring + runeOf(d, m) + `, `
@@ -228,7 +229,7 @@ func printArgLine(s string, m printMode) string {
 		datumstring = strings.TrimRight(datumstring, ", ")
 	}
 
-	succstring := printNodeInfix(Parse(al.seq.succedent), m)
+	succstring := printNodeInfix(Parse(al.seq.succedent().String()), m)
 	annotation := ""
 	if len(al.lines) > 0 {
 		for _, i := range al.lines {
@@ -261,7 +262,7 @@ func symb(s string, m printMode) string {
 	return s
 }
 
-func runeOf(s string, m printMode) string {
+func runeOf[str ~string](s str, m printMode) string {
 	var n int
 	if m == mLatex {
 		n = 1
@@ -269,11 +270,11 @@ func runeOf(s string, m printMode) string {
 		n = 2
 	}
 	for _, e := range greekBindings {
-		if e[1] == s {
+		if e[1] == string(s) {
 			return e[n]
 		}
 	}
-	return s
+	return string(s)
 }
 
 func lineSpec(infRule string) int {
@@ -386,5 +387,5 @@ func fullName(i string) string {
 }
 
 func isTheorem(s sequent) bool {
-	return s.datum == ""
+	return s.d == ""
 }

@@ -1,29 +1,88 @@
 package main
 
-import "github.com/adamay909/logicTools/gentzen"
+import (
+	"encoding/json"
+	"strconv"
 
-var exN int
+	"github.com/adamay909/logicTools/gentzen"
+)
 
-func nextExercise() string {
+var tautologies = []string{`>PP`}
+var exercises []string
+var expos int
 
-	if exN > len(tautologies) {
-		genRandomTautology()
+func nextProblem() {
+
+	if len(exercises) == 0 {
+		genNewExercise()
+		exercises = append(exercises, marshalJson())
+		displayExercise(exercises[expos])
+		return
 	}
-	exN++
-	return tautologies[exN-1]
+
+	exercises[expos] = string(marshalJson())
+	expos++
+
+	if expos == len(exercises) {
+		genNewExercise()
+		exercises = append(exercises, marshalJson())
+	}
+
+	displayExercise(exercises[expos])
+
 }
 
-func prevExercise() string {
-
-	if exN < 1 {
-		exN = 1
+func prevProblem() {
+	exercises[expos] = marshalJson()
+	expos--
+	if expos < 0 {
+		expos = 0
 	}
-	exN--
-	return tautologies[exN-1]
 
+	displayExercise(exercises[expos])
 }
 
-func generateRandomExercise() {
+func displayExercise(s string) {
+
+	json.Unmarshal([]byte(s), dsp)
+	dsp.xpos, dsp.ypos = 0, 0
+	dsp.overhang = false
+	dsp.modifier = ""
+
+	if dsp.SystemPL != oPL {
+		togglePL()
+	}
+
+	if dsp.Theorems != oTHM {
+		toggleTheorems()
+	}
+
+	backToNormal()
+
+	show("controls2")
+
+	setTextByID("controls2", `<button class="controls" id="prevExercise">Previous</button><button class="controls" id="nextExercise">Next</button>`)
+
+	hide("messages")
+
+	stopInput()
+}
+
+func endRandomExercise() {
+
+	oExercises = false
+
+	dsp.clear()
+
+	display()
+
+	hide("controls2")
+
+	setTextByID("controls2", "")
+}
+
+func genNewExercise() {
+
 	if oPL {
 		togglePL()
 	}
@@ -53,11 +112,11 @@ func generateRandomExercise() {
 
 	}
 
-	problem := `Derive from &ensp;` + seq1 + ` to &ensp;` + seq3
+	problem := `Q` + strconv.Itoa(expos+1) + `. Derive from &ensp;` + seq1 + ` to &ensp;` + seq3
 
 	if p2 != nil {
 
-		problem = `Derive from ` + seq1 + `&ensp; and &ensp; ` + seq2 + `&ensp; to &ensp; ` + seq3
+		problem = `Q` + strconv.Itoa(expos+1) + `. Derive from ` + seq1 + `&ensp; and &ensp; ` + seq2 + `&ensp; to &ensp; ` + seq3
 
 	}
 
@@ -67,32 +126,7 @@ func generateRandomExercise() {
 
 	display()
 
-	backToNormal()
-
-	show("controls2")
-
-	setTextByID("controls2", `<button class="controls" id="nextExercise">Next</div><button class="controls" id="quitExercise">Exit</button>`)
-
-	hide("messages")
-
-	stopInput()
-
 }
-
-func endRandomExercise() {
-
-	oExercises = false
-
-	dsp.clear()
-
-	display()
-
-	hide("controls2")
-
-	setTextByID("controls2", "")
-}
-
-var tautologies = []string{`>PP`}
 
 func genRandomTautology() string {
 

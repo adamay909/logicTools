@@ -326,6 +326,6 @@ func nextSentence(ts tokenStr) (tn tokenStr, err error) {
 		return ts[:findMatchingBracket(ts, 0)+1], err
 	}
 
-	err = errors.New("Missing brackets?")
+	err = errors.New("Something wrong. Check commas, brackets, etc.")
 	return
 }

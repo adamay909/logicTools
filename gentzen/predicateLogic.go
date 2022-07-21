@@ -1,6 +1,7 @@
 package gentzen
 
 import (
+	"log"
 	"strings"
 )
 
@@ -28,25 +29,30 @@ func isInstanceOf(s1, s2 string) (val bool, variable, term string) {
 	ns2 = ns2[1:]
 
 	if len(ns1) != len(ns2) {
+		log.Println(ns1, " and ", ns2, "not same")
 		return
 	}
 
 	for i := range ns1 {
 
 		if ns1[i].MainConnective() != ns2[i].MainConnective() {
+			log.Println(ns1, " and ", ns2, "not same2")
 
 			return
 		}
 
 		if ns1[i].IsAtomic() {
 			if len(ns1[i].Terms()) != len(ns2[i].Terms()) {
+				log.Println(ns1, " and ", ns2, "not same3")
 				return
 			}
 			if ns1[i].Predicate() != ns2[i].Predicate() {
+				log.Println(ns1, " and ", ns2, "not same4")
 				return
 			}
 			j := findPos(v, ns2[i].Terms())
 			if j == -1 {
+				log.Println(ns1, " and ", ns2, "not same5")
 				return
 			}
 			r = ns1[i].Terms()[j]
@@ -56,7 +62,7 @@ func isInstanceOf(s1, s2 string) (val bool, variable, term string) {
 	}
 	n3 := replaceTerms(ns2[0], v, r)
 
-	return ns1[0].String() == n3.String(), v, r
+	return n1.String() == n3.String(), v, r
 }
 
 func findPos(v string, list []string) int {
@@ -116,7 +122,7 @@ func (n *Node) hasTerm(t string) bool {
 			continue
 		}
 
-		if in(t, i.Terms()) {
+		if slicesContains(i.Terms(), t) {
 			return true
 		}
 	}

@@ -1,5 +1,7 @@
 package gentzen
 
+import "sort"
+
 type Node struct {
 	raw                string
 	connective         logicalConstant
@@ -377,4 +379,99 @@ func (c logicalConstant) Stringf(m printMode) string {
 		}
 	}
 	return ""
+}
+
+func getSubnodes(n *Node) []*Node {
+
+	var gs func(n *Node, list []*Node) []*Node
+
+	gs = func(n *Node, list []*Node) []*Node {
+
+		list = append(list, n)
+
+		if n.IsAtomic() {
+			return list
+		}
+
+		if n.subnode1 != nil {
+			list = gs(n.subnode1, list)
+		}
+
+		if n.subnode2 != nil {
+			list = gs(n.subnode2, list)
+		}
+
+		return list
+	}
+
+	var list []*Node
+
+	return gs(n, list)
+}
+
+//order nodes by depth
+func reorderNodes(nodes []*Node) (out []*Node) {
+
+	d := findMaxDepth(nodes)
+
+	for i := 0; i <= d; i++ {
+
+		for _, j := range nodes {
+			if j.Generation() == i {
+				out = append(out, j)
+			}
+		}
+	}
+	return out
+}
+
+func findMaxDepth(nodes []*Node) int {
+
+	var ds []int
+
+	for _, n := range nodes {
+		ds = append(ds, n.Generation())
+	}
+
+	sort.Ints(ds)
+
+	return ds[len(ds)-1]
+}
+
+//check if s2 is instance of s1
+func sameStructure(s1, s2 string) bool {
+
+	ns1 := getSubnodes(Parse(s1))
+	ns2 := getSubnodes(Parse(s2))
+
+	ns1 = reorderNodes(ns1)
+	ns2 = reorderNodes(ns2)
+
+	if len(ns2) < len(ns1) {
+		return false
+	}
+
+	for i := range ns1 {
+
+		if ns1[i].IsAtomic() {
+			old := ns1[i].Formula()
+			repl := ns2[i].Formula()
+			for _, n := range ns1 {
+				if n.IsAtomic() && !n.HasFlag("c") {
+					if n.Formula() == old {
+						n.SetFormula(repl)
+						n.SetFlag("c")
+					}
+				}
+			}
+		}
+		continue
+
+		if ns1[i].MainConnective() != ns2[i].MainConnective() {
+			return false
+		}
+	}
+
+	return printNodePolish(ns1[0]) == printNodePolish(ns2[0])
+
 }

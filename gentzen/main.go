@@ -208,7 +208,7 @@ func PrintDeriv(lines []string, offset int) (out string) {
 	seq2, err2 := parseArgline(lines[len(lines)-1])
 
 	if err1 == nil && err2 == nil {
-		if seq2.seq.datum == "" {
+		if seq2.seq.d == "" {
 			out = out + `%Prove \p{` + seq2.seq.StringLatex() + "}\n\n"
 		} else {
 			out = out + `%Derive from \p{` + seq1.seq.StringLatex() + `} to \p{` + seq2.seq.StringLatex() + "}\n\n"
@@ -252,7 +252,7 @@ func RandomSentence(m, d int) string {
 }
 
 //Parse should only be used when s is known to be well-formed.
-func Parse(s string) *Node {
+func Parse[S ~string](s S) *Node {
 
 	n, err := ParseStrict(s)
 
@@ -263,8 +263,8 @@ func Parse(s string) *Node {
 }
 
 //ParseStrict parses s.
-func ParseStrict(s string) (n *Node, err error) {
-	tokens, err := tokenize(s)
+func ParseStrict[str ~string](s str) (n *Node, err error) {
+	tokens, err := tokenize(string(s))
 	if err != nil {
 		return n, err
 	}

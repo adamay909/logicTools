@@ -22,16 +22,13 @@ func getArglines(c []inputLine) (s []string, ok bool) {
 		gentzen.WriteLog("Nothing to do.", "")
 		return
 	}
-	for i, line := range c {
-
-		if len(line) == 0 {
-			if i+1 < length(dsp.Input) {
-				gentzen.WriteLog("You seem to have an empty line in the middle.", "line "+strconv.Itoa(i+1)+": ")
-				ok = false
-				fmt.Println("here1")
-				return
-			}
-			break
+	for i := 0; i <= dsp.lastLine(); i++ {
+		line := dsp.Input[i]
+		if len(line) == 0 || line == nil {
+			gentzen.WriteLog("You seem to have an empty line in the middle.", "line "+strconv.Itoa(i+1)+": ")
+			ok = false
+			fmt.Println("here1")
+			return
 		}
 
 		err := isArgline(line)
@@ -51,6 +48,16 @@ func getArglines(c []inputLine) (s []string, ok bool) {
 
 	}
 	return
+}
+
+func (d *console) lastLine() int {
+
+	for i := len(d.Input) - 1; i >= 0; i-- {
+		if len(d.Input[i]) != 0 {
+			return i
+		}
+	}
+	return len(d.Input) - 1
 }
 
 func length(l []inputLine) int {

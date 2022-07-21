@@ -193,9 +193,9 @@ func (c logicalConstant) isQuantifier() bool {
 func (seq sequent) StringLatex() string {
 	var dat, suc string
 
-	if len(seq.datum) != 0 {
+	if len(seq.datumSlice()) != 0 {
 
-		for _, d := range strings.Split(seq.datum, ",") {
+		for _, d := range seq.datumSlice().StringSlice() {
 			if d[:1] == `\` {
 				dat = dat + d + `, `
 			} else {
@@ -205,7 +205,7 @@ func (seq sequent) StringLatex() string {
 		dat = strings.TrimRight(dat, ", ")
 	}
 
-	suc = printNodeInfix(Parse(seq.succedent), mLatex)
+	suc = printNodeInfix(Parse(seq.succedent().String()), mLatex)
 
 	return `\seq{` + dat + `}{` + suc + `}`
 }
