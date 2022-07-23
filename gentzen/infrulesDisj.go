@@ -1,5 +1,9 @@
 package gentzen
 
+import (
+	"errors"
+)
+
 func disjI(seq1, seq2 sequent) bool {
 
 	n1 := Parse(seq1.succedent().String())
@@ -29,117 +33,124 @@ func disjI(seq1, seq2 sequent) bool {
 	return true
 }
 
-func disjE(seq1, seq2, seq3, seq4 sequent) bool {
+func disjE(seq ...sequent) bool {
 
-	v1, msg1 := disjEhelper1(seq1, seq2, seq3, seq4)
-	v2, msg2 := disjEhelper1(seq2, seq1, seq3, seq4)
-	v3, msg3 := disjEhelper1(seq3, seq1, seq2, seq4)
+	var seq1, seq2, seq3, seq4 sequent
+	var err error
 
-	if !v1 && !v2 && !v3 {
-		if msg1 == "must have disjunction among premises" {
+	if len(seq) != 4 {
+		return false
+	}
 
-			if msg2 == msg1 {
-				logger.Print(msg3)
-				return false
-			}
-
-			logger.Print(msg2)
-			return false
+	//check if there are premises of the right form
+	for i := 0; i < 3; i++ {
+		seq1, seq2, seq3, err = disjEhelper3(seq, i)
+		if err == nil {
+			break
 		}
-		logger.Print(msg1)
+	}
+
+	if err != nil {
+		logger.Print(err.Error())
 		return false
 	}
 
-	var v bool
-	switch {
-
-	case v1:
-		v, msg2 = disjEhelper2(seq1, seq2, seq3, seq4)
-
-	case v2:
-		v, msg2 = disjEhelper2(seq2, seq1, seq3, seq4)
-
-	case v3:
-		v, msg2 = disjEhelper2(seq3, seq1, seq2, seq4)
-
-	}
-
-	if !v {
-		logger.Print(msg2)
+	//check if non-disjunction premises have the right succedent
+	seq4 = seq[3]
+	err = disjEhelper4(seq2, seq3, seq4)
+	if err != nil {
+		logger.Print(err.Error())
 		return false
 	}
 
+	//check datum
+	ok := disjEhelper5(seq1, seq2, seq3, seq4)
+	if !ok {
+		logger.Print("check your datums")
+		return false
+	}
 	return true
+
 }
 
-func disjEhelper1(seq1, seq2, seq3, seq4 sequent) (v bool, msg string) {
+func disjEhelper3(seq []sequent, i int) (seq1, seq2, seq3 sequent, err error) {
 
-	v = false
+	var j int
 
-	n1 := Parse(seq1.succedent().String())
-	n2 := Parse(seq2.succedent().String())
-	n3 := Parse(seq3.succedent().String())
-	n4 := Parse(seq4.succedent().String())
+	ok := false
+	for j = range seq {
 
-	if n1.MainConnective() != disj {
-		msg = "must have disjunction among premises"
-		return
-	}
-
-	if n2.Formula() != n3.Formula() {
-		msg = "must have two identical succedents"
-		return
-	}
-
-	if n3.Formula() != n4.Formula() {
-		msg = "conclusion must be identical to two of the succedents"
-		return
-	}
-
-	d1 := datum(n1.Child1Must().Formula())
-	d2 := datum(n1.Child2Must().Formula())
-	/*
-		if !datumIncludes(seq2.datumSlice(), d1) && !datumIncludes(seq3.datumSlice(), d1) {
-			msg = "one of disjuncts not in datums"
-			return
+		if Parse(seq[j].succedent()).MainConnective() == disj {
+			ok = true
+			seq1 = seq[j]
+			switch j {
+			case 0:
+				seq2 = seq[1]
+				seq3 = seq[2]
+			case 1:
+				seq2 = seq[0]
+				seq3 = seq[2]
+			case 2:
+				seq2 = seq[0]
+				seq3 = seq[1]
+			}
+			break
 		}
+	}
 
-		if !datumIncludes(seq2.datumSlice(), d2) && !datumIncludes(seq3.datumSlice(), d2) {
-			msg = "one of disjuncts not in datums"
-			return
-		}
-	*/
-	if !(datumIncludes(seq2.datumSlice(), d1) && datumIncludes(seq3.datumSlice(), d2)) && !(datumIncludes(seq2.datumSlice(), d2) && datumIncludes(seq3.datumSlice(), d1)) {
-		msg = "one of disjuncts not in datums"
+	if !ok {
+		err = errors.New("at least one premise must have disjunction as succedent")
 		return
 	}
 
-	v = true
+	d1 := datum(Parse(seq1.succedent()).Child1Must().Formula())
+	d2 := datum(Parse(seq1.succedent()).Child2Must().Formula())
+
+	if !datumIncludes(seq2.datumSlice(), d1) && !datumIncludes(seq3.datumSlice(), d1) {
+		err = errors.New("each disjunct must appear in datum of at least one other premise.")
+		return
+	}
+
+	if !datumIncludes(seq2.datumSlice(), d2) && !datumIncludes(seq3.datumSlice(), d2) {
+		err = errors.New("each disjunct must appear in datum of at least one other premise.")
+		return
+	}
+
 	return
 }
 
-func disjEhelper2(seq1, seq2, seq3, seq4 sequent) (v bool, msg string) {
+func disjEhelper4(seq2, seq3, seq4 sequent) (err error) {
 
-	v = false
+	want := Parse(seq4.succedent()).Formula()
 
-	n1 := Parse(seq1.succedent().String())
-	d1 := datum(n1.Child1Must().Formula())
-	d2 := datum(n1.Child2Must().Formula())
+	have1 := Parse(seq2.succedent()).Formula()
 
-	datumCanonical := datumRm(datumUnion(seq1.datumSlice(), seq2.datumSlice(), seq3.datumSlice()), d1, d2)
+	have2 := Parse(seq3.succedent()).Formula()
 
+	if want != have1 {
+		err = errors.New("succedents of premises do not match succedent of conclusion")
+		return
+	}
+
+	if want != have2 {
+		err = errors.New("succedents of premises do not match succedent of conclusion")
+		return
+	}
+
+	return
+}
+
+func disjEhelper5(seq ...sequent) bool {
+
+	datumU := datumUnion(seq[0].datumSlice(), seq[1].datumSlice(), seq[2].datumSlice())
+
+	d1 := Parse(seq[0].succedent()).Child1Must().Formula()
+	d2 := Parse(seq[0].succedent()).Child2Must().Formula()
+
+	want := datumRm(datumU, d1, d2)
+	have := seq[3].datumSlice()
 	if strictCheck {
-		if !datumsEqual(datumCanonical, seq4.datumSlice()) {
-			msg = "datum of conclusion incorrect"
-			return
-		}
-	} else {
-		if !datumsEquiv(datumCanonical, seq4.datumSlice()) {
-			msg = "datum of conclusion incorrect"
-			return
-		}
+		return datumsEqual(want, have)
 	}
-	v = true
-
-	return
+	return datumsEquiv(want, have)
 }

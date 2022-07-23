@@ -10,6 +10,9 @@
 	  <button class="button" id="clearInput" tabindex="0">Clear All</button> 
 	  <button class="button" id="toClipboard" tabindex="0">Copy to Clipboard</button> 
 	  <button class="button" id="toggleHelp" tabindex="0">Show Help</button>
+	  <button class="button" id="sizeUp" tabindex="0" style="margin-left: 2em; width:1.5em">+</button>
+	  <button class="button" id="sizeDown" tabindex="0" style="width: 1.5em">-</button>
+
 	</div>
 	<div id="cursorControls">
 	 <button class="button" tabindex="0" class="cursorkey" id="delete">DEL</button>
@@ -21,8 +24,10 @@
 	</div>
   <div id="mainArea" style="grid-template-columns: 1fr">
     <div id="settingsMenu" style="display: none">
+	  <button class="button" id="setTitle" tabindex="0">Set Title</button> 
+	  <button class="button" id="setOffset" tabindex="0">First Line: 1</button> 
+	  <button class="button" id="togglethm"  tabindex="0">No Theorems</button> 
       <button class="button" id="toggleSystem"  tabindex="0">Sentential Logic</button> 
-	  <button class="button" id="setOffset" tabindex="0">First Line: 1</button> <button class="button" id="togglethm"  tabindex="0">No Theorems</button> 
       <button class="button" id="loadExercise" tabindex="0">exercises</button>
       <button class="button" id="loadSamples" tabindex="0">examples</button>
 
@@ -32,6 +37,8 @@
 	  <button class="button" id="cliptype"  tabindex="0">Clipboard: text</button>
       <button class="button" id="textInput" tabindex="0">input text</button>
       <button class="button" id="showCursorKeys" tabindex="0">show arrow keys</button>
+      <button class="button" id="backHistory" tabindex="0">rewind</button>
+      <button class="button" id="forwardHistory" tabindex="0">forward</button>
 	</div>
 	  <button class="button" id="reset" tabindex="0">Reset</button>
     </div>

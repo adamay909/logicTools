@@ -1,10 +1,5 @@
 package main
 
-import (
-	"strconv"
-	"syscall/js"
-)
-
 type inputLine []string
 
 type console struct {
@@ -20,6 +15,7 @@ type console struct {
 	overhang            bool
 	Offset              int
 	viewTop, viewBottom int
+	fontSize            int
 }
 
 const (
@@ -66,205 +62,6 @@ func (d *console) checkOverhang() {
 	}
 }
 
-func (d *console) cursorMovement(m string) {
-	switch m {
-	case up:
-		d.arrowUp()
-	case down:
-		d.arrowDown()
-	case left:
-		d.arrowLeft()
-	case right:
-		d.arrowRight()
-	case home2:
-		d.home()
-	case end2:
-		d.end()
-	default:
-		return
-	}
-}
-
-func (d *console) arrowUp() {
-	if d.ypos == 0 {
-		return
-	}
-	d.ypos--
-	d.home()
-}
-
-func (d *console) arrowDown() {
-	if d.ypos == len(d.Input)-1 {
-		return
-	}
-	d.ypos++
-	d.home()
-}
-
-func (d *console) arrowLeft() {
-	if d.xpos == 0 {
-		return
-	}
-	d.xpos--
-}
-
-func (d *console) arrowRight() {
-	if d.xpos == len(d.currentLine()) {
-		return
-	}
-	if d.xpos == len(d.currentLine())-1 {
-		d.xpos++
-		d.overhang = true
-		return
-	}
-	d.xpos++
-	d.overhang = false
-}
-
-func (d *console) home() {
-	d.xpos = 0
-}
-
-func (d *console) end() {
-	d.xpos = len(d.currentLine()) - 1
-	d.arrowRight()
-}
-
-func (d *console) deletion(m string) {
-
-	switch m {
-	case del:
-		d.deleteChar()
-	case backspace2:
-		d.backspace()
-	default:
-		return
-	}
-}
-
-func (d *console) deleteChar() {
-	var l1, l2 inputLine
-
-	if d.xpos == 0 {
-		if len(d.currentLine()) == 0 {
-			d.deleteLine()
-		} else {
-			d.Input[d.ypos] = d.currentLine()[1:]
-		}
-		return
-	}
-	l1 = d.currentLine()[:d.xpos]
-	if d.xpos < len(d.currentLine())-1 {
-		l2 = d.currentLine()[d.xpos+1:]
-	}
-
-	d.Input[d.ypos] = append(l1, l2...)
-
-}
-
-func (d *console) backspace() {
-	if d.xpos == 0 && d.overhang && d.ypos > 0 {
-		d.deleteLine()
-		d.end()
-		d.arrowRight()
-		return
-	}
-	if d.xpos == 0 {
-		return
-	}
-	d.arrowLeft()
-	d.deleteChar()
-}
-
-func (d *console) deleteLine() {
-
-	if d.empty() {
-		return
-	}
-
-	if d.ypos == len(d.Input)-1 {
-		d.Input = d.Input[:d.ypos]
-		d.arrowUp()
-		d.home()
-		return
-	}
-	if d.ypos == 0 {
-		d.Input = d.Input[1:]
-		d.arrowUp()
-		d.home()
-		return
-	}
-	l1 := d.Input[:d.ypos]
-	l2 := d.Input[d.ypos+1:]
-	d.Input = nil
-	d.Input = append(l1, l2...)
-
-}
-
-func (d *console) insertion(m string) {
-	if d.modifier != "" {
-		m = d.modifier + m
-		d.modifier = ""
-	}
-	switch m {
-	case enter:
-		d.addNewline()
-	default:
-		tk, err := tkOf(m, tkraw, tktex, allBindings)
-		if err == nil {
-			d.addChar(tk)
-		}
-	}
-}
-
-func (d *console) addNewline() {
-
-	var frag1, frag2 []string
-
-	frag1 = d.currentLine()[:d.xpos]
-
-	if !d.overhang {
-		frag2 = d.currentLine()[d.xpos:]
-	}
-
-	var newlines []inputLine
-
-	for i := 0; i < d.ypos; i++ {
-		newlines = append(newlines, d.Input[i])
-	}
-
-	newlines = append(newlines, frag1)
-	newlines = append(newlines, frag2)
-
-	if d.ypos < len(d.Input)-1 {
-		for i := d.ypos + 1; i < len(d.Input); i++ {
-			newlines = append(newlines, d.Input[i])
-		}
-	}
-
-	d.Input = nil
-	d.Input = newlines
-	d.ypos++
-	d.xpos = 0
-	return
-}
-
-func (d *console) addChar(c string) {
-
-	var n inputLine
-
-	for i := 0; i < d.xpos; i++ {
-		n = append(n, d.currentLine()[i])
-	}
-	n = append(n, c)
-	for i := d.xpos; i < len(d.currentLine()); i++ {
-		n = append(n, d.currentLine()[i])
-	}
-	d.Input[d.ypos] = n
-
-	d.xpos++
-}
-
 func (d *console) clear() {
 	d.Input = nil
 	d.html = nil
@@ -308,32 +105,4 @@ func isModifier(k string) bool {
 
 func (d *console) setOffset(n int) {
 	d.Offset = n
-}
-
-func (d *console) scrollDown() {
-	if dsp.viewTop == 2 {
-		return
-	}
-
-	//	displayHeight, _ := strconv.Atoi(js.Global().Get("display").Get("clientheight").String())
-	//	lh := displayHeight / 26
-
-	js.Global().Get("display").Call("scrollBy", []map[string]string{map[string]string{"top": "32"}, map[string]string{"left": "0"}, map[string]string{"behavior": "auto"}})
-
-	dsp.viewBottom = dsp.viewBottom + 2
-	dsp.viewTop = dsp.viewTop + 2
-}
-
-func (d *console) scrollUp() {
-	if dsp.viewTop == 2 {
-		return
-	}
-
-	displayHeight, _ := strconv.Atoi(js.Global().Get("display").Get("clientheight").String())
-	lh := displayHeight / 26
-
-	js.Global().Get("display").Call("scrollBy", []int{0, lh * 2})
-
-	dsp.viewBottom = dsp.viewBottom - 2
-	dsp.viewTop = dsp.viewTop - 2
 }

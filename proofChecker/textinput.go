@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 	"strings"
 )
@@ -18,7 +17,6 @@ func text2data(text string) (resp []inputLine, title string, err error) {
 		title = strings.TrimPrefix(lines[0], "[[TITLE:")
 		title = strings.TrimSuffix(title, "]]")
 		lines = lines[1:]
-		fmt.Println("got title")
 	}
 	text = strings.Join(lines, "\n")
 

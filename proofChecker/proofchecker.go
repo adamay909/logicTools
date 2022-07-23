@@ -19,19 +19,19 @@ func checkDerivation() {
 
 	arglines, ok := getArglines(dsp.Input)
 	if !ok {
-		printMessage("RESULTS:\n\n" + gentzen.ShowLog())
+		printMessage(gentzen.ShowLog())
 		return
 	}
 
 	displayDerivation()
 
 	if gentzen.CheckDeriv(arglines, dsp.Offset) {
-		printMessage("RESULTS:\n\n Good!" + gentzen.ShowLog())
+		printMessage("Good!")
 		showPrettyDeriv(dsp)
 		return
 	}
 
-	printMessage("RESULTS:\n\n" + gentzen.ShowLog())
+	printMessage(gentzen.ShowLog())
 
 	return
 }

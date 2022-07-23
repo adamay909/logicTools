@@ -71,7 +71,12 @@ func setCursor(d *console, l []string) []string {
 }
 
 func unsetCursor(l []string) []string {
-	const cursor = `<div id="cursor">&thinsp;</div>`
+	var cursor = `<div id="cursor">&thinsp;</div>`
+
+	if dsp.modifier != "" {
+		cursor = strings.ReplaceAll(cursor, `&thinsp;`, dsp.modifier)
+	}
+
 	var rv []string
 
 	for _, e := range l {
@@ -86,7 +91,13 @@ func unsetCursor(l []string) []string {
 func insertCursor(l []string, p int) []string {
 
 	var m []string
-	const cursor = `<div id="cursor">&thinsp;</div>`
+
+	var cursor = `<div id="cursor">&thinsp;</div>`
+
+	if dsp.modifier != "" {
+		cursor = strings.ReplaceAll(cursor, `&thinsp;`, dsp.modifier)
+	}
+
 	m = append(m, l[:p]...)
 	m = append(m, cursor)
 	m = append(m, l[p:]...)
@@ -101,7 +112,7 @@ func parseNsplit(l inputLine, raw bool) (dat, tstl, succ, dots, annot []string) 
 	for i, e := range l {
 		var text string
 		if !raw {
-			text = plainText(e)
+			text = plainHTML(e)
 		} else {
 			text = e
 		}

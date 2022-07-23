@@ -1,11 +1,17 @@
+
 @font-face {
-  font-family: 'Noto Sans Math';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/notosansmath/v15/7Aump_cpkSecTWaHRlH2hyV5UEl981w.woff2) format('woff2');
-  unicode-range: U+0302-0303, U+0305, U+0307-0308, U+0330, U+0391-03A1, U+03A3-03A9, U+03B1-03C9, U+03D1, U+03D5-03D6, U+03F0-03F1, U+03F4-03F5, U+2034-2037, U+2057, U+20D0-20DC, U+20E1, U+20E5-20EF, U+2102, U+210A-210E, U+2110-2112, U+2115, U+2119-211D, U+2124, U+2128, U+212C-212D, U+212F-2131, U+2133-2138, U+213C-2140, U+2145-2149, U+2190, U+2192, U+2194-21AE, U+21B0-21E5, U+21F1-21F2, U+21F4-2211, U+2213-2214, U+2216-22FF, U+2308-230B, U+2310, U+2319, U+231C-2321, U+2336-237A, U+237C, U+2395, U+239B-23B6, U+23D0, U+23DC-23E1, U+2474-2475, U+25AF, U+25B3, U+25B7, U+25BD, U+25C1, U+25CA, U+25CC, U+25FB, U+266D-266F, U+27C0-27FF, U+2900-2AFF, U+2B0E-2B11, U+2B30-2B4C, U+2BFE, U+FF5B, U+FF5D, U+1D400-1D7FF, U+1EE00-1EEFF, U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+ font-family: 'Noto Sans Math';
+ src: url(/assets/NotoSansMath.woff2) format('woff2');
 }
+
+@font-face {
+ font-family: 'math';
+ src: url(/assets/math.otf) format('opentype');
+}
+
+div#messages>p {
+padding: 0em;
+margin:0.2em;}
 
 img {
   width: 1em;
@@ -15,6 +21,11 @@ img {
 body {
  font-family: 'Noto Sans Math', sans-serif;
 } 
+
+.greek {
+ font-family: 'math', 'Noto Sans Math', sans-serif;
+ font-size: 1.08em;
+}
 
 div#navbar{
  display: flex;
@@ -30,14 +41,6 @@ div#cursorControls{
  margin-left: auto;
  }
 
-.button#check{
- background-color: lightcyan;
-}
-
-.button#check:hover{
- background-color: red;
- }
-
  .button{
  display: inline-block;
  font-size: 1em;
@@ -51,6 +54,14 @@ div#cursorControls{
  color: black;
  background-color: lightgreen;
 }
+
+.button#check{
+ background-color: lightcyan;
+}
+
+.button#check:hover{
+ background-color: red;
+ }
 
 button#toggleSettings {
   background-color: white;
@@ -91,13 +102,20 @@ div#editor {
 
 
 div#display {
- font-size: 1.2em;
  position: relative;
- height: 31em;
+ height: 40rem;
  border: solid;
  border-width:1.5px;
     margin-left: 0.5em;
- overflow-y: scroll;
+ overflow-y: hidden;
+}
+
+div#display.active {
+ border-color: blue;
+}
+
+div#display.inactive {
+ border-color: lightgrey;
 }
 
 div#dummy{
@@ -113,8 +131,12 @@ div#dummy{
 div#messages{
  display: none;
  width: 80%;
-    margin: 0.5em;
-    padding-left: 0.5em;
+ overflow-y: auto;
+ margin: 0.5em;
+ margin-top:0em;
+ margin-bottom: 0em;
+ padding-left: 0.5em;
+ padding-top: 0em;
  border-color: red;
  border: ridge;
  border-radius: 30px;
@@ -157,7 +179,7 @@ div#cursor.inactive {
 }
 @keyframes blinker {
      0%{
-        background-color: green;
+        background-color: black;
     }
      100%{
         background-color: white;
@@ -166,7 +188,7 @@ div#cursor.inactive {
  div#deriv {
      display:grid;
      width: 100%;
-     grid-template-columns: 30px minmax(40px, max-content) 40px minmax(40px, max-content) minmax(40px, max-content) 1fr;
+     grid-template-columns: 3em minmax(40px, max-content) 3em minmax(40px, max-content) minmax(40px, max-content) 1fr;
 }
  div#help{
      display: inline-block;
@@ -275,7 +297,6 @@ div#settingsMenu>button {
 }
 
 div#settingsMenu > button#toggleSystem{
-margin-top: 2em;
 }
 
 
@@ -289,6 +310,7 @@ div#settingsMenu > button#toggleadvanced {
     font-size: 0.8em;
     margin-top: 2em;
 }
+
 div#settingsMenu > button#toggleadvanced:hover {
    color: red;
     background-color: pink;
@@ -308,6 +330,8 @@ div#advancedstuff >button{
 div#textinput {
  display: none;
 }
+
+
 
 
 

@@ -78,7 +78,6 @@ var (
 		[3]string{`(`, `(`, `(`},
 		[3]string{`)`, `)`, `)`},
 		[3]string{`,`, `,`, `,`},
-		[3]string{`.`, `\ldots`, `...`},
 	}
 
 	connBindings = [][3]string{
@@ -97,6 +96,11 @@ var (
 
 	turnstileBindings = [][3]string{
 		[3]string{`|-`, `\vdash`, "⊢"},
+		[3]string{`.`, `\ldots`, `...`},
+	}
+
+	dotsBindings = [][3]string{
+		[3]string{`.`, `\ldots`, `...`},
 	}
 
 	greekBindings = [][3]string{
@@ -137,12 +141,21 @@ var (
 		[3]string{`\q`, `\psi`, "\u03c8"},
 		[3]string{`\w`, `\omega`, "\u03c9"},
 	}
+
+	extraBindings = [][3]string{
+		[3]string{`v`, `v`, `v`},
+		[3]string{`X`, `X`, `X`},
+		[3]string{`U`, `U`, `U`},
+		[3]string{` `, ` `, ` `},
+		[3]string{`V`, `V`, `V`},
+		[3]string{`.`, `.`, `.`},
+	}
 )
 
 var allBindings [][3]string
 
 func init() {
-	allBindings = combineBindings(keyBindings, punctBindings, connBindings, plBindings, turnstileBindings, greekBindings)
+	allBindings = combineBindings(keyBindings, punctBindings, connBindings, plBindings, turnstileBindings, dotsBindings, greekBindings)
 }
 
 func tkOf(s string, srctype, dsttype tkType, b [][3]string) (tk string, err error) {

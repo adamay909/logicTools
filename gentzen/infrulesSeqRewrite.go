@@ -1,17 +1,17 @@
 package gentzen
 
 //seq1 is concluding sequent
-func seqRewrite(seq1, seq2 sequent, n int) bool {
+func seqRewrite(have, want sequent, n int) bool {
 
-	if isSeqReduce(seq2, seq1) {
+	if isSeqReduce(have, want) {
 		return true
 	}
 
-	if isSeqReorder(seq2, seq1) {
+	if isSeqReorder(have, want) {
 		return true
 	}
 
-	if isSeqAddition(seq2, seq1) {
+	if isSeqAddition(have, want) {
 		return true
 	}
 
@@ -21,14 +21,14 @@ func seqRewrite(seq1, seq2 sequent, n int) bool {
 }
 
 //check if datum of seq1 is a reduction of seq2
-func isSeqReduce(seq1, seq2 sequent) bool {
+func isSeqReduce(have, want sequent) bool {
 
-	if seq1.s != seq2.s {
+	if have.succedent() != want.succedent() {
 		return false
 	}
 
-	datum1 := seq1.datumSlice()
-	datum2 := seq2.datumSlice()
+	datum1 := have.datumSlice()
+	datum2 := want.datumSlice()
 
 	if !(len(datum1) < len(datum2)) {
 		return false
@@ -44,14 +44,14 @@ func isSeqReduce(seq1, seq2 sequent) bool {
 }
 
 //check if datum of seq1 is a reordering of seq2
-func isSeqReorder(seq1, seq2 sequent) bool {
+func isSeqReorder(have, want sequent) bool {
 
-	if seq1.s != seq2.s {
+	if have.succedent() != want.succedent() {
 		return false
 	}
 
-	datum1 := seq1.datumSlice()
-	datum2 := seq2.datumSlice()
+	datum1 := have.datumSlice()
+	datum2 := want.datumSlice()
 
 	if len(datum1) != len(datum2) {
 		return false
@@ -69,23 +69,23 @@ func isSeqReorder(seq1, seq2 sequent) bool {
 	return true
 }
 
-//check if datum of seq2 is addtion to seq1
-func isSeqAddition(seq1, seq2 sequent) bool {
+//check if datum of have is addtion to want
+func isSeqAddition(have, want sequent) bool {
 
-	if seq1.s != seq2.s {
+	if have.succedent() != have.succedent() {
 		return false
 	}
 
-	datum1 := seq1.datumSlice()
-	datum2 := seq2.datumSlice()
+	datum1 := have.datumSlice()
+	datum2 := want.datumSlice()
 
-	if !(len(datum2) > len(datum1)) {
+	if !(len(datum1) > len(datum2)) {
 		return false
 	}
 
-	for _, e := range datum1 {
+	for _, e := range datum2 {
 
-		if !slicesContains(datum2, e) {
+		if !slicesContains(datum1, e) {
 			return false
 		}
 	}

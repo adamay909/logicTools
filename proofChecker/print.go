@@ -37,16 +37,19 @@ func plainOutput(s []string) string {
 	var r string
 
 	for _, e := range s {
-		r = r + plainText(e)
+		r = r + plainHTML(e)
 	}
 	return r
 
 }
 
-func plainText(s string) string {
+func plainHTML(s string) string {
 
 	for _, e := range allBindings {
 		if s == e[tktex] {
+			if isGreek(s) {
+				return `<span class="greek">` + e[tktxt] + `</span>`
+			}
 			return e[tktxt]
 		}
 	}
@@ -72,4 +75,14 @@ func latexOutput() string {
 		output = output + `\item ` + plainOutput(l) + "\n"
 	}
 	return output + `\end{enumerate}` + "\n"
+}
+
+func isGreek(s string) bool {
+
+	for _, e := range greekBindings {
+		if s == e[tktex] {
+			return true
+		}
+	}
+	return false
 }

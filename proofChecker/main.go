@@ -4,8 +4,10 @@ import (
 	"embed"
 	_ "embed"
 	"encoding/json"
+	"fmt"
 	"sort"
 	"strconv"
+	"strings"
 	"syscall/js"
 
 	"github.com/adamay909/logicTools/gentzen"
@@ -55,6 +57,7 @@ func main() {
 
 	setupJS()
 	resetDisplay()
+	loadHistory()
 
 	<-make(chan bool)
 }
@@ -84,6 +87,13 @@ func setupPage() {
 	if !oPRIVATE {
 		setAttributeByID("loadExercise", "style", "display:none")
 	}
+
+	h := int(0.8 * float64(js.Global().Get("innerHeight").Int()))
+	setAttributeByID("display", `style`, `height: `+strconv.Itoa(h)+`px`)
+
+	dsp.fontSize = 120
+	setAttributeByID("editor", `style`, `font-size:`+strconv.Itoa(dsp.fontSize)+`%;`)
+
 }
 
 func setupJS() {
@@ -112,6 +122,8 @@ func onClick() {
 	case "toggleHelp":
 		toggleHelp()
 
+	case "setTitle":
+		setTitle()
 	case "toggleSystem":
 		togglePL()
 	case "setOffset":
@@ -136,6 +148,10 @@ func onClick() {
 		inputFromText()
 	case "showCursorKeys":
 		showArrowKeys()
+	case "backHistory":
+		backHistory()
+	case "forwardHistory":
+		forwardHistory()
 
 	case "backButton":
 		backToNormal()
@@ -161,6 +177,11 @@ func onClick() {
 	case "delete":
 		handleInput("Delete")
 
+	case "sizeUp":
+		sizeUp()
+	case "sizeDown":
+		sizeDown()
+
 	default:
 		if target.Get("className").String() == "fileLink" {
 			loadFile(target.Get("innerHTML").String(), "exercises")
@@ -174,13 +195,13 @@ func onClick() {
 func display() {
 	dsp.format()
 	setTextByID("display", dsp.typeset())
-	setTextByID("dummy", dsp.typeset())
+	setTextByID("dummy", "")
 }
 
 func displayDerivation() {
 	dsp.formatDerivation()
 	setTextByID("display", dsp.typeset())
-	setTextByID("dummy", dsp.typeset())
+	setTextByID("dummy", "")
 
 }
 
@@ -199,7 +220,7 @@ func handleInput(s string) {
 	dsp.format()
 	setTextByID("display", dsp.typeset())
 	focusInput()
-	setTextByID("dummy", dsp.typeset())
+	setTextByID("dummy", "")
 	scrollDisplay()
 	return
 }
@@ -209,6 +230,7 @@ func focusInput() {
 }
 
 func clearInput() {
+	saveHistory()
 	dsp.clear()
 	setTextByID("setOffset", "First Line: "+strconv.Itoa(dsp.Offset))
 	display()
@@ -399,6 +421,40 @@ func setOffset() {
 	display()
 }
 
+func setTitle() {
+
+	title := js.Global().Call("prompt", "Title:").String()
+	dsp.Title = convert(title)
+
+	display()
+}
+
+func convert(s string) string {
+
+	words := strings.Split(s, " ")
+
+	var wn []string
+	for _, w := range words {
+		r := ""
+		t := w
+		for i := 0; i < len(t); {
+			fmt.Println("check: ", t[i:])
+			for _, e := range allBindings {
+				if strings.HasPrefix(string(t[i:]), e[tkraw]) {
+					r = r + e[tktxt]
+					i = i + len(e[tkraw]) - 1
+					break
+				}
+			}
+			i++
+		}
+		wn = append(wn, r)
+	}
+
+	return `<span class="greek">` + strings.Join(wn, " ") + `</span>`
+
+}
+
 func toClipboard() {
 	if oABOUT {
 		return
@@ -425,7 +481,7 @@ func startInput() {
 	acceptInput = true
 	display()
 	setAttributeByID("cursor", "class", "active")
-	setAttributeByID("display", "style", "border-color: blue")
+	setAttributeByID("display", "class", "active")
 
 }
 
@@ -434,7 +490,7 @@ func stopInput() {
 	acceptInput = false
 	display()
 	setAttributeByID("cursor", "class", "inactive")
-	setAttributeByID("display", "style", "border-color:lightgrey")
+	setAttributeByID("display", "class", "inactive")
 
 }
 
@@ -612,4 +668,14 @@ func toggleAdvanced() {
 
 func showArrowKeys() {
 	show("cursorControls")
+}
+
+func sizeUp() {
+	dsp.fontSize = dsp.fontSize + 20
+	setAttributeByID("editor", `style`, `font-size:`+strconv.Itoa(dsp.fontSize)+`%;`)
+}
+
+func sizeDown() {
+	dsp.fontSize = dsp.fontSize - 20
+	setAttributeByID("editor", `style`, `font-size:`+strconv.Itoa(dsp.fontSize)+`%;`)
 }

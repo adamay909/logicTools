@@ -181,17 +181,17 @@ func datumsEqual(d1, d2 datumSlice) bool {
 
 }
 
-func datumsEquiv(d1, d2 datumSlice) bool {
+func datumsEquiv(want, have datumSlice) bool {
 
 	dummy := plshFormula("P")
 	if oPL {
 		dummy = plshFormula("Fx")
 	}
 
-	r1 := sequent{d1.datum(), dummy}
-	r2 := sequent{d2.datum(), dummy}
+	w1 := sequent{want.datum(), dummy}
+	h2 := sequent{have.datum(), dummy}
 
-	return equivSequents(r1, r2)
+	return equivSequents(w1, h2)
 
 }
 

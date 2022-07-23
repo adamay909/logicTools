@@ -44,6 +44,7 @@ func prevProblem() {
 
 func displayExercise(s string) {
 
+	saveHistory()
 	json.Unmarshal([]byte(s), dsp)
 	dsp.xpos, dsp.ypos = 0, 0
 	dsp.overhang = false

@@ -28,7 +28,6 @@ There is a parser for an infix notation. That is designed to be used with the on
 package gentzen
 
 import (
-	"fmt"
 	"log"
 	"math/rand"
 	"strconv"
@@ -203,7 +202,6 @@ func IsWff(s string) bool {
 //PrintDeriv prints the derivation given by lines
 //as latex formatted derivation.
 func PrintDeriv(lines []string, offset int) (out string) {
-	fmt.Println("printing")
 	seq1, err1 := parseArgline(lines[0])
 	seq2, err2 := parseArgline(lines[len(lines)-1])
 
