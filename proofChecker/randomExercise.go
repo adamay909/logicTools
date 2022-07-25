@@ -12,7 +12,7 @@ var exercises []string
 var expos int
 
 func nextProblem() {
-
+	saveHistory()
 	if len(exercises) == 0 {
 		genNewExercise()
 		exercises = append(exercises, marshalJson())

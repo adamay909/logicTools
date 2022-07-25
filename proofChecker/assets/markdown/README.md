@@ -115,12 +115,22 @@ You may have to go through several rounds of checking and fixing a derivation be
 
 ### The Editor
 
-The editor is very primitive with limited functionality. You can move the cursor around with the arrow keys, home and end for moving to the start or end of line, and delete and backspace should work more or less normally (sometimes more, sometimes less...). But no more advanced navigation around the input area, no positioning the cursor with your mouse,  and no copying and pasting and the like. Given the intended use, it should be enough (it works for me...). While it seems to work with the iOS on-screen keyboard (I have tried it on an iPad Air), it definitely does not work on an Android with an on-screen keyboard. You will need a physical keyboard (even on iOS, using the touch screen keyboard is going to be really slow). 
+The editor is very primitive with limited functionality. It works like an old-school, keyboard-only editor. You can move the cursor around with the arrow keys, home and end for moving to the start or end of line, and delete and backspace should work more or less normally (sometimes more, sometimes less...). But no more advanced navigation around the input area, no positioning the cursor with your mouse,  and no copying and pasting and the like. Given the intended use, it should be enough (it works for me...). While it seems to work with the iOS on-screen keyboard once you activate soft-cursor keys--from the options under 'Advanced Stuff'--, it definitely does not work on an Android with an on-screen keyboard. You will need a physical keyboard (even on iOS, using the touch screen keyboard is going to be really slow). 
 
-The editor is designed to be as transparent as possible: symbols should be easy to type and students should not have to worry about how what's on the screen corresponds to what they see in the course material. Some special key combinations are used to facilitate typing symbol. Check the help on how to input symbols. 
+Apart from the above limitations, The editor is designed to be as transparent as possible: symbols should be easy to type and students should not have to worry about how what's on the screen corresponds to what they see in the course material. Some special key combinations are used to facilitate typing symbol. Check the help on how to input symbols. 
 
 You can copy the contents of the input area using the "Copy to Clipboard" button.
 
+### Exercises
+
+When you click 'exercises', you will be presented with some exercises from the course material. You will also see a button that says 'random exercises'. That generates random exercises asking you to construct derivations. While there should be a derivation that the exercise asks you to construct (barring coding mistakes on my part), I cannot make any promises about the ease or difficulty of constructing a derivation that fits the bill. Note that the proof system has a lax view of a successful derivation: a derivation may have premises that are redundant.
+
+### Preservation of History
+
+The proof checker will attempt to store the current state of the editor so that when you open the proof checker again, you will be presented with the last state of things before you quit (or the program crashed). The proof checker will also store a series of snapshots of the editor. This last happens whenever you clear the screen or move to the next exercise. All history is stored in the browser's local cache so how much history is stored for how long depends on your browser settings and the like.
+
+You can go back and forth in history using buttons under 'advanced stuff'. You can also choose to delete points in the history.
+ 
 ### Installation
 
 This proof-checker is designed to run completely inside the browser so it is easy to host yourself so long as you are able to host static websites. The docs folder of the GitHub repository contains all the files you need.

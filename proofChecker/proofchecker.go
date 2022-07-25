@@ -74,7 +74,29 @@ func showPrettyDeriv(d *console) {
 		r = strings.Replace(r, `#dat#`, datum, 1)
 		r = strings.Replace(r, `#succ#`, succ, 1)
 		r = strings.Replace(r, `#annot#`, annot, 1)
-		d.html = append(d.html, r)
+
+		d.html = append(d.html, prettyGreek(r))
 	}
 	setTextByID("display", d.typeset())
+}
+
+func prettyGreek(r string) string {
+
+	var r2 string
+	var found bool
+	for _, c := range r {
+		found = false
+		for _, e := range greekBindings {
+			if string(c) == e[tktxt] {
+				r2 = r2 + `<span class="greek">` + e[tktxt] + `</span>`
+				found = true
+				break
+			}
+		}
+		if !found {
+			r2 = r2 + string(c)
+		}
+	}
+
+	return strings.ReplaceAll(r2, "⊢", " ⊢ ")
 }

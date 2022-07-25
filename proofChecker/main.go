@@ -4,7 +4,6 @@ import (
 	"embed"
 	_ "embed"
 	"encoding/json"
-	"fmt"
 	"sort"
 	"strconv"
 	"strings"
@@ -58,6 +57,8 @@ func main() {
 	setupJS()
 	resetDisplay()
 	loadHistory()
+	cleanHistory()
+	recoverState()
 
 	<-make(chan bool)
 }
@@ -152,6 +153,8 @@ func onClick() {
 		backHistory()
 	case "forwardHistory":
 		forwardHistory()
+	case "removeFromHistory":
+		rmFromHistory()
 
 	case "backButton":
 		backToNormal()
@@ -212,6 +215,7 @@ func typeformula() {
 	input := js.Global().Get("event").Get("key")
 
 	handleInput(input.String())
+	saveState()
 }
 
 func handleInput(s string) {
@@ -231,13 +235,18 @@ func focusInput() {
 
 func clearInput() {
 	saveHistory()
+	clearScreen()
+	saveState()
+	focusInput()
+	stopInput()
+}
+
+func clearScreen() {
 	dsp.clear()
 	setTextByID("setOffset", "First Line: "+strconv.Itoa(dsp.Offset))
 	display()
 	printMessage("")
 	hide("messages")
-	focusInput()
-	stopInput()
 }
 
 func resetDisplay() {
@@ -438,7 +447,6 @@ func convert(s string) string {
 		r := ""
 		t := w
 		for i := 0; i < len(t); {
-			fmt.Println("check: ", t[i:])
 			for _, e := range allBindings {
 				if strings.HasPrefix(string(t[i:]), e[tkraw]) {
 					r = r + e[tktxt]
@@ -451,7 +459,7 @@ func convert(s string) string {
 		wn = append(wn, r)
 	}
 
-	return `<span class="greek">` + strings.Join(wn, " ") + `</span>`
+	return strings.Join(wn, " ")
 
 }
 
@@ -555,6 +563,7 @@ func toggleExercises() {
 func toggleSamples() {
 	stopInput()
 	hide("console")
+	hide("controls2")
 	show("extra")
 	show("exerciseList")
 	show("backButton")

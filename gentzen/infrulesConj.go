@@ -42,25 +42,25 @@ func conjI(seq1, seq2, seq3 sequent) bool {
 	}
 
 	if n1.Formula() != n3.subnode1.Formula() && n1.Formula() != n3.subnode2.Formula() {
-		logger.Print("first premise not conjunct of conclusion")
+		logger.Print("succedent of conclusion must be conjunction of succedents of premises")
 
 		return false
 	}
 
 	if n2.Formula() != n3.subnode1.Formula() && n2.Formula() != n3.subnode2.Formula() {
-		logger.Print("second premise not conjunct of conclusion")
+		logger.Print("succedent of conclusion must be conjunction of succedents of premises")
 		return false
 	}
 
 	datumCanonical := datumUnion(seq1.datumSlice(), seq2.datumSlice())
 	if strictCheck {
 		if !datumsEqual(datumCanonical, seq3.datumSlice()) {
-			logger.Print("datum of conclusion must be union of datums of premise")
+			logger.Print("datum of conclusion must be union of datums of premises")
 			return false
 		}
 	} else {
 		if !datumsEquiv(datumCanonical, seq3.datumSlice()) {
-			logger.Print("datum of conclusion must be union of datums of premise")
+			logger.Print("datum of conclusion must be union of datums of premises")
 			return false
 		}
 	}

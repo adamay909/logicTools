@@ -63,6 +63,15 @@ div#cursorControls{
  background-color: red;
  }
 
+.button#sizeUp {
+ border-radius: 50%;
+}
+
+.button#sizeDown {
+ border-radius: 50%;
+}
+
+
 button#toggleSettings {
   background-color: white;
 }

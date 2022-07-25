@@ -9,7 +9,7 @@ func (d *console) typeset() string {
 
 	var html string
 	if d.Title != "" {
-		html = `<h3 id="extitle">` + d.Title + `</h3>`
+		html = `<h3 id="extitle">` + prettyGreek(d.Title) + `</h3>`
 	}
 	html = html + `<div id="deriv">`
 	html = html + strings.Join(d.html, "\n")
