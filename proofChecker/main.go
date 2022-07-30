@@ -20,6 +20,10 @@ var assets embed.FS
 //Not useful for general consumption.
 var oPRIVATE = true
 
+var mainEditorFunc,
+	titleEditorFunc,
+	clickFunc js.Value
+
 var indexHtml, helpHtml, styleCSS string
 
 var (
@@ -32,6 +36,8 @@ var (
 	oMENU = false
 
 	oABOUT = false
+
+	oEXTHM = false
 
 	oExercises = false
 
@@ -99,8 +105,12 @@ func setupPage() {
 
 func setupJS() {
 
-	js.Global().Call("addEventListener", "keydown", js.FuncOf(jsWrap(typeformula)).Value, true)
-	js.Global().Call("addEventListener", "click", js.FuncOf(jsWrap(onClick)).Value, true)
+	mainEditorFunc = js.FuncOf(jsWrap(typeformula)).Value
+	titleEditorFunc = js.FuncOf(jsWrap(typetitle)).Value
+	clickFunc = js.FuncOf(jsWrap(onClick)).Value
+
+	js.Global().Call("addEventListener", "keydown", mainEditorFunc, true)
+	js.Global().Call("addEventListener", "click", clickFunc, true)
 }
 
 func onClick() {
@@ -125,6 +135,7 @@ func onClick() {
 
 	case "setTitle":
 		setTitle()
+
 	case "toggleSystem":
 		togglePL()
 	case "setOffset":
@@ -155,12 +166,17 @@ func onClick() {
 		forwardHistory()
 	case "removeFromHistory":
 		rmFromHistory()
-
+	case "exportHistory":
+		exportHistory()
 	case "backButton":
 		backToNormal()
 
 	case "submitInput":
 		getInput()
+
+	case "randomTheorem":
+		oEXTHM = true
+		nextProblem()
 
 	case "nextExercise":
 		nextProblem()
@@ -251,6 +267,7 @@ func clearScreen() {
 
 func resetDisplay() {
 
+	oEXTHM = false
 	oPL = true
 	oTHM = true
 	oHELP = false
@@ -552,10 +569,10 @@ func toggleExercises() {
 	}
 	h := "<h3>Pick one to load</h3>"
 	for _, e := range files {
-		//		fmt.Println(e.Name())
 		h = h + `<button class="fileLink" tabindex=0>` + e.Name() + `</button>`
 	}
-	h = h + `<p><button class="fileLink" id="nextExercise" tabindex=0>Random Exercises</button></p>`
+	h = h + `<p><button class="fileLink" id="nextExercise" tabindex=0>Random Exercises (Derivations)</button></p>`
+	h = h + `<p><button class="fileLink" id="randomTheorem" tabindex=0>Random Exercises (Theorems)</button></p>`
 
 	setTextByID("exerciseList", h)
 }

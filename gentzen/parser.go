@@ -24,6 +24,7 @@ func parseTokens(t tokenStr) (*Node, error) {
 			err = errors.New("malformed: " + t.String())
 			return &n, err
 		}
+
 		n.SetFormula(t.String())
 		n.SetAtomic()
 		n.predicateLetter = t[0].predicate
@@ -41,6 +42,9 @@ func parseTokens(t tokenStr) (*Node, error) {
 		n.variable = t[0].variable
 		s1 := findNextSentence(t[1:])
 		n.subnode1, err = parseTokens(s1)
+		if isFormulaSet(n.subnode1.String()) {
+			err = errors.New("cannot have place holders for sets of formulas inside a formula1")
+		}
 		if err != nil {
 			return &n, err
 		}
@@ -50,9 +54,15 @@ func parseTokens(t tokenStr) (*Node, error) {
 		n.SetConnective(t[0].tokenType.logicConstant())
 		s1 := findNextSentence(t[1:])
 		n.subnode1, err = parseTokens(s1)
+		if isFormulaSet(n.subnode1.String()) {
+			err = errors.New("cannot have place holders for sets of formulas inside a formula2")
+		}
 		n.subnode1.parent = &n
 		s2 := t[len(s1)+1:]
 		n.subnode2, err = parseTokens(s2)
+		if isFormulaSet(n.subnode2.String()) {
+			err = errors.New("cannot have place holders for sets of formulas inside a formula3")
+		}
 		if err != nil {
 			return &n, err
 		}

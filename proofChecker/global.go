@@ -96,7 +96,6 @@ var (
 
 	turnstileBindings = [][3]string{
 		[3]string{`|-`, `\vdash`, "⊢"},
-		[3]string{`.`, `\ldots`, `...`},
 	}
 
 	dotsBindings = [][3]string{
@@ -143,11 +142,7 @@ var (
 	}
 
 	extraBindings = [][3]string{
-		[3]string{`v`, `v`, `v`},
-		[3]string{`X`, `X`, `X`},
-		[3]string{`U`, `U`, `U`},
 		[3]string{` `, ` `, ` `},
-		[3]string{`V`, `V`, `V`},
 		[3]string{`.`, `.`, `.`},
 	}
 )

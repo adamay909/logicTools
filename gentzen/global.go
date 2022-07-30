@@ -80,7 +80,7 @@ var infRules = [][]string{
 	{`=e`, `\iE`, `\iE`, `=E`},
 }
 
-var greekBindings = [][3]string{
+var greekUCBindings = [][3]string{
 	[3]string{`\G`, `\Gamma`, "\u0393"},
 	[3]string{`\D`, `\Delta`, "\u0394"},
 	[3]string{`\T`, `\Theta`, "\u0398"},
@@ -93,6 +93,9 @@ var greekBindings = [][3]string{
 	[3]string{`\F`, `\Phi`, "\u03a6"},
 	[3]string{`\Q`, `\Psi`, "\u03a8"},
 	[3]string{`\W`, `\Omega`, "\u03a9"},
+}
+
+var greekLCBindings = [][3]string{
 	[3]string{`\a`, `\alpha`, "\u03b1"},
 	[3]string{`\b`, `\beta`, "\u03b2"},
 	[3]string{`\g`, `\gamma`, "\u03b3"},
@@ -118,6 +121,49 @@ var greekBindings = [][3]string{
 	[3]string{`\q`, `\psi`, "\u03c8"},
 	[3]string{`\w`, `\omega`, "\u03c9"},
 }
+
+var greekUpperCaseLetters = []string{
+	`\Gamma`,
+	`\Delta`,
+	`\Theta`,
+	`\Lambda`,
+	`\Xi`,
+	`\Pi`,
+	`\Rho`,
+	`\Sigma`,
+	`\Upsilon`,
+	`\Phi`,
+	`\Psi`,
+	`\Omega`,
+}
+
+var greekLowerCaseLetters = []string{
+	`\alpha`,
+	`\beta`,
+	`\gamma`,
+	`\delta`,
+	`\epsilon`,
+	`\zeta`,
+	`\eta`,
+	`\theta`,
+	`\iota`,
+	`\kappa`,
+	`\lambda`,
+	`\mu`,
+	`\nu`,
+	`\xi`,
+	`\omicron`,
+	`\pi`,
+	`\rho`,
+	`\sigma`,
+	`\tau`,
+	`\upsilon`,
+	`\varphi`,
+	`\chi`,
+	`\psi`,
+	`\omega`,
+}
+
 var connectives [][]string
 
 //SetStandardPolish sets whether to use more standard notations for the
@@ -191,4 +237,19 @@ func SetStandardPolish(v bool) {
 
 	connectives = append(connectivesSL, connectivesPL...)
 	return
+}
+
+func greekCharOf(s string) string {
+
+	for _, e := range greekLCBindings {
+		if e[1] == s {
+			return e[2]
+		}
+	}
+	for _, e := range greekUCBindings {
+		if e[1] == s {
+			return e[2]
+		}
+	}
+	return s
 }

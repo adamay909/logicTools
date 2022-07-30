@@ -56,6 +56,15 @@ func plainHTML(s string) string {
 	return s
 }
 
+func plainText(s string) string {
+	for _, e := range greekBindings {
+		if s == e[tktex] {
+			return e[tktxt]
+		}
+	}
+	return s
+}
+
 func latexOutput() string {
 	if dsp.empty() {
 		return ""

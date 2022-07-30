@@ -55,7 +55,6 @@ func tokenizeLatex(s []string) (tokenStr, error) {
 
 	var err error
 	var ts, ts2 tokenStr
-
 	for _, e := range s {
 		e = strings.TrimSpace(e)
 		var t token
@@ -98,14 +97,20 @@ func tokenizeLatex(s []string) (tokenStr, error) {
 			t.tokenType = tAtomicSentence
 			t.str = e
 
+		case isGreekFormulaVar(e):
+			t.tokenType = tAtomicSentence
+			t.str = e
+
+		case isFormulaSet(e):
+			t.tokenType = tAtomicSentence
+			t.str = e
+
+		case isLowerCase(e[:1]):
+			t.tokenType = tTerm
+			t.str = e
 		default:
-			if isLowerCase(e[:1]) {
-				t.tokenType = tTerm
-				t.str = e
-			} else {
-				t.tokenType = tPredicate
-				t.str = e
-			}
+			t.tokenType = tPredicate
+			t.str = e
 		}
 		ts = append(ts, t)
 	}
@@ -203,7 +208,7 @@ func parseLatex(ts tokenStr) (*Node, error) {
 	return n, err
 }
 
-func populateNodes(n *Node) {
+func _populateNodes(n *Node) {
 
 	ns := getSubnodes(n)
 

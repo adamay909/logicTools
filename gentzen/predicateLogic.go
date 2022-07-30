@@ -22,45 +22,45 @@ func isInstanceOf(s1, s2 string) (val bool, variable, term string) {
 
 	v = n2.BoundVariable()
 
-	ns1 := getSubnodes(n1)
+	have := getSubnodes(n1)
 
-	ns2 := getSubnodes(n2)
+	want := getSubnodes(n2.Child1Must())
 
-	ns2 = ns2[1:]
-
-	if len(ns1) != len(ns2) {
-		log.Println(ns1, " and ", ns2, "not same")
+	if len(have) != len(want) {
+		log.Println(have, " and ", want, "not same")
 		return
 	}
 
-	for i := range ns1 {
+	for i := range have {
 
-		if ns1[i].MainConnective() != ns2[i].MainConnective() {
-			log.Println(ns1, " and ", ns2, "not same2")
+		if have[i].MainConnective() != want[i].MainConnective() {
+			log.Println(have, " and ", want, "not same2")
 
 			return
 		}
 
-		if ns1[i].IsAtomic() {
-			if len(ns1[i].Terms()) != len(ns2[i].Terms()) {
-				log.Println(ns1, " and ", ns2, "not same3")
+		if have[i].IsAtomic() {
+			if len(have[i].Terms()) != len(want[i].Terms()) {
+				log.Println(have, " and ", want, "not same3")
 				return
 			}
-			if ns1[i].Predicate() != ns2[i].Predicate() {
-				log.Println(ns1, " and ", ns2, "not same4")
+			if have[i].Predicate() != want[i].Predicate() {
+				log.Println(have, " and ", want, "not same4")
 				return
 			}
-			j := findPos(v, ns2[i].Terms())
+			j := findPos(v, want[i].Terms())
 			if j == -1 {
-				log.Println(ns1, " and ", ns2, "not same5")
-				return
+				continue
 			}
-			r = ns1[i].Terms()[j]
+			r = have[i].Terms()[j]
 			break
 
 		}
 	}
-	n3 := replaceTerms(ns2[0], v, r)
+	if r == "" {
+		return
+	}
+	n3 := replaceTerms(want[0], v, r)
 
 	return n1.String() == n3.String(), v, r
 }

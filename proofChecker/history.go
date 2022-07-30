@@ -146,3 +146,17 @@ func cleanHistory() {
 		historyPosition = 0
 	}
 }
+
+func exportHistory() {
+
+	obj := js.Global().Get("Blob").New([]any{strings.Join(history, "\n")})
+
+	url := js.Global().Get("URL").Call("createObjectURL", obj).String()
+
+	setTextByID("exportHistory", `<a href="`+url+`">right-click to download history</a>`)
+
+}
+
+func loadHistoryFromFile() {
+
+}

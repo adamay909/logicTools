@@ -114,7 +114,7 @@ func parseNsplit(l inputLine, raw bool) (dat, tstl, succ, dots, annot []string) 
 		if !raw {
 			text = plainHTML(e)
 		} else {
-			text = e
+			text = plainText(e)
 		}
 
 		if i < tst {

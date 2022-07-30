@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -96,11 +97,13 @@ func parseLine(l []string, raw bool) (datum, succ, annot string, err error) {
 			continue
 		}
 		if isGreekLetter(f) {
+			f, _ = tkOf(f, tktex, tktxt, greekBindings)
 			datum = datum + f + ","
 			continue
 		}
 		formula, err = gentzen.InfixParser(tk(e))
 		if err != nil {
+			fmt.Println("failed for ", e)
 			return
 		}
 		datum = datum + formula.String() + ","

@@ -88,6 +88,11 @@ func genNewExercise() {
 		togglePL()
 	}
 
+	if oEXTHM {
+		genNewExThm()
+		return
+	}
+
 	oExercises = true
 	var p1, p2, c *gentzen.Node
 	s := gentzen.Parse(genRandomTautology())
@@ -120,6 +125,35 @@ func genNewExercise() {
 		problem = `Q` + strconv.Itoa(expos+1) + `. Derive from ` + seq1 + `&ensp; and &ensp; ` + seq2 + `&ensp; to &ensp; ` + seq3
 
 	}
+
+	dsp.clear()
+
+	dsp.setTitle(problem)
+
+	display()
+
+}
+
+func genNewExThm() {
+
+	var s string
+
+	for s = gentzen.RandomSentence(3, 8); ; s = gentzen.RandomSentence(3, 8) {
+
+		if !gentzen.IsTautology(s) {
+			continue
+		}
+
+		if contains(tautologies, s) {
+			continue
+		}
+
+		break
+	}
+
+	tautologies = append(tautologies, s)
+
+	problem := `Q` + strconv.Itoa(expos+1) + `. Prove ` + textOf("|-") + textOf(" ") + gentzen.Parse(s).StringPlain()
 
 	dsp.clear()
 

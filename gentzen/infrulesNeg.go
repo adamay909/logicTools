@@ -44,23 +44,29 @@ func negI(seq1, seq2, seq3 sequent) bool {
 		logger.Print("conclusion must be negation")
 		return false
 	}
+	/*
+		if n1.Class() > n2.Class() {
+			if n1.Child1Must().Formula() != n2.Formula() {
+				logger.Print("succedents of premises must be negations of each other")
+				return false
+			}
+		}
 
-	if n1.Class() > n2.Class() {
-		if n1.Child1Must().Formula() != n2.Formula() {
-			logger.Print("succedents of premises must be negations of each other")
+		if n2.Class() >= n1.Class()+1 {
+			if n2.Child1Must().Formula() != n1.Formula() {
+				logger.Print("succedents of premises must be negations of each other")
+				return false
+			}
+		}
+
+		if !datumIncludes(seq1.datumSlice(), datum(n3.Child1Must().Formula())) {
+			logger.Print("conclusion's negation must be in datums of both premises")
 			return false
 		}
-	}
+	*/
 
-	if n2.Class() >= n1.Class()+1 {
-		if n2.Child1Must().Formula() != n1.Formula() {
-			logger.Print("succedents of premises must be negations of each other")
-			return false
-		}
-	}
-
-	if !datumIncludes(seq1.datumSlice(), datum(n3.Child1Must().Formula())) {
-		logger.Print("conclusion's negation must be in datums of both premises")
+	if lneg+n1.Formula() != n2.Formula() && n1.Formula() != lneg+n2.Formula() {
+		logger.Print("succedents of premises must be negations of each other")
 		return false
 	}
 

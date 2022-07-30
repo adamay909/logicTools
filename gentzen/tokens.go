@@ -72,6 +72,9 @@ func (t token) isAtomicSentence() bool {
 }
 
 func (t token) String() string {
+	if isGreekLowerCase(t.str) {
+		return greekCharOf(t.str)
+	}
 	if t.isQuantifier() {
 		return t.str + t.variable
 	}
@@ -197,42 +200,45 @@ func (t tokenStr) String() string {
 func nextToken(s string) (t token, r string) {
 
 	pos := 1
+	sr := []rune(s)
 
-	switch s[:pos] {
-	case ldisj:
+	switch {
+	case string(sr[:pos]) == ldisj:
 		t.tokenType = tDisj
-	case lconj:
+	case string(sr[:pos]) == lconj:
 		t.tokenType = tConj
-	case lcond:
+	case string(sr[:pos]) == lcond:
 		t.tokenType = tCond
-	case lneg:
+	case string(sr[:pos]) == lneg:
 		t.tokenType = tNeg
-	case luni:
+	case string(sr[:pos]) == luni:
 		t.tokenType = tUni
-	case lex:
+	case string(sr[:pos]) == lex:
 		t.tokenType = tEx
-	default:
-		if isLowerCase(s[:pos]) {
-			t.tokenType = tTerm
-			if len(s) > 1+pos {
-				if s[pos:pos+1] == `_` {
-					pos = pos + 2
-				}
+	case isGreekFormulaVar(string(sr[:pos])):
+		t.tokenType = tAtomicSentence
+	case isFormulaSet(string(sr[:pos])):
+		t.tokenType = tAtomicSentence
+	case isLowerCase(string(sr[:pos])):
+		t.tokenType = tTerm
+		if len(s) > 1+pos {
+			if string(sr[pos:pos+1]) == `_` {
+				pos = pos + 2
 			}
-		} else {
-			t.tokenType = tPredicate
-			if len(s) > 1+pos {
-				if s[pos:pos+1] == `\` {
-					pos = pos + 2
-				}
-				if len(s) > 1+pos {
-					if s[pos:pos+1] == `_` {
-						pos = pos + 2
-					}
-				}
-			}
-
 		}
+	default:
+		t.tokenType = tPredicate
+		if len(sr) > 1+pos {
+			if string(sr[pos:pos+1]) == `\` {
+				pos = pos + 2
+			}
+			if len(sr) > 1+pos {
+				if string(sr[pos:pos+1]) == `_` {
+					pos = pos + 2
+				}
+			}
+		}
+
 	}
 	if !oPL {
 		if t.tokenType == tTerm || t.tokenType == tPredicate {
@@ -242,8 +248,8 @@ func nextToken(s string) (t token, r string) {
 			t.tokenType = tAtomicSentence
 		}
 	}
-	t.str = s[:pos]
-	r = s[pos:]
+	t.str = string(sr[:pos])
+	r = string(sr[pos:])
 
 	return t, r
 }
@@ -274,14 +280,36 @@ func isLowerCase(s string) bool {
 	return true
 }
 
+func isGreekLowerCase(s string) bool {
+
+	for _, e := range greekLCBindings {
+		if s == e[1] {
+			return true
+		}
+	}
+
+	return false
+}
+
+func isGreekFormulaVar(s string) bool {
+
+	for _, e := range greekLCBindings {
+		if s == e[2] {
+			return true
+		}
+	}
+
+	return false
+}
+
 func tokenizePLround2(t tokenStr) (tokenStr, error) {
 	var t2 tokenStr
 	var e token
 	var err error
-
 	for i := 0; i < len(t); i++ {
 		e = t[i]
 
+		var n token
 		if e.isQuantifier() {
 			if i > len(t)-2 {
 				err = errors.New("quantifier without variable 1")
@@ -291,7 +319,6 @@ func tokenizePLround2(t tokenStr) (tokenStr, error) {
 				err = errors.New("quantifier without variable 2")
 				return t, err
 			}
-			var n token
 			n.tokenType = e.tokenType
 			n.str = e.str
 			n.variable = t[i+1].str
@@ -299,6 +326,11 @@ func tokenizePLround2(t tokenStr) (tokenStr, error) {
 			i++
 			continue
 		}
+		if e.isAtomicSentence() {
+			t2 = append(t2, e)
+			continue
+		}
+
 		if e.isPredicate() {
 			if i == len(t)-1 {
 				err = errors.New("predicate without term")
@@ -308,7 +340,6 @@ func tokenizePLround2(t tokenStr) (tokenStr, error) {
 				err = errors.New("predicate without term")
 				return t, err
 			}
-			var n token
 			n.tokenType = tAtomicSentence
 			n.predicate = e.str
 			n.str = e.str
@@ -331,11 +362,9 @@ func tokenizePLround2(t tokenStr) (tokenStr, error) {
 			t2 = append(t2, e)
 			continue
 		}
-
 		err = errors.New("something wrong")
 		return t, err
 	}
-
 	return t2, err
 
 }

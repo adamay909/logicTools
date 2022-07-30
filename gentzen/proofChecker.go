@@ -149,8 +149,13 @@ func parseArgline(s string) (al argLine, err error) {
 		if len(d) < 1 {
 			continue
 		}
-		if d[:1] == `\` {
+		if isFormulaSet(d) {
 			continue
+		}
+
+		if containsFormulaSet(d) {
+			err = errors.New("datum: place holders for sets of formulas cannot appear inside a formula")
+			return
 		}
 		_, err = ParseStrict(d)
 		if err != nil {
@@ -163,8 +168,8 @@ func parseArgline(s string) (al argLine, err error) {
 		err = errors.New("Not a sequent")
 		return
 	}
-	if hasGreek(fields[1]) {
-		err = errors.New("Cannot have Greek letters in succedent")
+	if containsFormulaSet(fields[1]) {
+		err = errors.New("Cannot have place holders for sets of formulas in succedent")
 		return
 	}
 	_, err = ParseStrict(fields[1])
@@ -208,7 +213,19 @@ func parseArgline(s string) (al argLine, err error) {
 }
 
 func hasGreek(s string) bool {
-	return strings.Contains(s, `\`)
+	if !oPL {
+		return strings.Contains(s, `\`)
+	}
+	r := []rune(s)
+
+	for i := range r {
+		for _, e := range greekUpperCaseLetters {
+			if strings.HasPrefix(string(r[i:]), e) {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func printArgLine(s string, m printMode) string {
@@ -269,7 +286,12 @@ func runeOf[str ~string](s str, m printMode) string {
 	} else {
 		n = 2
 	}
-	for _, e := range greekBindings {
+	for _, e := range greekLCBindings {
+		if e[1] == string(s) {
+			return e[n]
+		}
+	}
+	for _, e := range greekUCBindings {
 		if e[1] == string(s) {
 			return e[n]
 		}
@@ -388,4 +410,26 @@ func fullName(i string) string {
 
 func isTheorem(s sequent) bool {
 	return s.d == ""
+}
+
+func isFormulaSet(s string) bool {
+
+	for _, e := range greekUCBindings {
+		if e[2] == s {
+			return true
+		}
+	}
+	return false
+}
+
+func containsFormulaSet(s string) bool {
+
+	r := []rune(s)
+
+	for _, e := range r {
+		if isFormulaSet(string(e)) {
+			return true
+		}
+	}
+	return false
 }
