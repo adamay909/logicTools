@@ -205,6 +205,8 @@ func parseLatex(ts tokenStr) (*Node, error) {
 		n.subnode2.parent = n
 	}
 
+	n, err = ParseStrict(n.String())
+
 	return n, err
 }
 

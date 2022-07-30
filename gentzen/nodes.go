@@ -243,8 +243,9 @@ func (n *Node) BoundVariable() string {
 	return n.variable
 }
 
-func (n *Node) AddTerm(t string) {
-	n.term = append(n.term, t)
+func (n *Node) AddTerm(t ...string) {
+
+	n.term = append(n.term, t...)
 	return
 }
 
@@ -452,7 +453,12 @@ func sameStructure(s1, s2 string) bool {
 	}
 
 	for i := range ns1 {
-
+		if ns1[i].IsQuantifier() {
+			if ns1[i].MainConnective() != ns2[i].MainConnective() {
+				return false
+			}
+			ns1[i].variable = ns2[i].variable
+		}
 		if ns1[i].IsAtomic() {
 			old := ns1[i].Formula()
 			repl := ns2[i].Formula()

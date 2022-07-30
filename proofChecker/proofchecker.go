@@ -25,7 +25,6 @@ func checkDerivation() {
 	}
 
 	displayDerivation()
-	fmt.Println("sending following")
 	for _, i := range arglines {
 		fmt.Println(i)
 	}
