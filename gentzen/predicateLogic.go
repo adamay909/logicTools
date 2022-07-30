@@ -1,6 +1,7 @@
 package gentzen
 
 import (
+	"errors"
 	"log"
 	"strings"
 )
@@ -127,4 +128,25 @@ func (n *Node) hasTerm(t string) bool {
 		}
 	}
 	return false
+}
+
+func (n *Node) hasIllegalBoundVariables() (err error) {
+
+	ns := getSubnodes(n)
+
+	for _, e := range ns {
+		if e.IsQuantifier() {
+			v := e.BoundVariable()
+
+			for _, f := range getSubnodes(e)[1:] {
+				if f.IsQuantifier() {
+					if f.BoundVariable() == v {
+						err = errors.New("nested quantifiers with same variable name")
+						return
+					}
+				}
+			}
+		}
+	}
+	return
 }

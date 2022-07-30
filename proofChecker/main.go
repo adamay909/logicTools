@@ -65,6 +65,7 @@ func main() {
 	loadHistory()
 	cleanHistory()
 	recoverState()
+	stopInput()
 
 	<-make(chan bool)
 }

@@ -343,9 +343,14 @@ func lineSpec(infRule string) int {
 }
 
 func checkLineRef(infRule string, cur int, offset int, lines []int) bool {
+	thm := theorems
+	if oPL {
+		thm = append(thm, quantifierRules...)
+	}
+
 	if oTHM {
-		for i := range theorems {
-			if infRule == theorems[i][0] || infRule == theorems[i][1] {
+		for i := range thm {
+			if infRule == thm[i][0] || infRule == thm[i][1] {
 				infRule = "theorem"
 				break
 			}

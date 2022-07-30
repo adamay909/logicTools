@@ -266,5 +266,10 @@ func ParseStrict[str ~string](s str) (n *Node, err error) {
 	if err != nil {
 		return n, err
 	}
-	return parseTokens(tokens)
+	n, err = parseTokens(tokens)
+	if err != nil {
+		return
+	}
+	err = n.hasIllegalBoundVariables()
+	return
 }

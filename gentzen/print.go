@@ -92,6 +92,10 @@ func printNodeInfix(n *Node, m printMode) (s string) {
 		return s
 	}
 
+	if n.IsAtomic() {
+		return s
+	}
+
 	if n.IsQuantifier() {
 		return s
 	}
@@ -196,6 +200,9 @@ func (seq sequent) StringLatex() string {
 	if len(seq.datumSlice()) != 0 {
 
 		for _, d := range seq.datumSlice().StringSlice() {
+			if len(d) == 0 {
+				continue
+			}
 			if d[:1] == `\` {
 				dat = dat + d + `, `
 			} else {

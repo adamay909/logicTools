@@ -9,18 +9,36 @@ var theorems = [][]string{
 	{"Contraposition", "CP", ">>pq>-q-p"},
 	{"Implication", "IM", ">>pqV-pq"},
 	{"Elimination", "EL", ">Vpq>-pq"},
-	{"DeMorgan 1", "DM1", ">-Vpq^-p-q"},
-	{"DeMorgan 2", "DM2", ">-^pqV-p-q"},
-	{"DeMorgan 3", "DM3", ">V-p-q-^pq"},
-	{"DeMorgan 4", "DM4", ">^-p-q-Vpq"},
+	{"DeMorgan", "DM", ">-Vpq^-p-q"},
+	{"DeMorgan", "DM", ">-^pqV-p-q"},
+	{"DeMorgan", "DM", ">V-p-q-^pq"},
+	{"DeMorgan", "DM", ">^-p-q-Vpq"},
 	{"Commutativity of Conjunction", "CC", ">^pq^qp"},
 	{"Commutatitivity of Disjunction", "CD", ">VpqVpq"},
 	{"Associativity of Conjunction", "AC", ">^^pqr^p^qr"},
+	{"Associativity of Conjunction", "AC", ">^p^qr^^pqr"},
 	{"Associativity of Disjunction", "AD", ">VVpqrVpVqr"},
+	{"Associativity of Disjunction", "AD", ">VpVqrVVpqr"},
+	{"Double Negation Introduction", "DN", ">p--p"},
+}
+
+var quantifierRules = [][]string{
+	{"Quantifier Exchange", "QE", ">UxFx-Xx-Fx"},
+	{"Quantifier Exchange", "QE", ">XxFx-Ux-Fx"},
+	{"Quantifier Exchange", "QE", ">-Xx-FxUxFx"},
+	{"Quantifier Exchange", "QE", ">-Ux-FxXxFx"},
+	{"Quantifier Exchange", "QE", ">-UxFxXx-Fx"},
+	{"Quantifier Exchange", "QE", ">-XxFxUx-Fx"},
+	{"Quantifier Exchange", "QE", ">Xx-Fx-UxFx"},
+	{"Quantifier Exchange", "QE", ">Ux-Fx-XxFx"},
+	{"Confinement", "CF", ">^UxFxUxGxUx^FxGx"},
+	{"Confinement", "CF", ">Ux^FxGx^UxFxUxGx"},
+	{"Confinement", "CF", ">VUxFxUxGxUxVFxGx"},
+	{"Confinement", "CF", ">UxVFxGxVUxFxUxGx"},
 }
 
 func theorem(seq sequent, inf string) bool {
-	var tf string
+	var tf []string
 	thm := theorems
 
 	if oPL {
@@ -29,23 +47,27 @@ func theorem(seq sequent, inf string) bool {
 			thm[i][2] = strings.ReplaceAll(thm[i][2], "q", "Gx")
 			thm[i][2] = strings.ReplaceAll(thm[i][2], "r", "Hx")
 		}
+		thm = append(thm, quantifierRules...)
 	}
 	inf = strings.TrimSpace(inf)
 	for i := range thm {
-		if inf == theorems[i][0] || inf == theorems[i][1] {
-			tf = theorems[i][2]
+		if inf == thm[i][0] || inf == thm[i][1] {
+			tf = append(tf, thm[i][2])
 		}
 	}
 
-	if tf == "" {
+	if len(tf) == 0 {
 		logger.Print(inf, "is not a theorem")
 		return false
 	}
 
-	if !sameStructure(tf, seq.succedent().String()) {
-		logger.Print("not instance of ", inf)
-		return false
+	for _, thc := range tf {
+		if sameStructure(thc, seq.succedent().String()) {
+			return true
+		}
 	}
-	return true
+
+	logger.Print("not instance of ", inf)
+	return false
 
 }

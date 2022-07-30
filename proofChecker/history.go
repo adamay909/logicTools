@@ -153,7 +153,15 @@ func exportHistory() {
 
 	url := js.Global().Get("URL").Call("createObjectURL", obj).String()
 
-	setTextByID("exportHistory", `<a href="`+url+`">right-click to download history</a>`)
+	stopInput()
+	hide("console")
+	hide("controls2")
+	show("extra")
+	show("historyDialog")
+	show("backButton")
+	hide("console")
+
+	setTextByID("historyDialog", `<a href="`+url+`">right-click to download history</a>`)
 
 }
 

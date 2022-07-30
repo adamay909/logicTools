@@ -98,7 +98,7 @@ func tokenizeLatex(s []string) (tokenStr, error) {
 			t.str = e
 
 		case isGreekFormulaVar(e):
-			t.tokenType = tAtomicSentence
+			t.tokenType = tPredicate
 			t.str = e
 
 		case isFormulaSet(e):
@@ -118,6 +118,7 @@ func tokenizeLatex(s []string) (tokenStr, error) {
 	ts2 = ts
 	if oPL {
 		ts2 = nil
+		ts = fixBrackets(ts)
 		ts = fixIdentity(ts)
 		ts2, err = tokenizePLround2(ts)
 		if err != nil {
@@ -126,6 +127,38 @@ func tokenizeLatex(s []string) (tokenStr, error) {
 
 	}
 	return ts2, err
+}
+
+func fixBrackets(ts tokenStr) tokenStr {
+
+	var rts tokenStr
+	var q = false
+
+	for i := 0; i < len(ts); i++ {
+		e := ts[i]
+
+		if isGreekFormulaVar(e.str) {
+			rts = append(rts, e)
+			if i < len(ts)-1 {
+				if ts[i+1].tokenType == tOpenb {
+					q = true
+					i++
+					continue
+				}
+			}
+			continue
+		}
+		if e.tokenType == tCloseb {
+			if q == true {
+				q = false
+				continue
+			}
+		}
+
+		rts = append(rts, e)
+	}
+
+	return rts
 }
 
 func fixIdentity(ts tokenStr) tokenStr {
@@ -204,6 +237,8 @@ func parseLatex(ts tokenStr) (*Node, error) {
 		n.SetChild2(ns2)
 		n.subnode2.parent = n
 	}
+
+	n, err = ParseStrict(n.String())
 
 	return n, err
 }
@@ -302,7 +337,6 @@ func nextSentence(ts tokenStr) (tn tokenStr, err error) {
 	if len(ts) == 0 {
 		return
 	}
-
 	if ts[0].isAtomicSentence() {
 		if len(ts) == 1 {
 			return ts[:1], err
@@ -331,6 +365,6 @@ func nextSentence(ts tokenStr) (tn tokenStr, err error) {
 		return ts[:findMatchingBracket(ts, 0)+1], err
 	}
 
-	err = errors.New("Something wrong. Check commas, brackets, etc.")
+	err = errors.New("Something wrong. Check commas, brackets, etc." + ts[0].str)
 	return
 }

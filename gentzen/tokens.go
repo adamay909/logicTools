@@ -216,7 +216,7 @@ func nextToken(s string) (t token, r string) {
 	case string(sr[:pos]) == lex:
 		t.tokenType = tEx
 	case isGreekFormulaVar(string(sr[:pos])):
-		t.tokenType = tAtomicSentence
+		t.tokenType = tPredicate
 	case isFormulaSet(string(sr[:pos])):
 		t.tokenType = tAtomicSentence
 	case isLowerCase(string(sr[:pos])):
@@ -260,6 +260,10 @@ func cleanString(s string) string {
 	s = strings.ReplaceAll(s, "\t", "")
 	s = strings.ReplaceAll(s, "(", "")
 	s = strings.ReplaceAll(s, ")", "")
+
+	for _, g := range greekLCBindings {
+		s = strings.ReplaceAll(s, g[0], g[2])
+	}
 
 	return s
 }
@@ -332,6 +336,22 @@ func tokenizePLround2(t tokenStr) (tokenStr, error) {
 		}
 
 		if e.isPredicate() {
+			if isGreekFormulaVar(e.str) {
+				if i == len(t)-1 {
+					n.tokenType = tAtomicSentence
+					n.predicate = e.str
+					n.str = e.str
+					t2 = append(t2, n)
+					continue
+				}
+				if !t[i+1].isTerm() {
+					n.tokenType = tAtomicSentence
+					n.predicate = e.str
+					n.str = e.str
+					t2 = append(t2, n)
+					continue
+				}
+			}
 			if i == len(t)-1 {
 				err = errors.New("predicate without term")
 				return t, err
@@ -348,8 +368,17 @@ func tokenizePLround2(t tokenStr) (tokenStr, error) {
 					break
 				}
 				n.term = append(n.term, t[j].str)
-				n.str = n.str + t[j].str
 				i++
+			}
+			if isGreekFormulaVar(e.str) {
+				n.str = n.str + "("
+			}
+			for _, e := range n.term {
+				n.str = n.str + e
+			}
+
+			if isGreekFormulaVar(e.str) {
+				n.str = n.str + ")"
 			}
 			t2 = append(t2, n)
 			continue
@@ -362,7 +391,7 @@ func tokenizePLround2(t tokenStr) (tokenStr, error) {
 			t2 = append(t2, e)
 			continue
 		}
-		err = errors.New("something wrong")
+		err = errors.New("something wrong: " + e.str)
 		return t, err
 	}
 	return t2, err

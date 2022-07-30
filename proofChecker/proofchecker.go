@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -25,10 +24,6 @@ func checkDerivation() {
 	}
 
 	displayDerivation()
-	fmt.Println("sending following")
-	for _, i := range arglines {
-		fmt.Println(i)
-	}
 
 	if gentzen.CheckDeriv(arglines, dsp.Offset) {
 		printMessage("Good!")

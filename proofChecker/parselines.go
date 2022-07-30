@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -103,7 +102,6 @@ func parseLine(l []string, raw bool) (datum, succ, annot string, err error) {
 		}
 		formula, err = gentzen.InfixParser(tk(e))
 		if err != nil {
-			fmt.Println("failed for ", e)
 			return
 		}
 		datum = datum + formula.String() + ","

@@ -184,8 +184,9 @@ div#cursor{
 }
 
 div#cursor.inactive {
- animation-play-state: paused;
+ display: none;
 }
+
 @keyframes blinker {
      0%{
         background-color: black;
