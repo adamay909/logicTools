@@ -24,6 +24,12 @@ func checkDerivation() {
 	}
 
 	displayDerivation()
+<<<<<<< HEAD
+=======
+	for _, i := range arglines {
+		fmt.Println(i)
+	}
+>>>>>>> 08d25eec1484bdb79952c4713f3e08b11aa7306e
 
 	if gentzen.CheckDeriv(arglines, dsp.Offset) {
 		printMessage("Good!")
