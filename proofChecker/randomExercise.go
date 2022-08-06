@@ -15,17 +15,17 @@ func nextProblem() {
 	saveHistory()
 	if len(exercises) == 0 {
 		genNewExercise()
-		exercises = append(exercises, marshalJson())
+		exercises = append(exercises, dsp.marshalJson())
 		displayExercise(exercises[expos])
 		return
 	}
 
-	exercises[expos] = string(marshalJson())
+	exercises[expos] = string(dsp.marshalJson())
 	expos++
 
 	if expos == len(exercises) {
 		genNewExercise()
-		exercises = append(exercises, marshalJson())
+		exercises = append(exercises, dsp.marshalJson())
 	}
 
 	displayExercise(exercises[expos])
@@ -33,7 +33,7 @@ func nextProblem() {
 }
 
 func prevProblem() {
-	exercises[expos] = marshalJson()
+	exercises[expos] = dsp.marshalJson()
 	expos--
 	if expos < 0 {
 		expos = 0

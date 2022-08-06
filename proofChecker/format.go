@@ -8,6 +8,8 @@ import (
 func (d *console) typeset() string {
 
 	var html string
+
+	html = `<h3 id="extitle"></h3>`
 	if d.Title != "" {
 		html = `<h3 id="extitle">` + prettyGreek(d.Title) + `</h3>`
 	}

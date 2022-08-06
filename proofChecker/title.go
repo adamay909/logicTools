@@ -1,15 +1,19 @@
 package main
 
-import "syscall/js"
+import (
+	"syscall/js"
+)
 
 var avail [][3]string
 
 func editTitle() {
 
 	stopInput()
-	dsp.Title = "&emsp;"
 
-	setTextByID("display", dsp.typeset())
+	if dsp.Title == "" {
+		dsp.Title = "&ensp;"
+	}
+	stopInput()
 
 	setAttributeByID("extitle", "style", "background-color: lightblue")
 
@@ -22,19 +26,27 @@ func editTitle() {
 
 func endEditTitle() {
 
+	if dsp.Title == "&ensp;" {
+		dsp.Title = ""
+	}
 	setAttributeByID("extitle", "style", "background-color: white")
 	js.Global().Call("removeEventListener", "keydown", titleEditorFunc, true)
 	js.Global().Call("addEventListener", "keydown", mainEditorFunc, true)
+	stopInput()
 }
 
 var tpos int
 var tmodifier string
+var titleString []rune
 
 func typetitle() {
 	stopInput()
-	titleString := []rune(dsp.Title)
+	titleString = []rune(dsp.Title)
 
 	key := getInputString()
+	if key == "Shift" {
+		return
+	}
 
 	if key == enter {
 		tmodifier = ""
@@ -42,14 +54,15 @@ func typetitle() {
 		return
 	}
 
-	if key == backspace2 {
+	if key == backspace {
 		tmodifier = ""
-		if len(titleString) < 1 {
+		if string(titleString) == "&ensp;" {
+			setAttributeByID("extitle", "style", "background-color: lightblue")
 			return
 		}
 		titleString = titleString[:len(titleString)-1]
 		dsp.Title = string(titleString)
-		setTextByID("display", dsp.typeset())
+		stopInput()
 		setAttributeByID("extitle", "style", "background-color: lightblue")
 		return
 	}
@@ -67,7 +80,7 @@ func typetitle() {
 	if err == nil {
 		titleString = append(titleString, []rune(inp)...)
 		dsp.Title = string(titleString)
-		setTextByID("display", dsp.typeset())
+		stopInput()
 		setAttributeByID("extitle", "style", "background-color: lightblue")
 	}
 	tmodifier = ""

@@ -1,69 +1,98 @@
-<div id="console">  
-<div id="navbar">
-    <div id="menuButton">
-      <button class="button"   tabindex=
-      "0"><img src="assets/menuIcon.png" alt="settings" id="toggleSettings"/></button>
+  <div id="console">
+    <div id="navbar">
+      <div id="menuButton">
+        <button class="button" tabindex="0"><img src="assets/menuIcon.png" alt="settings"
+        id="toggleSettings" /></button>
+      </div>
+
+      <div id="controls">
+        <button class="button" id="check" tabindex="0">Check Derivation</button>
+        <button class="button" id="clearInput" tabindex="0">Clear All</button>
+        <button class="button" id="toClipboard" tabindex="0">Copy to Clipboard</button>
+        <button class="button" id="toggleHelp" tabindex="0">Show Help</button>
+        <button class="button" id="sizeUp" tabindex="0" style=
+        "margin-left: 2em; width:1.5em">+</button> <button class="button" id="sizeDown"
+        tabindex="0" style="width: 1.5em">-</button>
+      </div>
+
+      <div id="cursorControls">
+        <button class="button cursorkey" tabindex="0" id="delete">DEL</button>
+        <button class="button cursorkey" tabindex="0" id="arrowLeft">&#8592;</button>
+        <button class="button cursorkey" tabindex="0" id="arrowUp">&#8593;</button>
+        <button class="button cursorkey" tabindex="0" id="arrowDown">&#8595;</button>
+        <button class="button cursorkey" tabindex="0" id="arrowRight">&#8594;</button>
+      </div>
     </div>
 
-    <div id="controls">
-      <button class="button" id="check"  tabindex="0">Check Derivation</button> 
-	  <button class="button" id="clearInput" tabindex="0">Clear All</button> 
-	  <button class="button" id="toClipboard" tabindex="0">Copy to Clipboard</button> 
-	  <button class="button" id="toggleHelp" tabindex="0">Show Help</button>
-	  <button class="button" id="sizeUp" tabindex="0" style="margin-left: 2em; width:1.5em">+</button>
-	  <button class="button" id="sizeDown" tabindex="0" style="width: 1.5em">-</button>
+    <div id="mainArea" style="grid-template-columns: 1fr">
+      <div id="settingsMenu" style="display: none">
+        <div class="buttongroup">
+          <button class="button" id="toggleSystem" tabindex="0">Sentential Logic</button>
+          <button class="button" id="setTitle" tabindex="0">Set Title</button>
+          <button class="button" id="setOffset" tabindex="0">First Line: 1</button>
+          <button class="button" id="togglethm" tabindex="0">No Theorems</button>
+        </div>
 
-	</div>
-	<div id="cursorControls">
-	 <button class="button" tabindex="0" class="cursorkey" id="delete">DEL</button>
-	 <button class="button" tabindex="0" class="cursorkey" id="arrowLeft">&#8592;</button>
-	 <button class="button" tabindex="0" class="cursorkey" id="arrowUp">&#8593;</button>
-	 <button class="button" tabindex="0" class="cursorkey" id="arrowDown">&#8595;</button>
-	 <button class="button" tabindex="0" class="cursorkey" id="arrowRight">&#8594;</button>
-	</div>
-	</div>
-  <div id="mainArea" style="grid-template-columns: 1fr">
-    <div id="settingsMenu" style="display: none">
-	  <button class="button" id="setTitle" tabindex="0">Set Title</button> 
-	  <button class="button" id="setOffset" tabindex="0">First Line: 1</button> 
-	  <button class="button" id="togglethm"  tabindex="0">No Theorems</button> 
-      <button class="button" id="toggleSystem"  tabindex="0">Sentential Logic</button> 
-      <button class="button" id="loadExercise" tabindex="0">exercises</button>
-      <button class="button" id="loadSamples" tabindex="0">examples</button>
+        <div class="buttongroup">
+          <button class="button" id="loadExercise" tabindex="0">exercises</button>
+          <button class="button" id="loadSamples" tabindex="0">examples</button>
+        </div>
 
-      <button class="button" id="togglereadme" tabindex="0">README</button>
-	  <button class="button" id="toggleadvanced" tabindex="0">Advanced Stuff</button>
-	  <div id="advancedstuff">
-	  <button class="button" id="cliptype"  tabindex="0">Clipboard: text</button>
-      <button class="button" id="textInput" tabindex="0">input text</button>
-      <button class="button" id="showCursorKeys" tabindex="0">show arrow keys</button>
-      <button class="button" id="backHistory" tabindex="0">rewind</button>
-      <button class="button" id="forwardHistory" tabindex="0">forward</button>
-	  <!--      <button class="button" id="exportHistory" tabindex="0">export</button>-->
-      <button class="button" id="removeFromHistory" tabindex="0">delete from history</button>
-	</div>
-	  <button class="button" id="reset" tabindex="0">Reset</button>
+        <div class="buttongroup">
+          <button class="button" id="backHistory" tabindex="0">rewind</button>
+          <button class="button" id="forwardHistory" tabindex="0">forward</button> 
+          <button class="button" id="removeFromHistory" tabindex="0">delete from
+          history</button>
+        </div>
+
+        <div class="buttongroup">
+          <button class="button" id="toggleadvanced" tabindex="0">Advanced Stuff</button>
+
+          <div id="advancedstuff">
+            <button class="button" id="cliptype" tabindex="0">Clipboard: text</button>
+            <button class="button" id="textInput" tabindex="0">input text</button>
+            <button class="button" id="showCursorKeys" tabindex="0">show arrow
+            keys</button>
+          </div>
+        </div>
+
+        <div class="buttongroup">
+          <button class="button" id="reset" tabindex="0">Reset</button>
+        </div>
+
+        <div class="buttongroup">
+          <button class="button" id="togglereadme" tabindex="0">README</button>
+        </div>
+      </div>
+
+      <div id="editor">
+        <div id="display" tabindex="0"></div>
+
+        <div id="dummy" contenteditable="" tabindex="0"></div>
+
+        <div id="controls2"></div>
+
+        <div id="messages"></div>
+      </div>
+
+      <div id="help" style="display: none"></div>
     </div>
-
-    <div id="editor">
-      <div id="display" tabindex="0"></div>
-
-      <div id="dummy" contenteditable="" tabindex="0"></div>
-	<div id="controls2"></div>
-      <div id="messages"></div>
-    </div>
-    <div id="help" style="display: none"></div>
   </div>
-</div>
 
-<div id="extra">
- <button id="backButton" >Go Back</button>
- 	<div id="textinput">
-	 <h3>Input text. Only use output generated by this app through the copy to clipboard function.</h3>
-	 <textarea name="textarea" id="textinputarea" rows="15" cols="40"></textarea>
-	 <button id="submitInput">Submit</button>
-	</div>
-	<div id="exerciseList"></div>
-    <div id="readme"</div>
-	<div id="historyDialog"></div>
-</div>
+  <div id="extra">
+    <button id="backButton">Go Back</button>
+
+    <div id="txtinput">
+      <h3>Input text. Only use output generated by this app through the copy to clipboard
+      function.</h3>
+      <textarea name="textarea" id="textinputarea" rows="15" cols="40">
+</textarea> <button id="submitInput">Submit</button>
+    </div>
+
+    <div id="exerciseList"></div>
+
+    <div id="historyDialog"></div>
+
+    <div id="readme"></div>
+  </div>
+

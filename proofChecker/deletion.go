@@ -5,7 +5,7 @@ func (d *console) deletion(m string) {
 	switch m {
 	case del:
 		d.deleteChar()
-	case backspace2:
+	case backspace:
 		d.backspace()
 	default:
 		return

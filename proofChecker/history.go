@@ -4,18 +4,22 @@ import (
 	"encoding/json"
 	"strings"
 	"syscall/js"
+
+	"honnef.co/go/js/dom/v2"
 )
 
 var history []string
 var historyPosition int
 
+var stash string
+
 func saveHistory() {
 
-	c := marshalJson()
+	c := dsp.marshalJson()
 
 	history = append(history, c)
 
-	historyPosition = len(history)
+	cleanHistory()
 
 	json := strings.Join(history, "\n")
 
@@ -45,6 +49,10 @@ func backHistory() {
 		return
 	}
 
+	if historyPosition == len(history) {
+		stashState()
+	}
+
 	historyPosition = historyPosition - 1
 
 	moveInHistory()
@@ -52,11 +60,16 @@ func backHistory() {
 
 func forwardHistory() {
 
-	if historyPosition >= len(history) {
+	historyPosition = historyPosition + 1
+
+	if historyPosition > len(history) {
 		return
 	}
 
-	historyPosition = historyPosition + 1
+	if historyPosition == len(history) {
+		reloadStash()
+		return
+	}
 
 	moveInHistory()
 
@@ -87,9 +100,38 @@ func moveInHistory() {
 
 func saveState() {
 
-	c := marshalJson()
+	c := dsp.marshalJson()
 
 	js.Global().Get("localStorage").Call("setItem", "current", c)
+
+}
+
+func stashState() {
+
+	stash = dsp.marshalJson()
+
+}
+
+func reloadStash() {
+	if stash == "" {
+		return
+	}
+
+	json.Unmarshal([]byte(stash), dsp)
+	stash = ""
+	dsp.xpos, dsp.ypos = 0, 0
+	dsp.overhang = false
+	dsp.modifier = ""
+	if dsp.SystemPL != oPL {
+		togglePL()
+	}
+	if dsp.Theorems != oTHM {
+		toggleTheorems()
+	}
+
+	setTextByID("messages", "")
+	hide("messages")
+	display()
 
 }
 
@@ -165,6 +207,34 @@ func exportHistory() {
 
 }
 
-func loadHistoryFromFile() {
+func importHistory() {
+	stopInput()
+	hide("console")
+	hide("controls2")
+	show("extra")
+	show("historyDialog")
+	show("backButton")
+	hide("console")
+
+	html := `<h3>Paste JSON</h3>
+<textarea name="textarea" id="historyinputarea" rows="15" cols="40"></textarea>
+	 <button id="importHistory">Import</button>`
+
+	setTextByID("historyDialog", html)
+}
+
+func rewriteHistory() {
+	stopInput()
+	history = strings.Split(dom.GetWindow().Document().GetElementByID("historyinputarea").(*dom.HTMLTextAreaElement).Value(), "\n")
+	dom.GetWindow().Document().GetElementByID("historyinputarea").(*dom.HTMLTextAreaElement).SetValue("")
+	dsp.clear()
+	display()
+	printMessage("")
+	hide("messages")
+	hide("historyDialog")
+	hide("extra")
+	hide("backButton")
+	show("console")
+	stopInput()
 
 }

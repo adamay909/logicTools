@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 type inputLine []string
 
 type console struct {
@@ -19,18 +21,25 @@ type console struct {
 }
 
 const (
-	up         = "ArrowUp"
-	down       = "ArrowDown"
-	right      = "ArrowRight"
-	left       = "ArrowLeft"
-	home2      = "Home"
-	end2       = "End"
-	del        = "Delete"
-	backspace2 = "Backspace"
-	enter      = "Enter"
+	up        = "ArrowUp"
+	down      = "ArrowDown"
+	right     = "ArrowRight"
+	left      = "ArrowLeft"
+	home2     = "Home"
+	end2      = "End"
+	del       = "Delete"
+	backspace = "Backspace"
+	enter     = "Enter"
 )
 
 func (d *console) handleInput(key string) {
+
+	fmt.Println(key)
+
+	if isSpecial(key) {
+		handleSpecial(key)
+		return
+	}
 
 	d.xprev = d.xpos
 	d.yprev = d.ypos
@@ -105,4 +114,42 @@ func isModifier(k string) bool {
 
 func (d *console) setOffset(n int) {
 	d.Offset = n
+}
+
+var sp1, sp2 string
+
+func isSpecial(key string) bool {
+
+	if sp1 == "Control" && sp2 == "Alt" {
+		sp1 = ""
+		sp2 = ""
+		return true
+	}
+
+	if sp1 == "" {
+		if key == "Control" {
+			sp1 = key
+			sp2 = ""
+		}
+		return false
+	}
+
+	if sp1 == "Control" {
+		if key == "Alt" {
+			sp2 = key
+		}
+		return false
+	}
+	return false
+}
+
+func handleSpecial(key string) {
+
+	switch key {
+	case "s":
+		exportHistory()
+	case "l":
+		importHistory()
+	default:
+	}
 }

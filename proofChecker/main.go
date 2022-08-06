@@ -135,7 +135,8 @@ func onClick() {
 		toggleHelp()
 
 	case "setTitle":
-		setTitle()
+		//	setTitle()
+		editTitle()
 
 	case "toggleSystem":
 		togglePL()
@@ -169,6 +170,8 @@ func onClick() {
 		rmFromHistory()
 	case "exportHistory":
 		exportHistory()
+	case "importHistory":
+		rewriteHistory()
 	case "backButton":
 		backToNormal()
 
@@ -496,7 +499,7 @@ func toClipboard() {
 		copyToClipboard(plainTextDeriv(withTitle))
 
 	case oJsonOutput:
-		copyToClipboard(marshalJson())
+		copyToClipboard(dsp.marshalJson())
 	}
 
 	return

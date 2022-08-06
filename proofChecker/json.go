@@ -5,9 +5,9 @@ import (
 	"log"
 )
 
-func marshalJson() string {
+func (d *console) marshalJson() string {
 
-	output, err := json.Marshal(dsp)
+	output, err := json.Marshal(d)
 
 	if err != nil {
 
@@ -17,10 +17,10 @@ func marshalJson() string {
 	return string(output)
 }
 
-func unmarshalJson(data string) {
+func (d *console) unmarshalJson(data string) {
 
-	dsp.clear()
-	err := json.Unmarshal([]byte(data), dsp)
+	d.clear()
+	err := json.Unmarshal([]byte(data), d)
 
 	if err != nil {
 		log.Fatal("json falied")

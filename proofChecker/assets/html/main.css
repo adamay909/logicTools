@@ -92,13 +92,13 @@ div#settingsMenu {
  display: inline;
 }
 
-div#settingsMenu > .button {
+div.buttongrounp > .button {
 width: 100%;
 font-size: 1em;
 margin-top: 0.25em;
 }
 
-div#settingsMenu >.button:hover{
+div#buttongroup >.button:hover{
  display: inline-block;
  color: black;
  background-color: lightgreen;
@@ -300,8 +300,12 @@ div#readme {
  margin-left: 8em;
 }
 
-div#settingsMenu>button {
-    width: 80%;
+div.buttongroup {
+    margin-top:1em;
+}
+
+div.buttongroup > button {
+    width: 100%;
     margin: 0.2em;
     border-radius: 30px;
 }
@@ -311,21 +315,18 @@ div#settingsMenu > button#toggleSystem{
 
 
 div#settingsMenu > button#loadExercise{
-margin-top: 2em;
 }
 
 div#settingsMenu > button#toggleadvanced {
    color: red;
     background-color: white;
     font-size: 0.8em;
-    margin-top: 2em;
 }
 
 div#settingsMenu > button#toggleadvanced:hover {
    color: red;
     background-color: pink;
     font-size: 0.8em;
-    margin-top: 2em;
 }
 
 
