@@ -183,6 +183,11 @@ div#cursor{
  animation:blinker 0.75s linear infinite;
 }
 
+div#cursor2{ 
+ display: inline;
+ animation:blinker 0.75s linear infinite;
+}
+
 div#cursor.inactive {
  display: none;
 }

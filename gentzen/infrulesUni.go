@@ -57,7 +57,7 @@ func uniI(seq1, seq2 sequent) bool {
 		if len(d) == 0 {
 			continue
 		}
-		if string(d[0]) == `\` {
+		if isFormulaSet(d.String()) {
 			continue
 		}
 		if Parse(d).hasTerm(term) {

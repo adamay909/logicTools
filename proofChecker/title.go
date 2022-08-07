@@ -1,18 +1,21 @@
 package main
 
 import (
+	"strings"
 	"syscall/js"
 )
 
 var avail [][3]string
 
 func editTitle() {
+	var cursor = `<div id="cursor2">&thinsp;</div>`
 
 	stopInput()
-
 	if dsp.Title == "" {
 		dsp.Title = "&ensp;"
 	}
+	dsp.Title = dsp.Title + cursor
+
 	stopInput()
 
 	setAttributeByID("extitle", "style", "background-color: lightblue")
@@ -22,9 +25,13 @@ func editTitle() {
 	js.Global().Call("addEventListener", "keydown", titleEditorFunc, true)
 
 	avail = combineBindings(keyBindings, punctBindings, connBindings, plBindings, turnstileBindings, greekBindings, extraBindings)
+
+	focusInput()
 }
 
 func endEditTitle() {
+	var cursor = `<div id="cursor2">&thinsp;</div>`
+	dsp.Title = strings.TrimSuffix(dsp.Title, cursor)
 
 	if dsp.Title == "&ensp;" {
 		dsp.Title = ""
@@ -40,8 +47,9 @@ var tmodifier string
 var titleString []rune
 
 func typetitle() {
-	stopInput()
-	titleString = []rune(dsp.Title)
+	var cursor = `<div id="cursor2">&thinsp;</div>`
+
+	titleString = []rune(strings.TrimSuffix(dsp.Title, cursor))
 
 	key := getInputString()
 	if key == "Shift" {
@@ -61,7 +69,7 @@ func typetitle() {
 			return
 		}
 		titleString = titleString[:len(titleString)-1]
-		dsp.Title = string(titleString)
+		dsp.Title = string(titleString) + cursor
 		stopInput()
 		setAttributeByID("extitle", "style", "background-color: lightblue")
 		return
@@ -79,12 +87,11 @@ func typetitle() {
 	inp, err := tkOf(key, tkraw, tktxt, avail)
 	if err == nil {
 		titleString = append(titleString, []rune(inp)...)
-		dsp.Title = string(titleString)
+		dsp.Title = string(titleString) + cursor
 		stopInput()
 		setAttributeByID("extitle", "style", "background-color: lightblue")
 	}
 	tmodifier = ""
-
 }
 
 func getInputString() string {

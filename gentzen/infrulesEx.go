@@ -65,7 +65,7 @@ func exEhelper(seq1, seq2, seq3 sequent) (v bool, msg string) {
 	datum2 := seq2.datumSlice()
 
 	for _, d := range datum2 {
-		if d[:1] == `\` {
+		if isFormulaSet(d.String()) {
 			continue
 		}
 		found, _, kappa = isInstanceOf(d.String(), seq1.succedent().String())
@@ -85,7 +85,7 @@ func exEhelper(seq1, seq2, seq3 sequent) (v bool, msg string) {
 		if len(d) == 0 {
 			continue
 		}
-		if d[:1] == `\` {
+		if isFormulaSet(d.String()) {
 			continue
 		}
 		if Parse(d).hasTerm(kappa) {
@@ -98,7 +98,7 @@ func exEhelper(seq1, seq2, seq3 sequent) (v bool, msg string) {
 		if len(d) == 0 {
 			continue
 		}
-		if d[:1] == `\` {
+		if isFormulaSet(d.String()) {
 			continue
 		}
 		if Parse(d).hasTerm(kappa) {
