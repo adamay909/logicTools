@@ -81,18 +81,18 @@ var infRules = [][]string{
 }
 
 var greekUCBindings = [][3]string{
-	[3]string{`\G`, `\Gamma`, "\u0393"},
-	[3]string{`\D`, `\Delta`, "\u0394"},
-	[3]string{`\T`, `\Theta`, "\u0398"},
-	[3]string{`\L`, `\Lambda`, "\u039b"},
-	[3]string{`\X`, `\Xi`, "\u039e"},
-	[3]string{`\P`, `\Pi`, "\u03a0"},
-	[3]string{`\R`, `\Rho`, "\u03a1"},
-	[3]string{`\S`, `\Sigma`, "\u03a3"},
-	[3]string{`\U`, `\Upsilon`, "\u03a5"},
-	[3]string{`\F`, `\Phi`, "\u03a6"},
-	[3]string{`\Q`, `\Psi`, "\u03a8"},
-	[3]string{`\W`, `\Omega`, "\u03a9"},
+	[3]string{`/G`, `\Gamma`, "\u0393"},
+	[3]string{`/D`, `\Delta`, "\u0394"},
+	[3]string{`/T`, `\Theta`, "\u0398"},
+	[3]string{`/L`, `\Lambda`, "\u039b"},
+	[3]string{`/X`, `\Xi`, "\u039e"},
+	[3]string{`/P`, `\Pi`, "\u03a0"},
+	[3]string{`/R`, `\Rho`, "\u03a1"},
+	[3]string{`/S`, `\Sigma`, "\u03a3"},
+	[3]string{`/U`, `\Upsilon`, "\u03a5"},
+	[3]string{`/F`, `\Phi`, "\u03a6"},
+	[3]string{`/Q`, `\Psi`, "\u03a8"},
+	[3]string{`/W`, `\Omega`, "\u03a9"},
 }
 
 var greekLCBindings = [][3]string{

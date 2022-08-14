@@ -34,8 +34,6 @@ const (
 
 func (d *console) handleInput(key string) {
 
-	fmt.Println(key)
-
 	if isSpecial(key) {
 		handleSpecial(key)
 		return
@@ -144,12 +142,15 @@ func isSpecial(key string) bool {
 }
 
 func handleSpecial(key string) {
-
+	fmt.Println("special", key)
 	switch key {
-	case "s":
+	case "e":
 		exportHistory()
 	case "l":
 		importHistory()
 	default:
 	}
+	sp1 = ""
+	sp2 = ""
+
 }

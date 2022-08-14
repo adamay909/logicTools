@@ -1,6 +1,8 @@
 package gentzen
 
-import "sort"
+import (
+	"sort"
+)
 
 type Node struct {
 	raw                string
@@ -168,12 +170,15 @@ func (n *Node) BracketClass() int {
 	c := 0
 
 	if n.IsAtomic() {
-		if oPL && n.parent != nil {
+		if oPL && n.predicateLetter == "=" && n.parent != nil {
 			if n.parent.IsQuantifier() {
 				c++
 			}
-
-			if isGreekFormulaVar(n.Predicate()) && len(n.Terms()) > 0 {
+		}
+		if isGreekFormulaVar(n.Predicate()) && len(n.Terms()) > 0 && n.parent != nil {
+			if n.parent.IsNegation() {
+				c = 2
+			} else {
 				c++
 			}
 		}
@@ -190,6 +195,11 @@ func (n *Node) BracketClass() int {
 		if oPL && n.parent != nil {
 			if n.parent.IsQuantifier() {
 				c++
+			}
+			if n.subnode1.Predicate() == "=" {
+				if n.parent.IsNegation() {
+					c++
+				}
 			}
 		}
 		return c

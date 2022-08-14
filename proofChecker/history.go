@@ -37,9 +37,6 @@ func loadHistory() {
 
 	history = strings.Split(json, "\n")
 	historyPosition = len(history)
-	if historyPosition < 0 {
-		historyPosition = 0
-	}
 
 }
 
@@ -199,6 +196,7 @@ func exportHistory() {
 	hide("console")
 	hide("controls2")
 	show("extra")
+	hide("txtinput")
 	show("historyDialog")
 	show("backButton")
 	hide("console")
@@ -212,6 +210,7 @@ func importHistory() {
 	hide("console")
 	hide("controls2")
 	show("extra")
+	hide("txtinput")
 	show("historyDialog")
 	show("backButton")
 	hide("console")

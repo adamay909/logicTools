@@ -57,14 +57,19 @@ func printNodeInfix(n *Node, m printMode) (s string) {
 			switch m {
 			case mLatex:
 				s = `\nident{` + n.subnode1.term[0] + `}{` + n.subnode1.term[1] + `}`
-				return s
+				//				return s
 			case mPlainLatex:
 				s = n.subnode1.term[0] + `\mathbin{\neq}` + n.subnode1.term[1] + ``
-				return s
+				//				return s
 			case mPlainText:
 				s = n.subnode1.term[0] + "\u2260" + n.subnode1.term[1]
-				return s
+				//				return s
 			default:
+			}
+			if n.parent != nil {
+				if n.parent.IsNegation() {
+					s = br[1][0] + s + br[1][1]
+				}
 			}
 		}
 
@@ -93,7 +98,9 @@ func printNodeInfix(n *Node, m printMode) (s string) {
 	}
 
 	if n.IsAtomic() {
-		return s
+		if n.Predicate() != "=" {
+			return s
+		}
 	}
 
 	if n.IsQuantifier() {
@@ -110,6 +117,10 @@ func printNodeInfix(n *Node, m printMode) (s string) {
 	var blevel int
 
 	blevel = n.BracketClass()
+
+	if blevel == 0 {
+		return s
+	}
 
 	if blevel+1 >= len(br) {
 		ob1 = br[len(br)-1][0]

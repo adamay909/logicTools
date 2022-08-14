@@ -5,6 +5,8 @@ import (
 	"strings"
 )
 
+var cursor = `<div id="cursor">&thinsp;</div>`
+
 func (d *console) typeset() string {
 
 	var html string
@@ -19,23 +21,23 @@ func (d *console) typeset() string {
 }
 
 func (d *console) format() {
-	cursor := true
-	d.formatHTML(cursor)
+	showCursor := true
+	d.formatHTML(showCursor)
 }
 
 func (d *console) formatDerivation() {
-	cursor := false
-	d.formatHTML(cursor)
+	showCursor := false
+	d.formatHTML(showCursor)
 }
 
-func (d *console) formatHTML(cursor bool) {
+func (d *console) formatHTML(showCursor bool) {
 
 	d.html = nil
 
 	for n, l := range d.Input {
 		var dat, succ, annot []string
 
-		if cursor && n == d.ypos {
+		if showCursor && n == d.ypos {
 			l = setCursor(d, d.Input[n])
 		}
 		raw := true
@@ -73,7 +75,6 @@ func setCursor(d *console, l []string) []string {
 }
 
 func unsetCursor(l []string) []string {
-	var cursor = `<div id="cursor">&thinsp;</div>`
 
 	if dsp.modifier != "" {
 		cursor = strings.ReplaceAll(cursor, `&thinsp;`, dsp.modifier)

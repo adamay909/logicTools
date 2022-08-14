@@ -45,7 +45,7 @@ Finally, there are two rules for identity (Gentzen does not have these; he uses 
 
 - **Identity Introduction (=I)** For any constant κ, infer ⊢ κ=κ.
 - **Identity Elimination (=E)** For any constants κ1 and κ2 , infer
-⊢ (κ1=κ2 ∧ φ(κ1)) ⊃ φ∗ (κ2) where φ∗ (κ2) is any formula you can
+⊢ (κ1=κ2 ∧ φ(κ1)) ⊃ φ∗(κ2) where φ∗(κ2) is any formula you can
 obtain by substituting at least one instance of κ1 in φ with κ2 .
 
 
@@ -81,10 +81,81 @@ You must write the above as:
 
 Notice the use of the keyword "premise" in the annotation. That is what you must use for a premise that is not an assumption (an assumption must take the form s ⊢ s). 
 
+
+### Theorems
+
+To make life easier, you can choose to allow the use of a few theorems. If you do use theorems, you must use their abbreviations in the annotations. The theorems are:
+
+#### Theorems of Sentential Logic
+-**Identity (ID)** ⊢ p ⊃ p
+-**Non-Contradiction (NC)** ⊢ ¬(p ∧ ¬p)
+-**Excluded Middle (EM)** ⊢ p ∨ ¬p
+-**DeMorgan (DM)** ⊢ ¬(p ∨ q) ⊃ (¬p ∧ ¬q)
+-**DeMorgan (DM)** ⊢ (¬p ∧ ¬q) ⊃ ¬(p ∨ q)
+-**DeMorgan (DM)** ⊢ ¬(p ∧ q) ⊃ (¬p ∨ ¬q)
+-**DeMorgan (DM)** ⊢ (¬p ∨ ¬q) ⊃ ¬(p ∧ q)
+-**Implication (IM)** ⊢ (p ⊃ q) ⊃ (¬p ∨ q)
+-**Elimination (EL)** ⊢ (p ∨ q) ⊃ (¬p ⊃ q)
+-**Contraposition (CP)** ⊢ (p ⊃ q) ⊃ (¬q ⊃ ¬p)
+-**Commutativity of Conjunction (CC)** ⊢ (p ∧ q) ⊃ (q ∧ p)
+-**Commutativity of Disjunction (CD)** ⊢ (p ∨ q) ⊃ (q ∨ p)
+-**Associativity of Conjunction (AC)** ⊢ [(p ∧ q) ∧ r] ⊃ [p ∧ (q ∧ r)]
+-**Associativity of Conjunction (AC)** ⊢ [p ∧ (q ∧ r)] ⊃ [(p ∧ q) ∧ r]
+-**Associativity of Disjunction (AD)** ⊢ [(p ∨ q) ∨ r] ⊃ [p ∨ (q ∨ r)]
+-**Associativity of Disjunction (AD)** ⊢ [p ∨ (q ∨ r)] ⊃ [(p ∨ q) ∨ r]
+-**Double Negation Introduction (DN)** ⊢ p ⊃ ¬¬p
+
+#### Theorems of Predicate Logic
+-**Quantifier Exchange (QE)** ⊢ ∃xFx ⊃ ¬∀x(¬Fx)
+-**Quantifier Exchange (QE)** ⊢ ¬∀x(¬Fx) ⊃ ∃xFx
+-**Quantifier Exchange (QE)** ⊢ ∀xFx ⊃ ¬∃x(¬Fx)
+-**Quantifier Exchange (QE)** ⊢ ¬∃x(¬Fx) ⊃ ∀xFx
+-**Quantifier Exchange (QE)** ⊢ ∃x(¬Fx) ⊃ ¬∀xFx
+-**Quantifier Exchange (QE)** ⊢ ¬∀xFx ⊃ ∃x(¬Fx)
+-**Quantifier Exchange (QE)** ⊢ ∀x(¬Fx) ⊃ ¬∃xFx
+-**Quantifier Exchange (QE)** ⊢ ¬∃xFx ⊃ ∀x(¬Fx)
+
+The proof checker will recognize instances of theorems. Here is an example of a use of EM:
+
+1. Γ ⊢ P⊃Q...premise
+2. ⊢ P∨¬P...EM
+3. P ⊢ P...A
+4. Γ,P ⊢ Q...1,3,⊃E
+5. Γ,P ⊢ ¬P∨Q...4,∨I
+6. ¬P ⊢ ¬P...A
+7. ¬P ⊢ ¬P∨Q...6,∨I
+8. Γ ⊢ ¬P∨Q...2,5,7,∨E
+
+
+### The Proof Checker
+
+ The proof checker checks you whether each line is in accordance with the proof system. But it does not check whether you have managed to show what you set out to show. You'll have to check that yourself---usually a matter of inspecting the last line of your derivation, possibly in combination with the premises.
+
+You may have to go through several rounds of checking and fixing a derivation because the proof checker does not always list all the problems at once.
+
+### The Editor
+
+The editor is very primitive with limited functionality. It works like an old-school, keyboard-only editor. You can move the cursor around with the arrow keys, home and end for moving to the start or end of line, and delete and backspace should work more or less normally (sometimes more, sometimes less...). But no more advanced navigation around the input area, no positioning the cursor with your mouse,  and no copying and pasting and the like. Given the intended use, it should be enough (it works for me...). While it seems to work with the iOS on-screen keyboard once you activate soft-cursor keys--from the options under 'Advanced Stuff'--, it definitely does not work on an Android with an on-screen keyboard. You will need a physical keyboard (even on iOS, using the touch screen keyboard is going to be really slow). 
+
+Apart from the above limitations, The editor is designed to be as transparent as possible: symbols should be easy to type and students should not have to worry about how what's on the screen corresponds to what they see in the course material. Some special key combinations are used to facilitate typing symbol. Check the help on how to input symbols. 
+
+You can copy the contents of the input area using the "Copy to Clipboard" button.
+
+### Exercises
+
+When you click 'exercises', you will be presented with some exercises from the course material. You will also see a button that says 'random exercises'. That generates random exercises asking you to construct derivations. While there should be a derivation that the exercise asks you to construct (barring coding mistakes on my part), I cannot make any promises about the ease or difficulty of constructing a derivation that fits the bill. Note that the proof system has a lax view of a successful derivation: a derivation may have premises that are redundant.
+
+### Preservation of History
+
+The proof checker will attempt to store the current state of the editor so that when you open the proof checker again, you will be presented with the last state of things before you quit (or the program crashed). The proof checker will also store a series of snapshots of the editor. This last happens whenever you clear the screen or move to the next exercise. All history is stored in the browser's local cache so how much history is stored for how long depends on your browser settings and the like.
+
+You can go back and forth in history using buttons under 'advanced stuff'. You can also choose to delete points in the history.
+ 
 ### Installation
 
-This proof-checker is designed to run completely inside the browser so it is easy to host yourself so long as you are able to host static websites. You'll need the index.html file and the files in the assets/ folder.
+This proof-checker is designed to run completely inside the browser so it is easy to host yourself so long as you are able to host static websites. The docs folder of the GitHub repository contains all the files you need.
 
 ### Copyright
 
 The Go, HTML, and CSS sources for this proof checker written by Masahiro Yamada. Licensed under the MIT License. You can get the source code at:
+[https://github.com/adamay909/logicTools](https://github.com/adamay909/logicTools)

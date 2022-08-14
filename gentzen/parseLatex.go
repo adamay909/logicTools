@@ -2,6 +2,7 @@ package gentzen
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 )
 
@@ -54,7 +55,7 @@ func bracketsOK(s tokenStr) bool {
 func tokenizeLatex(s []string) (tokenStr, error) {
 
 	var err error
-	var ts, ts2 tokenStr
+	var ts tokenStr
 	for _, e := range s {
 		e = strings.TrimSpace(e)
 		var t token
@@ -115,18 +116,20 @@ func tokenizeLatex(s []string) (tokenStr, error) {
 		ts = append(ts, t)
 	}
 
-	ts2 = ts
+	//	ts2 = ts
 	if oPL {
-		ts2 = nil
+		fmt.Print("done")
+		//		ts2 = nil
 		ts = fixBrackets(ts)
 		ts = fixIdentity(ts)
-		ts2, err = tokenizePLround2(ts)
+		//	ts2, err = tokenizePLround2(ts)
+		ts, err = tokenizePLround2(ts)
 		if err != nil {
 			logger.Print(err)
 		}
 
 	}
-	return ts2, err
+	return ts, err
 }
 
 func fixBrackets(ts tokenStr) tokenStr {
@@ -164,7 +167,7 @@ func fixBrackets(ts tokenStr) tokenStr {
 func fixIdentity(ts tokenStr) tokenStr {
 
 	for i := 1; i < len(ts); i++ {
-		if ts[i].str == `=` {
+		if ts[i].str == `=` || ts[i].str == `≠` {
 			tt := ts[i]
 			ts[i].tokenType = ts[i-1].tokenType
 			ts[i].str = ts[i-1].str
@@ -172,7 +175,21 @@ func fixIdentity(ts tokenStr) tokenStr {
 			ts[i-1].str = tt.str
 		}
 	}
-	return ts
+	var tn, tn2 token
+	tn.tokenType = tNeg
+	tn.str = lneg
+	tn2.tokenType = tPredicate
+	tn2.str = "="
+	var tr tokenStr
+
+	for _, e := range ts {
+		if e.str != `≠` {
+			tr = append(tr, e)
+			continue
+		}
+		tr = append(tr, tn, tn2)
+	}
+	return tr
 }
 
 func isOpenb(s string) bool {

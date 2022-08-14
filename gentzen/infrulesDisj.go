@@ -81,7 +81,6 @@ func disjEhelper3(seq []sequent, i int) (seq1, seq2, seq3 sequent, err error) {
 	for j = range seq {
 
 		if Parse(seq[j].succedent()).MainConnective() == disj {
-			ok = true
 			seq1 = seq[j]
 			switch j {
 			case 0:
@@ -94,25 +93,21 @@ func disjEhelper3(seq []sequent, i int) (seq1, seq2, seq3 sequent, err error) {
 				seq2 = seq[0]
 				seq3 = seq[1]
 			}
+			d1 := datum(Parse(seq1.succedent()).Child1Must().Formula())
+			d2 := datum(Parse(seq1.succedent()).Child2Must().Formula())
+			if !datumIncludes(seq2.datumSlice(), d1) && !datumIncludes(seq3.datumSlice(), d1) {
+				continue
+			}
+			if !datumIncludes(seq2.datumSlice(), d2) && !datumIncludes(seq3.datumSlice(), d2) {
+				continue
+			}
+			ok = true
 			break
 		}
 	}
 
 	if !ok {
-		err = errors.New("at least one premise must have disjunction as succedent")
-		return
-	}
-
-	d1 := datum(Parse(seq1.succedent()).Child1Must().Formula())
-	d2 := datum(Parse(seq1.succedent()).Child2Must().Formula())
-
-	if !datumIncludes(seq2.datumSlice(), d1) && !datumIncludes(seq3.datumSlice(), d1) {
-		err = errors.New("each disjunct must appear in datum of at least one other premise.")
-		return
-	}
-
-	if !datumIncludes(seq2.datumSlice(), d2) && !datumIncludes(seq3.datumSlice(), d2) {
-		err = errors.New("each disjunct must appear in datum of at least one other premise.")
+		err = errors.New("check forms of your premises")
 		return
 	}
 

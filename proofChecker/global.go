@@ -92,6 +92,7 @@ var (
 		[3]string{`U`, `\forall`, "\u2200"},
 		[3]string{`X`, `\exists`, "\u2203"},
 		[3]string{"=", "=", "="},
+		[3]string{"|=", "≠", "≠"},
 	}
 
 	turnstileBindings = [][3]string{
@@ -144,6 +145,10 @@ var (
 	extraBindings = [][3]string{
 		[3]string{` `, ` `, ` `},
 		[3]string{`.`, `.`, `.`},
+		[3]string{`|X`, `X`, `X`},
+		[3]string{`|U`, `U`, `U`},
+		[3]string{`|v`, `v`, `v`},
+		[3]string{`|V`, `V`, `V`},
 	}
 )
 

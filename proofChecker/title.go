@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 	"syscall/js"
 )
@@ -10,10 +11,8 @@ var avail [][3]string
 func editTitle() {
 	var cursor = `<div id="cursor2">&thinsp;</div>`
 
-	stopInput()
-	if dsp.Title == "" {
-		dsp.Title = "&ensp;"
-	}
+	dsp.Title = strings.TrimSuffix(dsp.Title, cursor)
+
 	dsp.Title = dsp.Title + cursor
 
 	stopInput()
@@ -25,17 +24,17 @@ func editTitle() {
 	js.Global().Call("addEventListener", "keydown", titleEditorFunc, true)
 
 	avail = combineBindings(keyBindings, punctBindings, connBindings, plBindings, turnstileBindings, greekBindings, extraBindings)
-
+	fmt.Println("ready")
 	focusInput()
 }
 
 func endEditTitle() {
 	var cursor = `<div id="cursor2">&thinsp;</div>`
 	dsp.Title = strings.TrimSuffix(dsp.Title, cursor)
-
-	if dsp.Title == "&ensp;" {
-		dsp.Title = ""
+	if historyPosition != len(history) {
+		history[historyPosition] = dsp.marshalJson()
 	}
+
 	setAttributeByID("extitle", "style", "background-color: white")
 	js.Global().Call("removeEventListener", "keydown", titleEditorFunc, true)
 	js.Global().Call("addEventListener", "keydown", mainEditorFunc, true)
@@ -48,7 +47,7 @@ var titleString []rune
 
 func typetitle() {
 	var cursor = `<div id="cursor2">&thinsp;</div>`
-
+	fmt.Println("editing title")
 	titleString = []rune(strings.TrimSuffix(dsp.Title, cursor))
 
 	key := getInputString()
@@ -64,7 +63,7 @@ func typetitle() {
 
 	if key == backspace {
 		tmodifier = ""
-		if string(titleString) == "&ensp;" {
+		if string(titleString) == "" {
 			setAttributeByID("extitle", "style", "background-color: lightblue")
 			return
 		}

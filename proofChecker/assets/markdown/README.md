@@ -2,7 +2,7 @@
 
 ### The proof system
 
-This proof checker is designed for working with the proof system Gentzen uses in his "Die Wiederspruchsfreiheit der reinen Zahlentheorie" (1936) that I use for teaching  my introductory formal logic course. A proof is stated as a series of sequents where each sequent must have exactly one formula as its succedent. It can be trivially converted to and from proofs in the style of Lemmon's *Beginning Logic* as well others influenced by him  like Allen and Hand's *Logic Primer* (no surprise here since Lemmon's system is, as he says, Gentzen's). E.g., the following proof:
+This proof checker is designed for working with the proof system Gentzen uses in his "Die Wiederspruchsfreiheit der reinen Zahlentheorie" (1936) that I use in my introductory formal logic course. A proof is stated as a series of sequents where each sequent must have exactly one formula as its succedent. It can be trivially converted to proofs in the style of Lemmon's *Beginning Logic* as well others influenced by him (e.g., Allen and Hand, *Logic Primer*). E.g., the following proof:
 1. P ⊢ P
 2. Q ⊢ Q
 3. P,Q ⊢ P and Q
@@ -13,7 +13,7 @@ turns into the following in Lemmon's style:
 2 (2) Q  
 1,2 (3) P and Q  
 
-What we do is replace the turnstile with the line  number, and replace formulas on the antecedent side of each sequent with the appropriate line numbers (of course, you need to add appropriate annotations). One thing Gentzen's system allows is the use of placeholders on the antecedent side of a sequent which can be useful (there is an example of that below).
+What we do is replace the turnstile with the line  number, and replace formulas on the antecedent side of each sequent with the appropriate line numbers (of course, you need to add appropriate annotations). One thing Gentzen's allows is the use of placeholders on the antecedent side of a sequent which can be useful (there is an example of that below).
 
 The proof system has 9 inference rules for sentential logic. In the system, you may:
 - **Assumption Introduction (A)** Infer s ⊢ s.
@@ -45,7 +45,7 @@ Finally, there are two rules for identity (Gentzen does not have these; he uses 
 
 - **Identity Introduction (=I)** For any constant κ, infer ⊢ κ=κ.
 - **Identity Elimination (=E)** For any constants κ1 and κ2 , infer
-⊢ (κ1=κ2 ∧ φ(κ1)) ⊃ φ∗ (κ2) where φ∗ (κ2) is any formula you can
+⊢ (κ1=κ2 ∧ φ(κ1)) ⊃ φ∗(κ2) where φ∗(κ2) is any formula you can
 obtain by substituting at least one instance of κ1 in φ with κ2 .
 
 
@@ -81,30 +81,50 @@ You must write the above as:
 
 Notice the use of the keyword "premise" in the annotation. That is what you must use for a premise that is not an assumption (an assumption must take the form s ⊢ s). 
 
-#### Theorems
 
-You can change the settings to allow a small number of theorems. They are:
+### Theorems
 
-- **Identity (ID)** p⊃p
-- **Non-Contradiction (NC)** ¬(p∧¬p) 
-- **Excluded Middle (EM)** p∨¬p
-- **Contraposition (CP)** (p⊃q)⊃(¬q⊃¬p)
-- **Implication (IM)** (p⊃q)⊃(¬p⊃q)
-- **Elimination (EL)** (p∨q)⊃(¬p⊃q)
-- **DeMorgan 1 (DM1)** ¬(p∨q)⊃(¬p∧¬q)
-- **DeMorgan 2 (DM2)** ¬(p∧q)⊃(¬p∨¬q)
-- **DeMorgan 3 (DM3)** (¬p∨¬q)⊃¬(p∧q)
-- **DeMorgan 4 (DM4)** (¬p∧¬q)⊃¬(p∨q)
+To make life easier, you can choose to allow the use of a few theorems. If you do use theorems, you must use their abbreviations in the annotations. The theorems are:
 
-You can use theorems in the following sort of way:
+#### Theorems of Sentential Logic
+- **Identity (ID)** ⊢ p ⊃ p
+- **Non-Contradiction (NC)** ⊢ ¬(p ∧ ¬p)
+- **Excluded Middle (EM)** ⊢ p ∨ ¬p
+- **DeMorgan (DM)** ⊢ ¬(p ∨ q) ⊃ (¬p ∧ ¬q)
+- **DeMorgan (DM)** ⊢ (¬p ∧ ¬q) ⊃ ¬(p ∨ q)
+- **DeMorgan (DM)** ⊢ ¬(p ∧ q) ⊃ (¬p ∨ ¬q)
+- **DeMorgan (DM)** ⊢ (¬p ∨ ¬q) ⊃ ¬(p ∧ q)
+- **Implication (IM)** ⊢ (p ⊃ q) ⊃ (¬p ∨ q)
+- **Elimination (EL)** ⊢ (p ∨ q) ⊃ (¬p ⊃ q)
+- **Contraposition (CP)** ⊢ (p ⊃ q) ⊃ (¬q ⊃ ¬p)
+- **Commutativity of Conjunction (CC)** ⊢ (p ∧ q) ⊃ (q ∧ p)
+- **Commutativity of Disjunction (CD)** ⊢ (p ∨ q) ⊃ (q ∨ p)
+- **Associativity of Conjunction (AC)** ⊢ [(p ∧ q) ∧ r] ⊃ [p ∧ (q ∧ r)]
+- **Associativity of Conjunction (AC)** ⊢ [p ∧ (q ∧ r)] ⊃ [(p ∧ q) ∧ r]
+- **Associativity of Disjunction (AD)** ⊢ [(p ∨ q) ∨ r] ⊃ [p ∨ (q ∨ r)]
+- **Associativity of Disjunction (AD)** ⊢ [p ∨ (q ∨ r)] ⊃ [(p ∨ q) ∨ r]
+- **Double Negation Introduction (DN)** ⊢ p ⊃ ¬¬p
 
-1. ⊢(s∨t)⊃(s∨t)...ID
-2. ⊢[(s∨t)⊃(s∨t)]⊃[¬(s∨t)∨(s∨t)]...IM
-3. ⊢¬(s∨t)∨(s∨t)...1,2,⊃E
+#### Theorems of Predicate Logic
+- **Quantifier Exchange (QE)** ⊢ ∃xFx ⊃ ¬∀x(¬Fx)
+- **Quantifier Exchange (QE)** ⊢ ¬∀x(¬Fx) ⊃ ∃xFx
+- **Quantifier Exchange (QE)** ⊢ ∀xFx ⊃ ¬∃x(¬Fx)
+- **Quantifier Exchange (QE)** ⊢ ¬∃x(¬Fx) ⊃ ∀xFx
+- **Quantifier Exchange (QE)** ⊢ ∃x(¬Fx) ⊃ ¬∀xFx
+- **Quantifier Exchange (QE)** ⊢ ¬∀xFx ⊃ ∃x(¬Fx)
+- **Quantifier Exchange (QE)** ⊢ ∀x(¬Fx) ⊃ ¬∃xFx
+- **Quantifier Exchange (QE)** ⊢ ¬∃xFx ⊃ ∀x(¬Fx)
 
-The proof checker will recognize instances of the allowed theorems.
- 
+The proof checker will recognize instances of theorems. Here is an example of a use of EM:
 
+1. Γ ⊢ P⊃Q...premise
+2. ⊢ P∨¬P...EM
+3. P ⊢ P...A
+4. Γ,P ⊢ Q...1,3,⊃E
+5. Γ,P ⊢ ¬P∨Q...4,∨I
+6. ¬P ⊢ ¬P...A
+7. ¬P ⊢ ¬P∨Q...6,∨I
+8. Γ ⊢ ¬P∨Q...2,5,7,∨E
 
 
 ### The Proof Checker
@@ -116,6 +136,7 @@ You may have to go through several rounds of checking and fixing a derivation be
 ### The Editor
 
 The editor is very primitive with limited functionality. It works like an old-school, keyboard-only editor. You can move the cursor around with the arrow keys, home and end for moving to the start or end of line, and delete and backspace should work more or less normally (sometimes more, sometimes less...). But no more advanced navigation around the input area, no positioning the cursor with your mouse,  and no copying and pasting and the like. Given the intended use, it should be enough (it works for me...). While it seems to work with the iOS on-screen keyboard once you activate soft-cursor keys--from the options under 'Advanced Stuff'--, it definitely does not work on an Android with an on-screen keyboard. You will need a physical keyboard (even on iOS, using the touch screen keyboard is going to be really slow). 
+
 
 Apart from the above limitations, The editor is designed to be as transparent as possible: symbols should be easy to type and students should not have to worry about how what's on the screen corresponds to what they see in the course material. Some special key combinations are used to facilitate typing symbol. Check the help on how to input symbols. 
 

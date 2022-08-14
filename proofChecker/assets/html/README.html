@@ -1,6 +1,6 @@
 <h3>Online proof checker</h3>
 <h3>The proof system</h3>
-<p>This proof checker is designed for working with the proof system Gentzen uses in his &quot;Die Wiederspruchsfreiheit der reinen Zahlentheorie&quot; (1936) that I use for teaching  my introductory formal logic course. A proof is stated as a series of sequents where each sequent must have exactly one formula as its succedent. It can be trivially converted to and from proofs in the style of Lemmon's <em>Beginning Logic</em> as well others influenced by him  like Allen and Hand's <em>Logic Primer</em> (no surprise here since Lemmon's system is, as he says, Gentzen's). E.g., the following proof:</p>
+<p>This proof checker is designed for working with the proof system Gentzen uses in his &quot;Die Wiederspruchsfreiheit der reinen Zahlentheorie&quot; (1936) that I use in my introductory formal logic course. A proof is stated as a series of sequents where each sequent must have exactly one formula as its succedent. It can be trivially converted to proofs in the style of Lemmon's <em>Beginning Logic</em> as well others influenced by him (e.g., Allen and Hand, <em>Logic Primer</em>). E.g., the following proof:</p>
 <ol>
 <li>P ⊢ P</li>
 <li>Q ⊢ Q</li>
@@ -10,7 +10,7 @@
 <p>1 (1) P<br>
 2 (2) Q<br>
 1,2 (3) P and Q</p>
-<p>What we do is replace the turnstile with the line  number, and replace formulas on the antecedent side of each sequent with the appropriate line numbers (of course, you need to add appropriate annotations). One thing Gentzen's system allows is the use of placeholders on the antecedent side of a sequent which can be useful (there is an example of that below).</p>
+<p>What we do is replace the turnstile with the line  number, and replace formulas on the antecedent side of each sequent with the appropriate line numbers (of course, you need to add appropriate annotations). One thing Gentzen's allows is the use of placeholders on the antecedent side of a sequent which can be useful (there is an example of that below).</p>
 <p>The proof system has 9 inference rules for sentential logic. In the system, you may:</p>
 <ul>
 <li><strong>Assumption Introduction (A)</strong> Infer s ⊢ s.</li>
@@ -43,7 +43,7 @@ infer Γ, ∆ ⊢ ψ , provided κ does not appear in any of Γ, ∆ , and ψ.</
 <ul>
 <li><strong>Identity Introduction (=I)</strong> For any constant κ, infer ⊢ κ=κ.</li>
 <li><strong>Identity Elimination (=E)</strong> For any constants κ1 and κ2 , infer
-⊢ (κ1=κ2 ∧ φ(κ1)) ⊃ φ∗ (κ2) where φ∗ (κ2) is any formula you can
+⊢ (κ1=κ2 ∧ φ(κ1)) ⊃ φ∗(κ2) where φ∗(κ2) is any formula you can
 obtain by substituting at least one instance of κ1 in φ with κ2 .</li>
 </ul>
 <p>For annotations, the proof checker requires you to use the abbreviations given in parentheses.</p>
@@ -80,27 +80,50 @@ obtain by substituting at least one instance of κ1 in φ with κ2 .</li>
 <li>Γ ⊢ Q⊃P...2,⊃I</li>
 </ol>
 <p>Notice the use of the keyword &quot;premise&quot; in the annotation. That is what you must use for a premise that is not an assumption (an assumption must take the form s ⊢ s).</p>
-<h4>Theorems</h4>
-<p>You can change the settings to allow a small number of theorems. They are:</p>
+<h3>Theorems</h3>
+<p>To make life easier, you can choose to allow the use of a few theorems. If you do use theorems, you must use their abbreviations in the annotations. The theorems are:</p>
+<h4>Theorems of Sentential Logic</h4>
 <ul>
-<li><strong>Identity (ID)</strong> p⊃p</li>
-<li><strong>Non-Contradiction (NC)</strong> ¬(p∧¬p)</li>
-<li><strong>Excluded Middle (EM)</strong> p∨¬p</li>
-<li><strong>Contraposition (CP)</strong> (p⊃q)⊃(¬q⊃¬p)</li>
-<li><strong>Implication (IM)</strong> (p⊃q)⊃(¬p⊃q)</li>
-<li><strong>Elimination (EL)</strong> (p∨q)⊃(¬p⊃q)</li>
-<li><strong>DeMorgan 1 (DM1)</strong> ¬(p∨q)⊃(¬p∧¬q)</li>
-<li><strong>DeMorgan 2 (DM2)</strong> ¬(p∧q)⊃(¬p∨¬q)</li>
-<li><strong>DeMorgan 3 (DM3)</strong> (¬p∨¬q)⊃¬(p∧q)</li>
-<li><strong>DeMorgan 4 (DM4)</strong> (¬p∧¬q)⊃¬(p∨q)</li>
+<li><strong>Identity (ID)</strong> ⊢ p ⊃ p</li>
+<li><strong>Non-Contradiction (NC)</strong> ⊢ ¬(p ∧ ¬p)</li>
+<li><strong>Excluded Middle (EM)</strong> ⊢ p ∨ ¬p</li>
+<li><strong>DeMorgan (DM)</strong> ⊢ ¬(p ∨ q) ⊃ (¬p ∧ ¬q)</li>
+<li><strong>DeMorgan (DM)</strong> ⊢ (¬p ∧ ¬q) ⊃ ¬(p ∨ q)</li>
+<li><strong>DeMorgan (DM)</strong> ⊢ ¬(p ∧ q) ⊃ (¬p ∨ ¬q)</li>
+<li><strong>DeMorgan (DM)</strong> ⊢ (¬p ∨ ¬q) ⊃ ¬(p ∧ q)</li>
+<li><strong>Implication (IM)</strong> ⊢ (p ⊃ q) ⊃ (¬p ∨ q)</li>
+<li><strong>Elimination (EL)</strong> ⊢ (p ∨ q) ⊃ (¬p ⊃ q)</li>
+<li><strong>Contraposition (CP)</strong> ⊢ (p ⊃ q) ⊃ (¬q ⊃ ¬p)</li>
+<li><strong>Commutativity of Conjunction (CC)</strong> ⊢ (p ∧ q) ⊃ (q ∧ p)</li>
+<li><strong>Commutativity of Disjunction (CD)</strong> ⊢ (p ∨ q) ⊃ (q ∨ p)</li>
+<li><strong>Associativity of Conjunction (AC)</strong> ⊢ [(p ∧ q) ∧ r] ⊃ [p ∧ (q ∧ r)]</li>
+<li><strong>Associativity of Conjunction (AC)</strong> ⊢ [p ∧ (q ∧ r)] ⊃ [(p ∧ q) ∧ r]</li>
+<li><strong>Associativity of Disjunction (AD)</strong> ⊢ [(p ∨ q) ∨ r] ⊃ [p ∨ (q ∨ r)]</li>
+<li><strong>Associativity of Disjunction (AD)</strong> ⊢ [p ∨ (q ∨ r)] ⊃ [(p ∨ q) ∨ r]</li>
+<li><strong>Double Negation Introduction (DN)</strong> ⊢ p ⊃ ¬¬p</li>
 </ul>
-<p>You can use theorems in the following sort of way:</p>
+<h4>Theorems of Predicate Logic</h4>
+<ul>
+<li><strong>Quantifier Exchange (QE)</strong> ⊢ ∃xFx ⊃ ¬∀x(¬Fx)</li>
+<li><strong>Quantifier Exchange (QE)</strong> ⊢ ¬∀x(¬Fx) ⊃ ∃xFx</li>
+<li><strong>Quantifier Exchange (QE)</strong> ⊢ ∀xFx ⊃ ¬∃x(¬Fx)</li>
+<li><strong>Quantifier Exchange (QE)</strong> ⊢ ¬∃x(¬Fx) ⊃ ∀xFx</li>
+<li><strong>Quantifier Exchange (QE)</strong> ⊢ ∃x(¬Fx) ⊃ ¬∀xFx</li>
+<li><strong>Quantifier Exchange (QE)</strong> ⊢ ¬∀xFx ⊃ ∃x(¬Fx)</li>
+<li><strong>Quantifier Exchange (QE)</strong> ⊢ ∀x(¬Fx) ⊃ ¬∃xFx</li>
+<li><strong>Quantifier Exchange (QE)</strong> ⊢ ¬∃xFx ⊃ ∀x(¬Fx)</li>
+</ul>
+<p>The proof checker will recognize instances of theorems. Here is an example of a use of EM:</p>
 <ol>
-<li>⊢(s∨t)⊃(s∨t)...ID</li>
-<li>⊢[(s∨t)⊃(s∨t)]⊃[¬(s∨t)∨(s∨t)]...IM</li>
-<li>⊢¬(s∨t)∨(s∨t)...1,2,⊃E</li>
+<li>Γ ⊢ P⊃Q...premise</li>
+<li>⊢ P∨¬P...EM</li>
+<li>P ⊢ P...A</li>
+<li>Γ,P ⊢ Q...1,3,⊃E</li>
+<li>Γ,P ⊢ ¬P∨Q...4,∨I</li>
+<li>¬P ⊢ ¬P...A</li>
+<li>¬P ⊢ ¬P∨Q...6,∨I</li>
+<li>Γ ⊢ ¬P∨Q...2,5,7,∨E</li>
 </ol>
-<p>The proof checker will recognize instances of the allowed theorems.</p>
 <h3>The Proof Checker</h3>
 <p>The proof checker checks you whether each line is in accordance with the proof system. But it does not check whether you have managed to show what you set out to show. You'll have to check that yourself---usually a matter of inspecting the last line of your derivation, possibly in combination with the premises.</p>
 <p>You may have to go through several rounds of checking and fixing a derivation because the proof checker does not always list all the problems at once.</p>
