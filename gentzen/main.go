@@ -240,9 +240,8 @@ func PrintDerivText(lines []string, offset int) (out string) {
 
 //RandomSentence returns a randomly generated sentence of
 //sentential logic with at most m atomic sentences (m is capped at 10).
-//d specified max depth of recursion which determined the max number of
-//connectives. It used the package math/rand and you need to seed
-//the PRNG yourself.
+//d specifies the maximum number of connectives. It uses the package math/rand
+//and you need to seed the PRNG yourself.
 func RandomSentence(m, d int) string {
 
 	return genRand(m, d)

@@ -4,9 +4,9 @@ import (
 	"math/rand"
 )
 
-//Illform returns a probably ill-formed string based on s.
+//Malform returns a probably malformed string based on s.
 //Make sure to seed properly (uses math/rand).
-func Illform(s string) string {
+func Malform(s string) string {
 
 	tks := latexTokens(Parse(s))
 

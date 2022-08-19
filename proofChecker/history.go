@@ -230,9 +230,7 @@ func rewriteHistory() {
 	display()
 	printMessage("")
 	hide("messages")
-	hide("historyDialog")
-	hide("extra")
-	hide("backButton")
+	hideExtra()
 	show("console")
 	stopInput()
 

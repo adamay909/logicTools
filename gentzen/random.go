@@ -31,7 +31,7 @@ func genRand(m, d int) string {
 
 	s = "P"
 
-	for Parse(s).ConnectiveCount() < (d / 2) {
+	for Parse(s).ConnectiveCount() < d {
 		s2 = ""
 		for _, c := range s {
 			s2 = s2 + replace(string(c), cand)

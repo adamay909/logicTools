@@ -148,7 +148,7 @@ When you click 'exercises', you will be presented with some exercises from the c
 
 ### Preservation of History
 
-The proof checker will attempt to store the current state of the editor so that when you open the proof checker again, you will be presented with the last state of things before you quit (or the program crashed). The proof checker will also store a series of snapshots of the editor. This last happens whenever you clear the screen or move to the next exercise. All history is stored in the browser's local cache so how much history is stored for how long depends on your browser settings and the like.
+The proof checker will attempt to store the current state of the editor so that when you open the proof checker again, you will be presented with the last state of things before you quit (or the program crashed). The proof checker will also store a series of snapshots of the editor. This last happens whenever you clear the screen or move to the next exercise. All history is stored in the browser as off-line data so how much history is stored for how long depends on your browser settings and the like. 
 
 You can go back and forth in history using buttons under 'advanced stuff'. You can also choose to delete points in the history.
  

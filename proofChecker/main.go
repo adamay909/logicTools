@@ -62,6 +62,7 @@ func main() {
 
 	setupJS()
 	resetDisplay()
+	hideExtra()
 	loadHistory()
 	cleanHistory()
 	recoverState()
@@ -370,9 +371,6 @@ func toggleReadme() {
 	stopInput()
 	hide("console")
 	show("extra")
-	hide("txtinput")
-	hide("exerciseList")
-	hide("historyDialog")
 	show("readme")
 	show("backButton")
 	return
@@ -381,12 +379,7 @@ func toggleReadme() {
 func backToNormal() {
 	stopInput()
 	dom.GetWindow().Document().GetElementByID("textinputarea").(*dom.HTMLTextAreaElement).SetValue("")
-	hide("backButton")
-	hide("readme")
-	hide("txtinput")
-	hide("exerciseList")
-	hide("historyDialog")
-	hide("extra")
+	hideExtra()
 	show("console")
 	show("dummy")
 }
@@ -559,6 +552,16 @@ func copyToClipboard(s string) {
 	return
 }
 
+func hideExtra() {
+
+	hide("backButton")
+	hide("txtinput")
+	hide("exerciseList")
+	hide("historyDialog")
+	hide("readme")
+	hide("extra")
+}
+
 func toggleExercises() {
 	stopInput()
 	hide("console")
@@ -659,7 +662,7 @@ func inputFromText() {
 	stopInput()
 	hide("console")
 	show("extra")
-	show("textinput")
+	show("txtinput")
 	show("backButton")
 
 }
