@@ -1,12 +1,12 @@
 
 @font-face {
  font-family: 'Noto Sans Math';
- src: url(/assets/NotoSansMath.woff2) format('woff2');
+ src: url(assets/NotoSansMath.woff2) format('woff2');
 }
 
 @font-face {
  font-family: 'math';
- src: url(/assets/math.otf) format('opentype');
+ src: url(assets/math.otf) format('opentype');
 }
 
 div#messages>p {

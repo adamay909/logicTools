@@ -93,6 +93,7 @@ var greekUCBindings = [][3]string{
 	[3]string{`/F`, `\Phi`, "\u03a6"},
 	[3]string{`/Q`, `\Psi`, "\u03a8"},
 	[3]string{`/W`, `\Omega`, "\u03a9"},
+	[3]string{`\0`, `\emptyset`, "\u2300"},
 }
 
 var greekLCBindings = [][3]string{
@@ -166,8 +167,8 @@ var greekLowerCaseLetters = []string{
 
 var connectives [][]string
 
-//SetStandardPolish sets whether to use more standard notations for the
-//logical constants.
+// SetStandardPolish sets whether to use more standard notations for the
+// logical constants.
 func SetStandardPolish(v bool) {
 
 	if v {

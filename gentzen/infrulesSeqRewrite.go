@@ -1,17 +1,18 @@
 package gentzen
 
-//seq1 is concluding sequent
-func seqRewrite(have, want sequent, n int) bool {
+var emptySet = "\u2300"
 
-	if isSeqReduce(have, want) {
+// seq1 is concluding sequent
+func seqRewrite(res, ini sequent, n int) bool {
+	if isSeqReduce(ini, res) {
 		return true
 	}
 
-	if isSeqReorder(have, want) {
+	if isSeqReorder(ini, res) {
 		return true
 	}
 
-	if isSeqAddition(have, want) {
+	if isSeqAddition(ini, res) {
 		return true
 	}
 
@@ -20,30 +21,32 @@ func seqRewrite(have, want sequent, n int) bool {
 
 }
 
-//check if datum of seq1 is a reduction of seq2
-func isSeqReduce(have, want sequent) bool {
+// check if datum of res is a reduction of ini
+func isSeqReduce(ini, res sequent) bool {
 
-	if have.succedent() != want.succedent() {
+	if ini.succedent() != res.succedent() {
 		return false
 	}
 
-	datum1 := have.datumSlice()
-	datum2 := want.datumSlice()
+	datum1 := ini.datumSlice()
+	datum2 := res.datumSlice()
 
-	if !(len(datum1) < len(datum2)) {
+	if !(len(datum2) < len(datum1)) {
 		return false
 	}
 
-	for _, e := range datum2 {
-		if !slicesContains(datum1, e) {
+	for _, e := range datum1 {
+		if string(e) == emptySet {
+			continue
+		}
+		if !slicesContains(datum2, e) {
 			return false
 		}
 	}
-
 	return true
 }
 
-//check if datum of seq1 is a reordering of seq2
+// check if datum of seq1 is a reordering of seq2
 func isSeqReorder(have, want sequent) bool {
 
 	if have.succedent() != want.succedent() {
@@ -69,23 +72,25 @@ func isSeqReorder(have, want sequent) bool {
 	return true
 }
 
-//check if datum of have is addtion to want
-func isSeqAddition(have, want sequent) bool {
+// check if datum of have is addtion to want
+func isSeqAddition(ini, res sequent) bool {
 
-	if have.succedent() != have.succedent() {
+	if ini.succedent() != res.succedent() {
 		return false
 	}
 
-	datum1 := have.datumSlice()
-	datum2 := want.datumSlice()
+	datum1 := ini.datumSlice()
+	datum2 := res.datumSlice()
 
-	if !(len(datum1) > len(datum2)) {
+	if !(len(datum2) > len(datum1)) {
 		return false
 	}
 
-	for _, e := range datum2 {
-
-		if !slicesContains(datum1, e) {
+	for _, e := range datum1 {
+		if string(e) == emptySet {
+			continue
+		}
+		if !slicesContains(datum2, e) {
 			return false
 		}
 	}

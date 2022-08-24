@@ -226,6 +226,7 @@ func rewriteHistory() {
 	stopInput()
 	history = strings.Split(dom.GetWindow().Document().GetElementByID("historyinputarea").(*dom.HTMLTextAreaElement).Value(), "\n")
 	dom.GetWindow().Document().GetElementByID("historyinputarea").(*dom.HTMLTextAreaElement).SetValue("")
+	historyPosition = len(history)
 	dsp.clear()
 	display()
 	printMessage("")

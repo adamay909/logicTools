@@ -140,6 +140,7 @@ var (
 		[3]string{`\c`, `\chi`, "\u03c7"},
 		[3]string{`\q`, `\psi`, "\u03c8"},
 		[3]string{`\w`, `\omega`, "\u03c9"},
+		[3]string{`\0`, `\emptyset`, "\u2300"},
 	}
 
 	extraBindings = [][3]string{

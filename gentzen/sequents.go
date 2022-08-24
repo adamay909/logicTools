@@ -24,11 +24,12 @@ func (f plshFormula) String() string {
 
 func (s sequent) datumSlice() datumSlice {
 
-	dstr := string(s.d)
-
-	d := strings.Split(dstr, ",")
-
 	var r datumSlice
+	dstr := string(s.d)
+	if dstr == "" {
+		return r
+	}
+	d := strings.Split(dstr, ",")
 
 	for i := range d {
 		r = append(r, datum(strings.TrimSpace(d[i])))
@@ -86,7 +87,7 @@ func equivSequents(canonical, target sequent) bool {
 		return false
 	}
 
-	if isSeqReduce(target, canonical) {
+	if isSeqReduce(canonical, target) {
 		return true
 	}
 
@@ -134,7 +135,7 @@ func datumRm[dat datum | string](d1 datumSlice, d ...dat) datumSlice {
 
 }
 
-//check if d1 contains d2
+// check if d1 contains d2
 func datumContains(d1, d2 datumSlice) bool {
 
 	return slicesSupset(d1, d2)
