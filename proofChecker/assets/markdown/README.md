@@ -150,11 +150,11 @@ When you click 'exercises', you will be presented with some exercises from the c
 
 The proof checker will attempt to store the current state of the editor so that when you open the proof checker again, you will be presented with the last state of things before you quit (or the program crashed). The proof checker will also store a series of snapshots of the editor. This last happens whenever you clear the screen or move to the next exercise. All history is stored in the browser as off-line data so how much history is stored for how long depends on your browser settings and the like. 
 
-You can go back and forth in history using buttons under 'advanced stuff'. You can also choose to delete points in the history.
+You can go back and forth in history using the 'rewind' and 'forward' buttons.  You can also choose to delete points in the history.
  
 ### Installation
 
-This proof-checker is designed to run completely inside the browser so it is easy to host yourself so long as you are able to host static websites. The docs folder of the GitHub repository contains all the files you need.
+This proof-checker is designed to run completely inside the browser so it is easy to host it yourself so long as you are able to host static websites. The docs folder of the GitHub repository contains all the files you need.
 
 ### Copyright
 

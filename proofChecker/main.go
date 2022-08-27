@@ -16,8 +16,8 @@ import (
 //go:embed assets/html/* assets/files assets/samples
 var assets embed.FS
 
-//Enable some features for personal teaching material.
-//Not useful for general consumption.
+// Enable some features for personal teaching material.
+// Not useful for general consumption.
 var oPRIVATE = true
 
 var mainEditorFunc,
@@ -132,6 +132,8 @@ func onClick() {
 		clearInput()
 	case "toClipboard":
 		toClipboard()
+	case "print":
+		toPrinter()
 	case "toggleHelp":
 		toggleHelp()
 
@@ -541,10 +543,32 @@ func jsWrap(f func()) (fn func(this js.Value, args []js.Value) any) {
 
 func show(elem string) {
 	setAttributeByID(elem, "style", "display: inline-block")
+	//removeClass(elem, "hide")
+	//addClass(elem, "show")
 }
 
 func hide(elem string) {
 	setAttributeByID(elem, "style", "display: none")
+	// addClass(elem, "hide")
+}
+
+func addClass(elem string, nc string) {
+	class := dom.GetWindow().Document().GetElementByID(elem).GetAttribute("class")
+	class = class + " " + nc
+	dom.GetWindow().Document().GetElementByID(elem).SetAttribute("class", class)
+}
+
+func removeClass(elem string, nc string) {
+	class := dom.GetWindow().Document().GetElementByID(elem).GetAttribute("class")
+	ic := strings.Split(class, " ")
+	class = ""
+	for _, c := range ic {
+		if c == nc {
+			continue
+		}
+		class = class + c
+	}
+	dom.GetWindow().Document().GetElementByID(elem).SetAttribute("class", class)
 }
 
 func copyToClipboard(s string) {
@@ -715,4 +739,24 @@ func sizeUp() {
 func sizeDown() {
 	dsp.fontSize = dsp.fontSize - 20
 	setAttributeByID("editor", `style`, `font-size:`+strconv.Itoa(dsp.fontSize)+`%;`)
+}
+
+func toPrinter() {
+	var h, m bool
+	checkDeriv()
+	if oHELP {
+		h = true
+		toggleHelp()
+	}
+	if oMENU {
+		m = true
+		toggleSettings()
+	}
+	js.Global().Call("print", "")
+	if h {
+		toggleHelp()
+	}
+	if m {
+		toggleSettings()
+	}
 }

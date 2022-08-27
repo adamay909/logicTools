@@ -1,5 +1,5 @@
   <div id="console">
-    <div id="navbar">
+    <div id="navbar" class="noprint">
       <div id="menuButton">
         <button class="button" tabindex="0"><img src="assets/menuIcon.png" alt="settings"
         id="toggleSettings" /></button>
@@ -9,6 +9,7 @@
         <button class="button" id="check" tabindex="0">Check Derivation</button>
         <button class="button" id="clearInput" tabindex="0">Clear All</button>
         <button class="button" id="toClipboard" tabindex="0">Copy to Clipboard</button>
+        <button class="button" id="print" tabindex="0">Print</button>
         <button class="button" id="toggleHelp" tabindex="0">Show Help</button>
         <button class="button" id="sizeUp" tabindex="0" style=
         "margin-left: 2em; width:1.5em">+</button> <button class="button" id="sizeDown"
@@ -25,7 +26,7 @@
     </div>
 
     <div id="mainArea" style="grid-template-columns: 1fr">
-      <div id="settingsMenu" style="display: none">
+      <div id="settingsMenu" class="noprint" style="display: none">
         <div class="buttongroup">
           <button class="button" id="toggleSystem" tabindex="0">Sentential Logic</button>
           <button class="button" id="setTitle" tabindex="0">Set Title</button>
@@ -68,9 +69,9 @@
       <div id="editor">
         <div id="display" tabindex="0"></div>
 
-        <div id="dummy" contenteditable="" tabindex="0"></div>
+        <div id="dummy" class="noprint" contenteditable="" tabindex="0"></div>
 
-        <div id="controls2"></div>
+        <div id="controls2" class="noprint"></div>
 
         <div id="messages"></div>
       </div>
@@ -79,7 +80,7 @@
     </div>
   </div>
 
-  <div id="extra">
+  <div id="extra" class="noprint">
     <button id="backButton">Go Back</button>
 
     <div id="txtinput">
@@ -95,4 +96,5 @@
 
     <div id="readme"></div>
   </div>
-
+<div id="printarea">
+</div>

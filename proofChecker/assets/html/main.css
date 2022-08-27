@@ -133,7 +133,7 @@ div#dummy{
  top: 0;
  width: 100%;
  height: 31em;
- z-index: 9;
+ z-index: 5;
  opacity: 0;
 }
 
@@ -348,6 +348,25 @@ div#textinput {
 }
 
 
+@media print{
+ body {
+  font-size: 14px !important;
+ }
+div.noprint {
+ display: none !important;
+ }
+ div#console {
+  width: 100%;
+ }
+ div#mainArea {
+  display: block !important;;
+ }
+ div#display {
+  width: 100% !important;
+  height: auto !important;
+  border: none !important;
+  margin-bottom: 2em;
+ }
 
-
+}
 

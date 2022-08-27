@@ -17,7 +17,11 @@ func saveHistory() {
 
 	c := dsp.marshalJson()
 
-	history = append(history, c)
+	if historyPosition == len(history) {
+		history = append(history, c)
+	} else {
+		history[historyPosition] = c
+	}
 
 	cleanHistory()
 
@@ -226,6 +230,7 @@ func rewriteHistory() {
 	stopInput()
 	history = strings.Split(dom.GetWindow().Document().GetElementByID("historyinputarea").(*dom.HTMLTextAreaElement).Value(), "\n")
 	dom.GetWindow().Document().GetElementByID("historyinputarea").(*dom.HTMLTextAreaElement).SetValue("")
+	saveHistory()
 	historyPosition = len(history)
 	dsp.clear()
 	display()

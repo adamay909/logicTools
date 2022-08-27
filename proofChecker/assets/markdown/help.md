@@ -29,5 +29,4 @@ Inference rules must be specified by abbreviations (see README).
 
 Theorems, if allowed, must be specified by abbreviations (see README).
 
-If you need to start counting the lines at something other than 1, click on the first line number and you will be prompted for the desired number for the first line.
 
