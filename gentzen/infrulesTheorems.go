@@ -31,6 +31,7 @@ var quantifierRules = [][]string{
 	{"Quantifier Exchange", "QE", ">-XxFxUx-Fx"},
 	{"Quantifier Exchange", "QE", ">Xx-Fx-UxFx"},
 	{"Quantifier Exchange", "QE", ">Ux-Fx-XxFx"},
+
 	//	{"Confinement", "CF", ">^UxFxUxGxUx^FxGx"},
 	//	{"Confinement", "CF", ">Ux^FxGx^UxFxUxGx"},
 	//	{"Confinement", "CF", ">VUxFxUxGxUxVFxGx"},

@@ -27,7 +27,7 @@ func ltree(n *Node, simple bool) string {
 
 			r = r + ` ] `
 		} else {
-			r = r + ` ] !{\qbalance} `
+			r = r + ` ] ` // !{\qbalance} `
 		}
 
 		return r

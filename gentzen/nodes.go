@@ -15,13 +15,13 @@ type Node struct {
 	flags              []string
 }
 
-//SetFlag sets a flag for n. Use for storing extra information.
+// SetFlag sets a flag for n. Use for storing extra information.
 func (n *Node) SetFlag(f string) {
 	n.flags = append(n.flags, f)
 }
 
-//Child1 returns first chile of n if it exists. Returns ok=false
-//if n is atomic.
+// Child1 returns first chile of n if it exists. Returns ok=false
+// if n is atomic.
 func (n *Node) Child1() (m *Node, ok bool) {
 
 	if n.IsAtomic() {
@@ -34,8 +34,8 @@ func (n *Node) Child1() (m *Node, ok bool) {
 	return n.subnode1, ok
 }
 
-//Child2 returns first chile of n if it exists. Returns ok=false
-//if n is atomic or has no second chile.
+// Child2 returns first chile of n if it exists. Returns ok=false
+// if n is atomic or has no second chile.
 func (n *Node) Child2() (m *Node, ok bool) {
 
 	if n.IsAtomic() {
@@ -70,7 +70,7 @@ func (n *Node) Child2Must() (m *Node) {
 	return n.subnode2
 }
 
-//Parent returns parent of n. If n has no parent, ok is false.
+// Parent returns parent of n. If n has no parent, ok is false.
 func (n *Node) Parent() (m *Node, ok bool) {
 
 	if n.parent == nil {
@@ -335,14 +335,23 @@ func (n *Node) FreeVars() []string {
 	return fv
 }
 
-//String implements Stringer interface for node.
-//Return string is formatted in Polish notation.
+// String implements Stringer interface for node.
+// Return string is formatted in Polish notation.
 func (n *Node) String() string {
 
 	return printNodePolish(n)
 }
 
-//StringLatex return Latex string for n.
+// StringEnglish return English string for n.
+func (n *Node) StringEnglish() string {
+
+	return printNodeInfix(n, mEnglish)
+	//	return fixBrackets(printNodeInfix(n, mLatex), mLatex)
+
+	//		return printNodeLatex(n)
+}
+
+// StringLatex return Latex string for n.
 func (n *Node) StringLatex() string {
 
 	return printNodeInfix(n, mLatex)
@@ -351,21 +360,21 @@ func (n *Node) StringLatex() string {
 	//		return printNodeLatex(n)
 }
 
-//StringLatex return Latex string for n.
+// StringLatex return Latex string for n.
 func (n *Node) StringMathJax() string {
 
 	return printNodeInfix(n, mPlainLatex)
 	//return printNodeMathJax(n)
 }
 
-//StringPlain returns plain Unicode string
+// StringPlain returns plain Unicode string
 func (n *Node) StringPlain() string {
 
 	return printNodeInfix(n, mPlainText)
 	//return printNodePlain(n)
 }
 
-//ConnectiveCount returns the number of connectives in n.
+// ConnectiveCount returns the number of connectives in n.
 func (n *Node) ConnectiveCount() int {
 	var count int
 	s := n.String()
@@ -380,12 +389,12 @@ func (n *Node) ConnectiveCount() int {
 	return count
 }
 
-//String returns string for c.
+// String returns string for c.
 func (c logicalConstant) String() string {
 	return c.Stringf(mPolish)
 }
 
-//Sring returns formatted string for c.
+// Sring returns formatted string for c.
 func (c logicalConstant) Stringf(m printMode) string {
 
 	for _, e := range connectives {
@@ -424,7 +433,7 @@ func getSubnodes(n *Node) []*Node {
 	return gs(n, list)
 }
 
-//order nodes by depth
+// order nodes by depth
 func reorderNodes(nodes []*Node) (out []*Node) {
 
 	d := findMaxDepth(nodes)
@@ -453,7 +462,7 @@ func findMaxDepth(nodes []*Node) int {
 	return ds[len(ds)-1]
 }
 
-//check if s2 is instance of s1
+// check if s2 is instance of s1
 func sameStructure(s1, s2 string) bool {
 
 	ns1 := getSubnodes(Parse(s1))
@@ -494,4 +503,25 @@ func sameStructure(s1, s2 string) bool {
 
 	return printNodePolish(ns1[0]) == printNodePolish(ns2[0])
 
+}
+
+func (n *Node) AtomicCount() int {
+
+	var as []string
+
+	ns := getSubnodes(n)
+
+	for _, e := range ns {
+		if !e.IsAtomic() {
+			continue
+		}
+
+		if slicesContains(as, e.String()) {
+			continue
+		}
+
+		as = append(as, e.String())
+	}
+
+	return len(as)
 }

@@ -13,7 +13,7 @@ How to input logical symbols:
 -  &#x0393; : &emsp; \ followed by G (backslash--usually right above the Enter key--followed by G)
 -  &#x0394; : &emsp; \ followed by D
 -  &#x0398; : &emsp; \ followed by T
-- You can get a lot of other Greek letters by typing \ and following it by some alphabetical letter (both upper and lower case). Try it!
+- You can get a lot of other Greek letters by typing \ and following it by some  letter of the Roman alphabet (both upper and lower case). Try it!
 - &#x2200; : &emsp; U (upper case U as in Universal; only if using predicate logic)
 - &#x2203; : &emsp; X (upper case X as in eXists; only if using predicate logic)
 - ≠ : &emsp; \ followed by =

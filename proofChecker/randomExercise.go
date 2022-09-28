@@ -138,7 +138,7 @@ func genNewExThm() {
 
 	var s string
 
-	for s = gentzen.RandomSentence(3, 8); ; s = gentzen.RandomSentence(3, 8) {
+	for s = gentzen.RandomSentence(3, 8, false); ; s = gentzen.RandomSentence(3, 8, false) {
 
 		if !gentzen.IsTautology(s) {
 			continue
@@ -167,7 +167,7 @@ func genRandomTautology() string {
 
 	var s string
 
-	for s = gentzen.RandomSentence(3, 8); ; s = gentzen.RandomSentence(3, 8) {
+	for s = gentzen.RandomSentence(3, 8, false); ; s = gentzen.RandomSentence(3, 8, false) {
 
 		if !gentzen.IsTautology(s) {
 			continue

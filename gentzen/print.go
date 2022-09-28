@@ -47,11 +47,25 @@ func printNodeInfix(n *Node, m printMode) (s string) {
 		br = brackets[:2]
 	}
 
+	if !prettifyBrackets {
+		br = brackets[:2]
+	}
+
+	if m == mEnglish {
+		br = textBrackets
+	}
+
 	switch {
 
 	case n.IsUnary():
 
-		s = n.connectiveDisplay(m) + printNodeInfix(n.subnode1, m)
+		s = n.connectiveDisplay(m)
+		if m == mLatex {
+			if n.parent == nil {
+				s = `\mc{` + s + `}`
+			}
+		}
+		s = s + printNodeInfix(n.subnode1, m)
 		//special case negated identity
 		if n.MainConnective() == neg && n.subnode1.IsAtomic() && n.subnode1.predicateLetter == "=" {
 			switch m {
@@ -74,8 +88,19 @@ func printNodeInfix(n *Node, m printMode) (s string) {
 		}
 
 	case n.IsBinary():
+		s = n.connectiveDisplay(m)
+		if m == mLatex {
+			if n.parent == nil {
+				s = `\mc{` + s + `}`
+			}
+		}
 
-		s = printNodeInfix(n.subnode1, m) + n.connectiveDisplay(m) + printNodeInfix(n.subnode2, m)
+		s = printNodeInfix(n.subnode1, m) + s + printNodeInfix(n.subnode2, m)
+
+		if m == mEnglish && n.IsConditional() {
+			c := strings.Split(n.connectiveDisplay(m), ",")
+			s = c[0] + printNodeInfix(n.subnode1, m) + ", " + c[1] + printNodeInfix(n.subnode2, m)
+		}
 
 	case n.predicateLetter == "=":
 		switch m {
@@ -101,6 +126,11 @@ func printNodeInfix(n *Node, m printMode) (s string) {
 		if n.Predicate() != "=" {
 			return s
 		}
+	}
+
+	if m == mEnglish {
+		s = `\pp{` + s + `}`
+		return
 	}
 
 	if n.IsQuantifier() {
@@ -230,9 +260,9 @@ func (seq sequent) StringLatex() string {
 
 func (n *Node) connectiveDisplay(m printMode) string {
 	var s string
-	if m == mSimple {
-		m = mPlainText
-	}
+	//if m == mSimple {
+	//	m = mPlainText
+	//	}
 	for _, c := range connectives {
 		if string(n.MainConnective()) == c[0] {
 			s = c[int(m)]

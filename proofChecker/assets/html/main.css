@@ -350,23 +350,9 @@ div#textinput {
 
 @media print{
  body {
-  font-size: 14px !important;
+  font-size: 14px;
  }
-div.noprint {
- display: none !important;
+ div#messages {
+  margin-top: 2em;
  }
- div#console {
-  width: 100%;
- }
- div#mainArea {
-  display: block !important;;
- }
- div#display {
-  width: 100% !important;
-  height: auto !important;
-  border: none !important;
-  margin-bottom: 2em;
- }
-
 }
-

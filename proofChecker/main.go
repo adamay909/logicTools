@@ -60,6 +60,7 @@ var dsp *console
 
 func main() {
 
+	gentzen.SetStandardPolish(false)
 	setupJS()
 	resetDisplay()
 	hideExtra()
@@ -742,21 +743,30 @@ func sizeDown() {
 }
 
 func toPrinter() {
-	var h, m bool
+
 	checkDeriv()
-	if oHELP {
-		h = true
-		toggleHelp()
-	}
-	if oMENU {
-		m = true
-		toggleSettings()
-	}
+
+	stashScreen()
+
+	message := dom.GetWindow().Document().GetElementByID("messages").OuterHTML()
+
+	dom.GetWindow().Document().GetElementsByTagName("body")[0].SetInnerHTML(dsp.typeset() + message)
+
 	js.Global().Call("print", "")
-	if h {
-		toggleHelp()
-	}
-	if m {
-		toggleSettings()
-	}
+
+	restoreScreen()
+}
+
+var screenStash string
+
+func stashScreen() {
+
+	screenStash = dom.GetWindow().Document().GetElementsByTagName("body")[0].InnerHTML()
+
+}
+
+func restoreScreen() {
+
+	dom.GetWindow().Document().GetElementsByTagName("body")[0].SetInnerHTML(screenStash)
+
 }

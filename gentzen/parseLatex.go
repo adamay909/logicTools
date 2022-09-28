@@ -2,7 +2,6 @@ package gentzen
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 )
 
@@ -118,7 +117,6 @@ func tokenizeLatex(s []string) (tokenStr, error) {
 
 	//	ts2 = ts
 	if oPL {
-		fmt.Print("done")
 		//		ts2 = nil
 		ts = fixBrackets(ts)
 		ts = fixIdentity(ts)

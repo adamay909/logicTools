@@ -19,48 +19,57 @@ var (
 	}
 )
 
-func genRand(m, d int) string {
+func genRand(m, d int, fixed bool) string {
 
 	if m > len(atomicE) {
 		m = len(atomicE)
 	}
 
-	cand := generateCandidates(m)
+	cand := generateCandidates(m, fixed)
 
-	var s, s2 string
+	var s, sNew, sOld string
 
 	s = "P"
-
 	for Parse(s).ConnectiveCount() < d {
-		s2 = ""
+		sNew = ""
+		sOld = s
 		for _, c := range s {
-			s2 = s2 + replace(string(c), cand)
+			sNew = sNew + replace(string(c), cand)
 		}
 
-		if s == s2 {
+		if s == sNew {
 			break
 		}
-		s = s2
+		s = sNew
 	}
-
+	if Parse(s).ConnectiveCount() > d {
+		s = sOld
+	}
 	return s
 
 }
 
-func generateCandidates(m int) []string {
+func generateCandidates(m int, fixed bool) []string {
 
 	var r []string
-	perm := rand.Perm(len(atomicE))
+	var perm []int
 
+	if fixed {
+		for i := 0; i < len(atomicE); i++ {
+			perm = append(perm, i)
+		}
+	} else {
+		perm = rand.Perm(len(atomicE))
+	}
 	for _, n1 := range perm[:m] {
 		s1 := atomicE[n1]
 
-		r = append(r, string(lneg)+s1)
 		for _, n2 := range perm[:m] {
 			s2 := atomicE[n2]
 			for _, c := range connectivesSL {
 
 				if c[0] == lneg {
+					r = append(r, string(c[0])+s1)
 					continue
 				}
 				r = append(r, string(c[0])+s1+s2)

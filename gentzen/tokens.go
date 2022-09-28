@@ -194,9 +194,9 @@ func (t tokenStr) String() string {
 	return s
 }
 
-//nextToken returns the next token in s and
-//returns the remainder string r. Works with
-//predicate logic.
+// nextToken returns the next token in s and
+// returns the remainder string r. Works with
+// predicate logic.
 func nextToken(s string) (t token, r string) {
 
 	pos := 1
@@ -353,11 +353,11 @@ func tokenizePLround2(t tokenStr) (tokenStr, error) {
 				}
 			}
 			if i == len(t)-1 {
-				err = errors.New("predicate without term")
+				err = errors.New("predicate without term 1")
 				return t, err
 			}
 			if !t[i+1].isTerm() {
-				err = errors.New("predicate without term")
+				err = errors.New("predicate without term 2, " + t[i+1].str)
 				return t, err
 			}
 			n.tokenType = tAtomicSentence

@@ -27,6 +27,7 @@ const (
 	mPlainLatex printMode = 2
 	mPlainText  printMode = 3
 	mSimple     printMode = 4
+	mEnglish    printMode = 5
 )
 
 var brackets = [][2]string{
@@ -49,18 +50,29 @@ var brackets = [][2]string{
 	{`\Bigg\langle`, `\Bigg\rangle`},
 }
 
-var connectivesSL = [][]string{
-	{string(neg), `\lnot `, `\neg `, "\u00ac"},
-	{string(conj), `\land `, `\wedge `, "\u2227"},
-	{string(disj), `\lor `, `\vee `, "\u2228"},
-	{string(cond), `\limplies `, `\supset `, "\u2283"},
+var textBrackets = [][2]string{
+	{`$\langle$`, `$\rangle$`},
+	{`$\big\langle$`, `$\big\rangle$`},
+	{`$\Big\langle$`, `$\Big\rangle$`},
+	{`$\bigg\langle$`, `$\bigg\rangle$`},
+	{`$\Bigg\langle$`, `$\Bigg\rangle$`},
 }
 
-var connectivesPL = [][]string{
-	{string(uni), `\lforall `, `\forall `, "\u2200"},
-	{string(ex), `\lthereis `, `\exists `, "\u2203"},
-	{string(ident), `\mathbin{=}`, `\mathbin{=}`, `=`},
-}
+/*
+	var connectivesSL = [][]string{
+		{string(neg), `\lnot `, `\neg `, "\u00ac", "\u00ac", " it is not the case that "},
+		{string(conj), `\land `, `\wedge `, "\u2227", "\u2227", " and "},
+		{string(disj), `\lor `, `\vee `, "\u2228", "\u2228", " or "},
+		{string(cond), `\limplies `, `\supset `, "\u2283", "\u2283", " if, then "},
+	}
+
+	var connectivesPL = [][]string{
+		{string(uni), `\lforall `, `\forall `, "\u2200", "\u2200", " for all "},
+		{string(ex), `\lthereis `, `\exists `, "\u2203", "\u2203", " there is a "},
+		{string(ident), `\mathbin{=}`, `\mathbin{=}`, `=`, `=`, " equals "},
+	}
+*/
+var connectivesSL, connectivesPL [][6]string
 
 var infRules = [][]string{
 	{`a`, `A`, `A`, `A`},
@@ -92,6 +104,8 @@ var greekUCBindings = [][3]string{
 	[3]string{`/U`, `\Upsilon`, "\u03a5"},
 	[3]string{`/F`, `\Phi`, "\u03a6"},
 	[3]string{`/Q`, `\Psi`, "\u03a8"},
+	[3]string{`/W`, `\Omega`, "\u03a9"},
+	[3]string{`/W`, `\Omega`, "\u03a9"},
 	[3]string{`/W`, `\Omega`, "\u03a9"},
 	[3]string{`\0`, `\emptyset`, "\u2300"},
 }
@@ -165,7 +179,7 @@ var greekLowerCaseLetters = []string{
 	`\omega`,
 }
 
-var connectives [][]string
+var connectives [][6]string
 
 // SetStandardPolish sets whether to use more standard notations for the
 // logical constants.
@@ -189,19 +203,18 @@ func SetStandardPolish(v bool) {
 		ident = logicalConstant("=")
 		none = logicalConstant(`*`)
 
-		connectivesSL = [][]string{
-			{string(neg), `\lnot `, `\neg `, "\u00ac"},
-			{string(conj), `\land `, `\wedge `, "\u2227"},
-			{string(disj), `\lor `, `\vee `, "\u2228"},
-			{string(cond), `\limplies `, `\supset `, "\u2283"},
+		connectivesSL = [][6]string{
+			{string(neg), `\lnot `, `\neg `, "\u00ac", "\u00ac", " it is not the case that "},
+			{string(conj), `\land `, `\wedge `, "\u2227", "\u2227", " and "},
+			{string(disj), `\lor `, `\vee `, "\u2228", "\u2228", " or "},
+			{string(cond), `\limplies `, `\supset `, "\u2283", "\u2283", " if , then "},
 		}
 
-		connectivesPL = [][]string{
-			{string(uni), `\lforall `, `\forall `, "\u2200"},
-			{string(ex), `\lthereis `, `\exists `, "\u2203"},
-			{string(ident), `\mathbin{=}`, `\mathbin{=}`, `=`},
+		connectivesPL = [][6]string{
+			{string(uni), `\lforall `, `\forall `, "\u2200", "\u2200", " for all "},
+			{string(ex), `\lthereis `, `\exists `, "\u2203", "\u2203", " there is a "},
+			{string(ident), `\mathbin{=}`, `\mathbin{=}`, `=`, `=`, " equals "},
 		}
-
 		connectives = append(connectivesSL, connectivesPL...)
 
 		return
@@ -223,17 +236,17 @@ func SetStandardPolish(v bool) {
 	ident = logicalConstant("=")
 	none = logicalConstant(`*`)
 
-	connectivesSL = [][]string{
-		{string(neg), `\lnot `, `\neg `, "\u00ac"},
-		{string(conj), `\land `, `\wedge `, "\u2227"},
-		{string(disj), `\lor `, `\vee `, "\u2228"},
-		{string(cond), `\limplies `, `\supset `, "\u2283"},
+	connectivesSL = [][6]string{
+		{string(neg), `\lnot `, `\neg `, "\u00ac", "\u00ac", " it is not the case that "},
+		{string(conj), `\land `, `\wedge `, "\u2227", "\u2227", " and "},
+		{string(disj), `\lor `, `\vee `, "\u2228", "\u2228", " or "},
+		{string(cond), `\limplies `, `\supset `, "\u2283", "\u2283", " if , then "},
 	}
 
-	connectivesPL = [][]string{
-		{string(uni), `\lforall `, `\forall `, "\u2200"},
-		{string(ex), `\lthereis `, `\exists `, "\u2203"},
-		{string(ident), `\mathbin{=}`, `\mathbin{=}`, `=`},
+	connectivesPL = [][6]string{
+		{string(uni), `\lforall `, `\forall `, "\u2200", "\u2200", " for all "},
+		{string(ex), `\lthereis `, `\exists `, "\u2203", "\u2203", " there is a "},
+		{string(ident), `\mathbin{=}`, `\mathbin{=}`, `=`, `=`, " equals "},
 	}
 
 	connectives = append(connectivesSL, connectivesPL...)
@@ -253,4 +266,10 @@ func greekCharOf(s string) string {
 		}
 	}
 	return s
+}
+
+var prettifyBrackets = true
+
+func SetPrettyBrackets(v bool) {
+	prettifyBrackets = v
 }
