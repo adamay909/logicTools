@@ -33,7 +33,7 @@ var (
 
 	oHELP = false
 
-	oMENU = false
+	oMENU = true
 
 	oABOUT = false
 
@@ -41,7 +41,7 @@ var (
 
 	oExercises = false
 
-	oClipboard = 2
+	oClipboard = 0
 
 	oAdvanced = false
 
@@ -104,6 +104,9 @@ func setupPage() {
 	dsp.fontSize = 120
 	setAttributeByID("editor", `style`, `font-size:`+strconv.Itoa(dsp.fontSize)+`%;`)
 
+	//Stuff for simplifying display
+	hide("menuButton")
+
 }
 
 func setupJS() {
@@ -123,7 +126,10 @@ func onClick() {
 	//	fmt.Println(target.Get("outerHTML"))
 	switch target.Get("id").String() {
 	case "dummy":
+		endEditTitle()
 		startInput()
+	case "title":
+		editTitle()
 
 	case "toggleSettings":
 		toggleSettings()
@@ -222,7 +228,9 @@ func onClick() {
 func display() {
 	dsp.format()
 	setTextByID("display", dsp.typeset())
-	setTextByID("dummy", "")
+	setTextByID("dummy", `<h3 id="title">`+prettyGreek(dsp.Title)+`</h3>`)
+
+	// setTextByID("dummy", "")
 }
 
 func displayDerivation() {
@@ -279,10 +287,10 @@ func resetDisplay() {
 	oPL = true
 	oTHM = true
 	oHELP = false
-	oMENU = false
+	oMENU = true
 	oABOUT = false
 	oExercises = false
-	oClipboard = 2
+	oClipboard = 0
 	oAdvanced = false
 
 	var cons console

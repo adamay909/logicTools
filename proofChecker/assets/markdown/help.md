@@ -1,7 +1,9 @@
 To enable editing, click on the rectangular input area (try different points if necessary). If input is active, the frame will turn blue and the cursor starts blinking.
- 
+
+You can edit the title by clicking on the blue bar.
+  
 The only way to move around the input area is through the keyboard (arrow keys, home, 
-and end).
+and end; delete and backspace). You will need a physical keyboard.
 
 How to input logical symbols:
 - &#x00AC; : &emsp; - (the minus sign)
@@ -23,10 +25,8 @@ How to input logical symbols:
 The following letters cannot be used for sentence, predicate, and term letters:
 v, V, U, and X.
 
-For editing the title, you can use |v,|V, |U,|X to get v, V, U, X respectively.
+Inference rules must be specified by abbreviations used in the course material (see [README](https://github.com/adamay909/logicTools#online-proof-checker)).
 
-Inference rules must be specified by abbreviations (see README).
-
-Theorems, if allowed, must be specified by abbreviations (see README).
+Theorems, if allowed, must be specified by abbreviations used in the course material (see [README](https://github.com/adamay909/logicTools#online-proof-checker)).
 
 

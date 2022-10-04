@@ -148,9 +148,24 @@ func handleSpecial(key string) {
 		exportHistory()
 	case "l":
 		importHistory()
+	case "`":
+		toggleMenuButton()
+	case "c":
+		toClipboard()
 	default:
 	}
 	sp1 = ""
 	sp2 = ""
 
+}
+
+var menubutton = false
+
+func toggleMenuButton() {
+	menubutton = !menubutton
+	if menubutton {
+		show("menuButton")
+		return
+	}
+	hide("menuButton")
 }

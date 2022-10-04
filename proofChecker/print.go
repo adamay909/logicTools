@@ -2,6 +2,7 @@ package main
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/adamay909/logicTools/gentzen"
 )
@@ -70,12 +71,17 @@ func latexOutput() string {
 		return ""
 	}
 
-	if arglines, ok := getArglines(dsp.Input); ok {
-		return gentzen.PrintDeriv(arglines, dsp.Offset)
-	}
 	output := ""
+	if arglines, ok := getArglines(dsp.Input); ok {
+		output = `\subsubsection*{` + dsp.Title + `}` + "\n"
+		output = strings.ReplaceAll(output, "⊢", `$\lproves$`)
+		output = output + gentzen.PrintDeriv(arglines, dsp.Offset)
+		return output
+	}
 	ln := strconv.Itoa(dsp.Offset - 1)
-	output = `\begin{enumerate}\setcounter{enumi}{` + ln + `}` + "\n"
+	output = `\subsubsection*{` + dsp.Title + `}` + "\n"
+
+	output = output + `\begin{enumerate}\setcounter{enumi}{` + ln + `}` + "\n"
 
 	for _, l := range dsp.Input {
 		if len(l) == 0 {

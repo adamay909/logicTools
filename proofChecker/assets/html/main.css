@@ -109,6 +109,12 @@ div#editor {
  width: 100%;
 }
 
+button.systemButton {
+ border: none;
+font-size:1.5em;
+font-style:italic;
+font-weight:bold;
+}
 
 div#display {
  position: relative;
@@ -213,8 +219,9 @@ div#cursor.inactive {
      display: inline-block;
      padding: 0.5em 1em 0.5em 1em;
 }
- div.dln{
+ div.ln{
      display: inline;
+	 margin-left: 0.5em;
 }
  div.ddat {
      display: inline;
@@ -347,6 +354,11 @@ div#textinput {
  display: none;
 }
 
+h3 {
+width: 100%;
+height: 1.5em;
+background-color: lightblue;
+}
 
 @media print{
  body {

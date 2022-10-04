@@ -5,47 +5,35 @@
         id="toggleSettings" /></button>
       </div>
 
+		   <button class="systemButton" id="toggleSystem" tabindex="0">Sentential Logic</button>
       <div id="controls">
         <button class="button" id="check" tabindex="0">Check Derivation</button>
-        <button class="button" id="clearInput" tabindex="0">Clear All</button>
-        <button class="button" id="toClipboard" tabindex="0">Copy to Clipboard</button>
+        <button class="button" id="clearInput" tabindex="0">Clear Input</button>
         <button class="button" id="print" tabindex="0">Print</button>
-        <button class="button" id="toggleHelp" tabindex="0">Show Help</button>
+          <button class="button" id="backHistory" tabindex="0" style="margin-left: 2em">back</button>
+          <button class="button" id="forwardHistory" tabindex="0" style="margin-right: 1em">forward</button> 
         <button class="button" id="sizeUp" tabindex="0" style=
         "margin-left: 2em; width:1.5em">+</button> <button class="button" id="sizeDown"
-        tabindex="0" style="width: 1.5em">-</button>
+        tabindex="0" style="width: 1.5em;margin-right: 2em">-</button>
+        <button class="button" id="toggleHelp" tabindex="0">Show Help</button>
       </div>
 
-      <div id="cursorControls">
-        <button class="button cursorkey" tabindex="0" id="delete">DEL</button>
-        <button class="button cursorkey" tabindex="0" id="arrowLeft">&#8592;</button>
-        <button class="button cursorkey" tabindex="0" id="arrowUp">&#8593;</button>
-        <button class="button cursorkey" tabindex="0" id="arrowDown">&#8595;</button>
-        <button class="button cursorkey" tabindex="0" id="arrowRight">&#8594;</button>
-      </div>
     </div>
 
     <div id="mainArea" style="grid-template-columns: 1fr">
       <div id="settingsMenu" class="noprint" style="display: none">
         <div class="buttongroup">
-          <button class="button" id="toggleSystem" tabindex="0">Sentential Logic</button>
-          <button class="button" id="setTitle" tabindex="0">Set Title</button>
-          <button class="button" id="setOffset" tabindex="0">First Line: 1</button>
+		  <button class="button" id="setOffset" tabindex="0">First Line: 1</button>
           <button class="button" id="togglethm" tabindex="0">No Theorems</button>
-        </div>
-
+		</div>
         <div class="buttongroup">
           <button class="button" id="loadExercise" tabindex="0">exercises</button>
           <button class="button" id="loadSamples" tabindex="0">examples</button>
-        </div>
-
+		</div>
         <div class="buttongroup">
-          <button class="button" id="backHistory" tabindex="0">rewind</button>
-          <button class="button" id="forwardHistory" tabindex="0">forward</button> 
           <button class="button" id="removeFromHistory" tabindex="0">delete from
           history</button>
         </div>
-
         <div class="buttongroup">
           <button class="button" id="toggleadvanced" tabindex="0">Advanced Stuff</button>
 
@@ -56,11 +44,9 @@
             keys</button>
           </div>
         </div>
-
         <div class="buttongroup">
           <button class="button" id="reset" tabindex="0">Reset</button>
         </div>
-
         <div class="buttongroup">
           <button class="button" id="togglereadme" tabindex="0">README</button>
         </div>

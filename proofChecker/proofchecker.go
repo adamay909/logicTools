@@ -26,7 +26,7 @@ func checkDerivation() {
 	displayDerivation()
 
 	if gentzen.CheckDeriv(arglines, dsp.Offset) {
-		printMessage("Good!")
+		printMessage("No Illegal Moves Found")
 		showPrettyDeriv(dsp)
 		return
 	}

@@ -64,6 +64,7 @@ func forwardHistory() {
 	historyPosition = historyPosition + 1
 
 	if historyPosition > len(history) {
+		historyPosition--
 		return
 	}
 
@@ -193,8 +194,10 @@ func cleanHistory() {
 func exportHistory() {
 
 	obj := js.Global().Get("Blob").New([]any{strings.Join(history, "\n")})
-
 	url := js.Global().Get("URL").Call("createObjectURL", obj).String()
+
+	obj2 := js.Global().Get("Blob").New([]any{historyToLatex()})
+	url2 := js.Global().Get("URL").Call("createObjectURL", obj2).String()
 
 	stopInput()
 	hide("console")
@@ -205,7 +208,7 @@ func exportHistory() {
 	show("backButton")
 	hide("console")
 
-	setTextByID("historyDialog", `<a href="`+url+`">right-click to download history</a>`)
+	setTextByID("historyDialog", `<a href="`+url+`">right-click to download history as JSON</a>`+"<br /><br />"+`<a href="`+url2+`">right-click to download history as LaTeX</a>`)
 
 }
 
@@ -230,8 +233,8 @@ func rewriteHistory() {
 	stopInput()
 	history = strings.Split(dom.GetWindow().Document().GetElementByID("historyinputarea").(*dom.HTMLTextAreaElement).Value(), "\n")
 	dom.GetWindow().Document().GetElementByID("historyinputarea").(*dom.HTMLTextAreaElement).SetValue("")
-	saveHistory()
 	historyPosition = len(history)
+	saveHistory()
 	dsp.clear()
 	display()
 	printMessage("")
@@ -240,4 +243,22 @@ func rewriteHistory() {
 	show("console")
 	stopInput()
 
+}
+
+func historyToLatex() string {
+	var out string
+
+	stashState()
+
+	for p := range history {
+
+		json.Unmarshal([]byte(history[p]), dsp)
+
+		out = out + latexOutput()
+
+	}
+
+	reloadStash()
+
+	return out
 }

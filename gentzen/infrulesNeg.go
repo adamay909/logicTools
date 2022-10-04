@@ -74,6 +74,10 @@ func negI(seq1, seq2, seq3 sequent) bool {
 		logger.Print("conclusion's negation must be in datums of both premises")
 		return false
 	}
+	if !datumIncludes(seq1.datumSlice(), datum(n3.Child1Must().Formula())) {
+		logger.Print("conclusion's negation must be in datums of both premises")
+		return false
+	}
 
 	return true
 }
