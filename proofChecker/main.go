@@ -149,7 +149,7 @@ func onClick() {
 		editTitle()
 
 	case "toggleSystem":
-		togglePL()
+		//togglePL()
 	case "setOffset":
 		setOffset()
 	case "togglethm":
@@ -214,6 +214,9 @@ func onClick() {
 		sizeUp()
 	case "sizeDown":
 		sizeDown()
+
+	case "loadExamples":
+		loadSamples()
 
 	default:
 		if target.Get("className").String() == "fileLink" {
@@ -650,6 +653,20 @@ func toggleSamples() {
 		h = h + `<button class="sampleLink" tabindex=0>` + e.Name() + `</button>`
 	}
 	setTextByID("exerciseList", h)
+}
+
+func loadSamples() {
+	stopInput()
+	d, err := assets.ReadFile("assets/samples/samples.txt")
+	if err != nil {
+		panic(err)
+	}
+	json := string(d)
+	history = strings.Split(json, "\n")
+	historyPosition = 0
+	moveInHistory()
+	display()
+
 }
 
 func loadFile(name string, t string) {

@@ -1,4 +1,4 @@
-## Online proof checker 
+## In-Browser proof checker 
 
 
 
