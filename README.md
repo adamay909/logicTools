@@ -1,10 +1,10 @@
-## In-Browser proof checker 
+## In-Browser Proof Checker 
 
 
 
 ### The proof system
 
-This proof checker is designed for working with the proof system Gentzen uses in his "Die Wiederspruchsfreiheit der reinen Zahlentheorie" (1936) that I use in my introductory formal logic course. A proof is stated as a series of sequents where each sequent must have exactly one formula as its succedent. It can be trivially converted to proofs in the style of Lemmon's *Beginning Logic* as well others influenced by him (e.g., Allen and Hand, *Logic Primer*). E.g., the following proof:
+This proof checker is designed for working with the proof system Gerhard Gentzen presents in his "Die Wiederspruchsfreiheit der reinen Zahlentheorie" (1936) that I use in my introductory formal logic course. A proof is stated as a series of sequents where each sequent must have exactly one formula as its succedent. It can be trivially converted to proofs in the style of Lemmon's *Beginning Logic* as well as others influenced by him (e.g., Allen and Hand, *Logic Primer*). E.g., the following proof:
 1. P ⊢ P
 2. Q ⊢ Q
 3. P,Q ⊢ P and Q
@@ -15,7 +15,7 @@ turns into the following in Lemmon's style:
 2 (2) Q  
 1,2 (3) P and Q  
 
-What we do is replace the turnstile with the line  number, and replace formulas on the antecedent side of each sequent with the appropriate line numbers (of course, you need to add appropriate annotations). One thing Gentzen's allows is the use of placeholders on the antecedent side of a sequent which can be useful (there is an example of that below).
+What we do is replace the turnstile with the line  number, and replace formulas on the antecedent side of each sequent with the appropriate line numbers (of course, you need to add appropriate annotations). One thing Gentzen's system allows is the use of placeholders on the antecedent side of a sequent which can be useful (there is an example of that below).
 
 The proof system has 9 inference rules for sentential logic. In the system, you may:
 - **Assumption Introduction (A)** Infer s ⊢ s.
@@ -43,7 +43,7 @@ for any constant κ.
 - **Existential Quantifier Elimination (∃E)** From Γ ⊢ ∃υφ(υ) and ∆, φ (κ) ⊢ ψ,
 infer Γ, ∆ ⊢ ψ , provided κ does not appear in any of Γ, ∆ , and ψ.
 
-Finally, there are two rules for identity (Gentzen does not have these; he uses axioms governing the identity predicate):
+Finally, there are two rules for identity:
 
 - **Identity Introduction (=I)** For any constant κ, infer ⊢ κ=κ.
 - **Identity Elimination (=E)** For any constants κ1 and κ2 , infer
@@ -131,7 +131,7 @@ The proof checker will recognize instances of theorems. Here is an example of a 
 
 ### The Proof Checker
 
- The proof checker checks you whether each line is in accordance with the proof system. But it does not check whether you have managed to show what you set out to show. You'll have to check that yourself---usually a matter of inspecting the last line of your derivation, possibly in combination with the premises.
+The proof checker checks you whether each line is in accordance with the proof system. But it does not check whether you have managed to show what you set out to show. You'll have to check that yourself---usually a matter of inspecting the last line of your derivation, possibly in combination with the premises.
 
 You may have to go through several rounds of checking and fixing a derivation because the proof checker does not always list all the problems at once.
 
@@ -140,7 +140,7 @@ You may have to go through several rounds of checking and fixing a derivation be
 The editor is very primitive with limited functionality. It works like an old-school, keyboard-only editor. You can move the cursor around with the arrow keys, home and end for moving to the start or end of line, and delete and backspace should work more or less normally (sometimes more, sometimes less...). But no more advanced navigation around the input area, no positioning the cursor with your mouse,  and no copying and pasting and the like. Given the intended use, it should be enough (it works for me...).  You will need a physical keyboard. 
 
 
-Apart from the above limitations, The editor is designed to be as transparent as possible: symbols should be easy to type and students should not have to worry about how what's on the screen corresponds to what they see in the course material. Some special key combinations are used to facilitate typing symbol. Check the help on how to input symbols. 
+Apart from the above limitations, The editor is designed to be as transparent as possible: symbols should be easy to type and students should not have to worry about how what's on the screen corresponds to what they see in the course material. Some special key combinations are used to facilitate typing symbols. Check the help on how to input symbols. 
 
 
 ### Preservation of History
