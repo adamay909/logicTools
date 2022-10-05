@@ -29,8 +29,11 @@ v, V, U, and X.
 
 The editor will format your derivation on the fly. It is not possible to control the formatting.
 
-Inference rules must be specified by abbreviations used in the course material (see [README](https://github.com/adamay909/logicTools#online-proof-checker)).
+Inference rules must be specified by abbreviations used in the course material (see README).
 
-Theorems, if allowed, must be specified by abbreviations used in the course material (see [README](https://github.com/adamay909/logicTools#online-proof-checker)).
+Theorems, if allowed, must be specified by abbreviations used in the course material (see README).
 
 
+<div>
+<button class="button" id="togglereadme" tabindex="0">Click here forREADME</button>
+</div>

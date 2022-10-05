@@ -1,6 +1,6 @@
-<h2>In-Browser proof checker</h2>
+<h2>In-Browser Proof Checker</h2>
 <h3>The proof system</h3>
-<p>This proof checker is designed for working with the proof system Gentzen uses in his &quot;Die Wiederspruchsfreiheit der reinen Zahlentheorie&quot; (1936) that I use in my introductory formal logic course. A proof is stated as a series of sequents where each sequent must have exactly one formula as its succedent. It can be trivially converted to proofs in the style of Lemmon's <em>Beginning Logic</em> as well others influenced by him (e.g., Allen and Hand, <em>Logic Primer</em>). E.g., the following proof:</p>
+<p>This proof checker is designed for working with the proof system Gerhard Gentzen presents in his &quot;Die Wiederspruchsfreiheit der reinen Zahlentheorie&quot; (1936) that I use in my introductory formal logic course. A proof is stated as a series of sequents where each sequent must have exactly one formula as its succedent. It can be trivially converted to proofs in the style of Lemmon's <em>Beginning Logic</em> as well as others influenced by him (e.g., Allen and Hand, <em>Logic Primer</em>). E.g., the following proof:</p>
 <ol>
 <li>P ⊢ P</li>
 <li>Q ⊢ Q</li>
@@ -10,7 +10,7 @@
 <p>1 (1) P<br>
 2 (2) Q<br>
 1,2 (3) P and Q</p>
-<p>What we do is replace the turnstile with the line  number, and replace formulas on the antecedent side of each sequent with the appropriate line numbers (of course, you need to add appropriate annotations). One thing Gentzen's allows is the use of placeholders on the antecedent side of a sequent which can be useful (there is an example of that below).</p>
+<p>What we do is replace the turnstile with the line  number, and replace formulas on the antecedent side of each sequent with the appropriate line numbers (of course, you need to add appropriate annotations). One thing Gentzen's system allows is the use of placeholders on the antecedent side of a sequent which can be useful (there is an example of that below).</p>
 <p>The proof system has 9 inference rules for sentential logic. In the system, you may:</p>
 <ul>
 <li><strong>Assumption Introduction (A)</strong> Infer s ⊢ s.</li>
@@ -39,7 +39,7 @@ for any constant κ.</li>
 <li><strong>Existential Quantifier Elimination (∃E)</strong> From Γ ⊢ ∃υφ(υ) and ∆, φ (κ) ⊢ ψ,
 infer Γ, ∆ ⊢ ψ , provided κ does not appear in any of Γ, ∆ , and ψ.</li>
 </ul>
-<p>Finally, there are two rules for identity (Gentzen does not have these; he uses axioms governing the identity predicate):</p>
+<p>Finally, there are two rules for identity:</p>
 <ul>
 <li><strong>Identity Introduction (=I)</strong> For any constant κ, infer ⊢ κ=κ.</li>
 <li><strong>Identity Elimination (=E)</strong> For any constants κ1 and κ2 , infer
@@ -129,7 +129,7 @@ obtain by substituting at least one instance of κ1 in φ with κ2 .</li>
 <p>You may have to go through several rounds of checking and fixing a derivation because the proof checker does not always list all the problems at once.</p>
 <h3>The Editor</h3>
 <p>The editor is very primitive with limited functionality. It works like an old-school, keyboard-only editor. You can move the cursor around with the arrow keys, home and end for moving to the start or end of line, and delete and backspace should work more or less normally (sometimes more, sometimes less...). But no more advanced navigation around the input area, no positioning the cursor with your mouse,  and no copying and pasting and the like. Given the intended use, it should be enough (it works for me...).  You will need a physical keyboard.</p>
-<p>Apart from the above limitations, The editor is designed to be as transparent as possible: symbols should be easy to type and students should not have to worry about how what's on the screen corresponds to what they see in the course material. Some special key combinations are used to facilitate typing symbol. Check the help on how to input symbols.</p>
+<p>Apart from the above limitations, The editor is designed to be as transparent as possible: symbols should be easy to type and students should not have to worry about how what's on the screen corresponds to what they see in the course material. Some special key combinations are used to facilitate typing symbols. Check the help on how to input symbols.</p>
 <h3>Preservation of History</h3>
 <p>The proof checker will attempt to store the current state of the editor so that when you open the proof checker again, you will be presented with the last state of things before you quit (or the program crashed). The proof checker will also store a series of snapshots of the editor. This last happens whenever you clear the screen or make edits in the history. All history is stored in the browser as off-line data so how much history is stored for how long depends on your browser settings and the like.</p>
 <p>You can go back and forth in history using the 'back' and 'forward' buttons.</p>
