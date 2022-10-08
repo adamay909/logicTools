@@ -57,7 +57,7 @@ func slicesRemove[c comparable](s []c, e c) (r []c) {
 	return r
 }
 
-//check if s1 is proper super set of s2. Repeat elements count as distinct.
+// check if s1 is proper super set of s2. Repeat elements count as distinct.
 func slicesSupset[c comparable](s1, s2 []c) bool {
 
 	if len(s1) <= len(s2) {
@@ -88,4 +88,63 @@ func slicesCleanDuplicates[t comparable](old []t) (resp []t) {
 	}
 
 	return
+}
+
+func insertString(s1, s2 string, n int) string {
+
+	if n == 0 {
+		return s2 + s1
+	}
+
+	o := []rune(s1)
+
+	o1 := o[:n]
+
+	o2 := o[n:]
+
+	ins := []rune(s2)
+
+	var r []rune
+
+	r = append(r, o1...)
+
+	r = append(r, ins...)
+
+	r = append(r, o2...)
+
+	return string(r)
+
+}
+
+func rmString(s1, s2 string) string {
+
+	o := []rune(s1)
+
+	n := []rune(s2)
+
+	r := o
+
+	if len(o) < len(n) {
+		return string(o)
+	}
+	for i := range o {
+		match := false
+		if o[i] == n[0] {
+			if len(o[i:]) < len(n) {
+				break
+			}
+			for j := range n {
+				if o[i+j] != n[j] {
+					match = false
+					break
+				}
+				match = true
+			}
+			if match {
+				r = append(o[:i], o[i+len(n):]...)
+			}
+		}
+	}
+	return string(r)
+
 }

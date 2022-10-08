@@ -106,7 +106,7 @@ func setupPage() {
 
 	//Stuff for simplifying display
 	hide("menuButton")
-
+	hide("print")
 }
 
 func setupJS() {
@@ -145,7 +145,6 @@ func onClick() {
 		toggleHelp()
 
 	case "setTitle":
-		//	setTitle()
 		editTitle()
 
 	case "toggleSystem":

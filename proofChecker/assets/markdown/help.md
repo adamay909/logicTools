@@ -35,5 +35,5 @@ Theorems, if allowed, must be specified by abbreviations used in the course mate
 
 
 <div>
-<button class="button" id="togglereadme" tabindex="0">Click here forREADME</button>
+<button class="button" id="togglereadme" tabindex="0">Click here for README</button>
 </div>
