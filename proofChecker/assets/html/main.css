@@ -29,10 +29,12 @@ body {
 
 div#navbar{
  display: flex;
+	width: 100%;
 }
 
 div#controls {
     display: inline-flex;
+	width: 100%;
     margin-left:1em;
 }
 
@@ -111,9 +113,11 @@ div#editor {
 
 button.systemButton {
  border: none;
-font-size:1.5em;
+font-size:1em;
 font-style:italic;
 font-weight:bold;
+width: 10em;
+background-color: white;
 }
 
 div#display {
