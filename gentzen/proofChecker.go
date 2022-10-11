@@ -363,7 +363,12 @@ func checkLineRef(infRule string, cur int, offset int, lines []int) bool {
 	}
 
 	if len(lines) != lineSpec(infRule) {
-		logger.Print(fullName(infRule), " should refer to ", lineSpec(infRule), " lines")
+		if lineSpec(infRule) != 1 {
+			logger.Print(fullName(infRule), " should refer to ", lineSpec(infRule), " lines")
+		} else {
+			logger.Print(fullName(infRule), " should refer to ", lineSpec(infRule), " line")
+		}
+
 		return false
 	}
 
