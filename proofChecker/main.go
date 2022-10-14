@@ -29,7 +29,7 @@ var indexHtml, helpHtml, styleCSS string
 var (
 	oPL = true
 
-	oTHM = true
+	oTHM = false
 
 	oHELP = false
 
@@ -287,7 +287,7 @@ func resetDisplay() {
 
 	oEXTHM = false
 	oPL = true
-	oTHM = true
+	oTHM = false
 	oHELP = false
 	oMENU = true
 	oABOUT = false
