@@ -148,7 +148,7 @@ func onClick() {
 		editTitle()
 
 	case "toggleSystem":
-		//togglePL()
+		togglePL()
 	case "setOffset":
 		setOffset()
 	case "togglethm":
