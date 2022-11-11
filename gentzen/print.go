@@ -138,9 +138,9 @@ func printNodeInfix(n *Node, m printMode) (s string) {
 	}
 
 	if n.IsNegation() {
-		if !n.parent.IsQuantifier() {
-			return s
-		}
+		//	if !n.parent.IsQuantifier() {
+		return s
+		//		}
 	}
 
 	var ob1, ob2 string
