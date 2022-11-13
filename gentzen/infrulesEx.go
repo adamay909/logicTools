@@ -80,6 +80,11 @@ func exEhelper(seq1, seq2, seq3 sequent) (v bool, msg string) {
 		return
 	}
 
+	if Parse(seq3.s).hasTerm(kappa) {
+		msg = kappa + " may not appear in concluding succedent"
+		return
+	}
+
 	datum1 := seq1.datumSlice()
 	for _, d := range datum1 {
 		if len(d) == 0 {
