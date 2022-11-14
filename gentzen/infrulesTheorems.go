@@ -14,7 +14,7 @@ var theorems = [][]string{
 	{"DeMorgan", "DM", ">V-p-q-^pq"},
 	{"DeMorgan", "DM", ">^-p-q-Vpq"},
 	{"Commutativity of Conjunction", "CC", ">^pq^qp"},
-	{"Commutatitivity of Disjunction", "CD", ">VpqVpq"},
+	{"Commutatitivity of Disjunction", "CD", ">VpqVqp"},
 	{"Associativity of Conjunction", "AC", ">^^pqr^p^qr"},
 	{"Associativity of Conjunction", "AC", ">^p^qr^^pqr"},
 	{"Associativity of Disjunction", "AD", ">VVpqrVpVqr"},
