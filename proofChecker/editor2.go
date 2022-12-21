@@ -8,6 +8,7 @@ type console struct {
 	Title               string
 	Input               []inputLine
 	SystemPL            bool
+	SystemML            bool
 	Theorems            bool
 	xpos, ypos          int
 	xprev, yprev        int

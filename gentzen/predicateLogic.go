@@ -6,8 +6,8 @@ import (
 	"strings"
 )
 
-//check if s1 is instance of s2; if yes, variable and term return which
-//variable was replaced by which term
+// check if s1 is instance of s2; if yes, variable and term return which
+// variable was replaced by which term
 func isInstanceOf(s1, s2 string) (val bool, variable, term string) {
 
 	var v, r string
@@ -64,6 +64,19 @@ func isInstanceOf(s1, s2 string) (val bool, variable, term string) {
 	n3 := replaceTerms(want[0], v, r)
 
 	return n1.String() == n3.String(), v, r
+}
+
+// check if s1 is modal instance of s2 (i.e., s1 is s2 minus modal operator)
+func isModalInstanceOf(s1, s2 string) bool {
+
+	n1 := Parse(s1)
+	n2 := Parse(s2)
+
+	if !n2.MainConnective().isModalOperator() {
+		return false
+	}
+
+	return n2.Child1Must().String() == n1.String()
 }
 
 func findPos(v string, list []string) int {

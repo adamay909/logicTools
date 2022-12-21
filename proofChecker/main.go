@@ -29,7 +29,9 @@ var indexHtml, helpHtml, styleCSS string
 var (
 	oPL = true
 
-	oTHM = false
+	oML = true
+
+	oTHM = true
 
 	oHELP = false
 
@@ -287,7 +289,6 @@ func resetDisplay() {
 
 	oEXTHM = false
 	oPL = true
-	oTHM = false
 	oHELP = false
 	oMENU = true
 	oABOUT = false
@@ -302,6 +303,7 @@ func resetDisplay() {
 	setupPage()
 
 	dsp.SystemPL = oPL
+	dsp.SystemML = oML
 	dsp.Theorems = oTHM
 	dsp.overhang = false
 	dsp.Offset = 1
@@ -341,6 +343,9 @@ func togglePL() {
 	} else {
 		logConstBindings = connBindings
 		setTextByID("toggleSystem", "Sentential Logic")
+	}
+	if oML {
+		logConstBindings = append(logConstBindings, mlBindings...)
 	}
 	dsp.SystemPL = oPL
 	gentzen.SetPL(oPL)

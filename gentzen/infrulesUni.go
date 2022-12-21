@@ -10,6 +10,7 @@ func uniE(seq1, seq2 sequent) bool {
 	val, _, _ := isInstanceOf(seq2.succedent().String(), seq1.succedent().String())
 	if !val {
 		logger.Print("conclusion not an instance of premise")
+		return false
 	}
 
 	if strictCheck {

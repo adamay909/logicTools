@@ -39,16 +39,33 @@ in Γ .
 - **Universal Quantifier Elimination (∀E)** From Γ ⊢ ∀υφ(υ), infer Γ ⊢ φ(κ ),
 for any constant κ.
 - **Existential Quantifier Introduction (∃I)** Given a constant κ , infer from
-Γ ⊢ φ( κ) to Γ ⊢ ∃υφ(υ).
+Γ ⊢ φ(κ) to Γ ⊢ ∃υφ\*(υ).  (φ\*(υ) is φ(κ) with one or more inistance of κ replaced with  υ.)
 - **Existential Quantifier Elimination (∃E)** From Γ ⊢ ∃υφ(υ) and ∆, φ (κ) ⊢ ψ,
 infer Γ, ∆ ⊢ ψ , provided κ does not appear in any of Γ, ∆ , and ψ.
 
-Finally, there are two rules for identity:
+There are two rules for identity:
 
 - **Identity Introduction (=I)** For any constant κ, infer ⊢ κ=κ.
 - **Identity Elimination (=E)** For any constants κ1 and κ2 , infer
-⊢ (κ1=κ2 ∧ φ(κ1)) ⊃ φ∗(κ2) where φ∗(κ2) is any formula you can
-obtain by substituting at least one instance of κ1 in φ with κ2 .
+⊢ (κ1=κ2 ∧ φ(κ1)) ⊃ φ\*(κ2) ((φ\*(κ2) is φ(κ1) with one or more inistance of κ1 replaced with  κ2.)
+
+
+The system also works with modal logic (even more experimental than the other stuff). There are two rules each for the two modal operators:
+
+- **Necessity Introduction (&#x25a1;I)** from Γ ⊢ φ
+infer Γ ⊢ &#x25a1;φ, provided Γ contains no contingent claims.
+- **Necessity Elimination (&#x25a1;I)** from Γ ⊢ &#x25a1;φ
+infer Γ ⊢φ.
+- **Possibility Introduction (&#x25c7;I)** from Γ ⊢ φ
+infer Γ ⊢ &#x25c7;φ.
+- **Possibility Elimination (∃E)** From Γ ⊢ &#x25c7;φ and ∆, φ ⊢ ψ,
+infer Γ, ∆ ⊢ ψ , provided Γ,∆,ψ contain no contingent claims.
+
+'Contingent claims' in the above rules are formulas that are neither formulas whose main connectives are modal operators nor are negations of such formulas.
+ 
+
+
+
 
 
 For annotations, the proof checker requires you to use the abbreviations given in parentheses.
@@ -108,14 +125,20 @@ To make life easier, you can choose to allow the use of a few theorems. If you d
 - **Double Negation Introduction (DN)** ⊢ p ⊃ ¬¬p
 
 #### Theorems of Predicate Logic
-- **Quantifier Exchange (QE)** ⊢ ∃xFx ⊃ ¬∀x(¬Fx)
-- **Quantifier Exchange (QE)** ⊢ ¬∀x(¬Fx) ⊃ ∃xFx
-- **Quantifier Exchange (QE)** ⊢ ∀xFx ⊃ ¬∃x(¬Fx)
-- **Quantifier Exchange (QE)** ⊢ ¬∃x(¬Fx) ⊃ ∀xFx
-- **Quantifier Exchange (QE)** ⊢ ∃x(¬Fx) ⊃ ¬∀xFx
-- **Quantifier Exchange (QE)** ⊢ ¬∀xFx ⊃ ∃x(¬Fx)
-- **Quantifier Exchange (QE)** ⊢ ∀x(¬Fx) ⊃ ¬∃xFx
-- **Quantifier Exchange (QE)** ⊢ ¬∃xFx ⊃ ∀x(¬Fx)
+- **Quantifier Exchange (QE)** ⊢ ∃xFx ⊃ ¬∀x¬Fx
+- **Quantifier Exchange (QE)** ⊢ ¬∀x¬Fx ⊃ ∃xFx
+- **Quantifier Exchange (QE)** ⊢ ∀xFx ⊃ ¬∃x¬Fx
+- **Quantifier Exchange (QE)** ⊢ ¬∃x¬Fx ⊃ ∀xFx
+- **Quantifier Exchange (QE)** ⊢ ∃x¬Fx ⊃ ¬∀xFx
+- **Quantifier Exchange (QE)** ⊢ ¬∀xFx ⊃ ∃x¬Fx
+- **Quantifier Exchange (QE)** ⊢ ∀x¬Fx ⊃ ¬∃xFx
+- **Quantifier Exchange (QE)** ⊢ ¬∃xFx ⊃ ∀x¬Fx
+
+### Theorems of Modal Logic
+- **K**  ⊢ □(p⊃q)⊃(□p⊃□q)
+- **S4** □p⊃□□p
+- **S5** ⊢ ◇p⊃□◇p
+
 
 The proof checker will recognize instances of theorems. Here is an example of a use of EM:
 

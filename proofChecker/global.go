@@ -95,6 +95,11 @@ var (
 		[3]string{`\=`, "≠", "≠"},
 	}
 
+	mlBindings = [][3]string{
+		[3]string{`[`, `\lnec`, "\u25a1"},
+		[3]string{`<`, `\lpos`, "\u25c7"},
+	}
+
 	turnstileBindings = [][3]string{
 		[3]string{`|-`, `\vdash`, "⊢"},
 	}
@@ -156,7 +161,7 @@ var (
 var allBindings [][3]string
 
 func init() {
-	allBindings = combineBindings(keyBindings, punctBindings, connBindings, plBindings, turnstileBindings, dotsBindings, greekBindings)
+	allBindings = combineBindings(keyBindings, punctBindings, connBindings, plBindings, mlBindings, turnstileBindings, dotsBindings, greekBindings)
 }
 
 func tkOf(s string, srctype, dsttype tkType, b [][3]string) (tk string, err error) {

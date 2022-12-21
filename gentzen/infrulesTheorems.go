@@ -38,9 +38,19 @@ var quantifierRules = [][]string{
 	//	{"Confinement", "CF", ">UxVFxGxVUxFxUxGx"},
 }
 
+var modalTheorems = [][]string{
+	{"Distribution", "K", ">[>pq>[p[q"},
+	{"S4", "S4", ">[p[[p"},
+	{"S5", "S5", "><p[<p"},
+}
+
 func theorem(seq sequent, inf string) bool {
 	var tf []string
 	thm := theorems
+
+	if oML {
+		thm = append(thm, modalTheorems...)
+	}
 
 	if oPL {
 		for i := range thm {
@@ -50,6 +60,7 @@ func theorem(seq sequent, inf string) bool {
 		}
 		thm = append(thm, quantifierRules...)
 	}
+
 	inf = strings.TrimSpace(inf)
 	for i := range thm {
 		if inf == thm[i][0] || inf == thm[i][1] {

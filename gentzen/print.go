@@ -137,6 +137,10 @@ func printNodeInfix(n *Node, m printMode) (s string) {
 		return s
 	}
 
+	if n.IsModal() {
+		return s
+	}
+
 	if n.IsNegation() {
 		//	if !n.parent.IsQuantifier() {
 		return s
@@ -177,6 +181,11 @@ func (c logicalConstant) StringLatex() string {
 		return `\lforall `
 	case ex:
 		return `\lthereis `
+	case nec:
+		return `\lnec `
+	case pos:
+		return `\lpos `
+
 	default:
 		return ""
 	}
@@ -196,6 +205,10 @@ func (c logicalConstant) StringMathJax() string {
 		return `\forall `
 	case ex:
 		return `\exists `
+	case nec:
+		return `\box `
+	case pos:
+		return `\logenze `
 	default:
 		return ""
 	}
@@ -215,6 +228,10 @@ func (c logicalConstant) StringPlain() string {
 		return "\u2200"
 	case ex:
 		return "\u2203"
+	case nec:
+		return "\u25a1"
+	case pos:
+		return "\u25c7"
 	default:
 		return ""
 	}
@@ -233,6 +250,14 @@ func (n *Node) connectiveString() string {
 
 func (c logicalConstant) isQuantifier() bool {
 	return c == uni || c == ex
+}
+
+func (c logicalConstant) isModalOperator() bool {
+	return c == nec || c == pos
+}
+
+func (c logicalConstant) isNegation() bool {
+	return c == neg
 }
 
 func (seq sequent) StringLatex() string {

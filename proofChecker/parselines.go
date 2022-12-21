@@ -240,6 +240,10 @@ func replaceInfrules(s string) string {
 		[2]string{`\existsI`, `ei`},
 		[2]string{`=E`, `=e`},
 		[2]string{`=I`, `=i`},
+		[2]string{`\necE`, `le`},
+		[2]string{`\necI`, `li`},
+		[2]string{`\posE`, `me`},
+		[2]string{`\posI`, `mi`},
 	}
 	s = strings.ReplaceAll(s, " ", "")
 	a := strings.Split(s, ",")

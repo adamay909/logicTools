@@ -35,6 +35,10 @@ const (
 	ee = "ee"
 	ii = "=i"
 	ie = "=e"
+	li = `\lnecI` //use l and m for necessity and possibility
+	le = `\lnecE`
+	mi = `\lposI`
+	me = `\lposE`
 )
 
 var checkLog strings.Builder
@@ -113,16 +117,30 @@ func checkDerivation(lines []string, offset int) bool {
 
 		case ee: //existential elimo
 			aE(!exE(al[l.lines[0]-offset].seq, al[l.lines[1]-offset].seq, l.seq))
+
 		case ii: //identity introduction
 			aE(!idI(l.seq))
 
 		case ie: //identity introduction
 			aE(!idE(l.seq))
 
+		case li: //necessity introduction
+			aE(!necI(al[l.lines[0]-offset].seq, l.seq))
+
+		case le: //necessity elim
+			aE(!necE(al[l.lines[0]-offset].seq, l.seq))
+
+		case mi: //possibility intro
+			aE(!posI(al[l.lines[0]-offset].seq, l.seq))
+
+		case me: //possibility elim
+			aE(!posE(al[l.lines[0]-offset].seq, al[l.lines[1]-offset].seq, l.seq))
+
 		case "premise": //premise
 
 		case "": //sequent rewrite
 			aE(!seqRewrite(l.seq, al[l.lines[0]-offset].seq, l.lines[0]))
+
 		default: //check if we are dealing with a theorem
 			aE(!oTHM)
 			aE(!theorem(l.seq, l.inf))
@@ -331,6 +349,14 @@ func lineSpec(infRule string) int {
 		return 0
 	case ie:
 		return 0
+	case le:
+		return 1
+	case li:
+		return 1
+	case me:
+		return 2
+	case mi:
+		return 1
 	case "premise":
 		return 0
 	case "":
@@ -344,6 +370,11 @@ func lineSpec(infRule string) int {
 
 func checkLineRef(infRule string, cur int, offset int, lines []int) bool {
 	thm := theorems
+
+	if oML {
+		thm = append(thm, modalTheorems...)
+	}
+
 	if oPL {
 		thm = append(thm, quantifierRules...)
 	}
@@ -358,7 +389,7 @@ func checkLineRef(infRule string, cur int, offset int, lines []int) bool {
 	}
 
 	if lineSpec(infRule) == -1 {
-		logger.Print("unknown inference rule or theorem.")
+		logger.Print("unknown inference rule or theorem.", infRule)
 		return false
 	}
 

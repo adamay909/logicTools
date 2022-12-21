@@ -26,6 +26,8 @@ const (
 	tAtomicSentence
 	tUni
 	tEx
+	tNec
+	tPos
 	tPredicate
 	tTerm
 	tOpenb
@@ -33,7 +35,7 @@ const (
 )
 
 const (
-	tConnective tokenID = tConj | tDisj | tNeg | tCond | tUni | tEx
+	tConnective tokenID = tConj | tDisj | tNeg | tCond | tUni | tEx | tNec | tPos
 )
 
 const (
@@ -41,7 +43,11 @@ const (
 )
 
 const (
-	tUnary tokenID = tNeg | tUni | tEx
+	tModalOperator tokenID = tNec | tPos
+)
+
+const (
+	tUnary tokenID = tNeg | tUni | tEx | tNec | tPos
 )
 
 const (
@@ -50,6 +56,10 @@ const (
 
 func (t token) isQuantifier() bool {
 	return t.tokenType == tUni || t.tokenType == tEx
+}
+
+func (t token) isModalOperator() bool {
+	return t.tokenType == tNec || t.tokenType == tPos
 }
 
 func (t token) isPredicate() bool {
@@ -116,9 +126,16 @@ func (t token) isEx() bool {
 	return t.tokenType == tEx
 }
 
+func (t token) isNec() bool {
+	return t.tokenType == tNec
+}
+
+func (t token) isPos() bool {
+	return t.tokenType == tPos
+}
 func (t token) isUnary() bool {
 
-	return t.isNeg() || t.isUni() || t.isEx()
+	return t.isNeg() || t.isUni() || t.isEx() || t.isNec() || t.isPos()
 }
 
 func (t token) isBinary() bool {
@@ -158,6 +175,10 @@ func (t tokenID) logicConstant() logicalConstant {
 		return uni
 	case tEx:
 		return ex
+	case tNec:
+		return nec
+	case tPos:
+		return pos
 	default:
 		return logicalConstant("")
 	}
@@ -215,6 +236,10 @@ func nextToken(s string) (t token, r string) {
 		t.tokenType = tUni
 	case string(sr[:pos]) == lex:
 		t.tokenType = tEx
+	case string(sr[:pos]) == lnec:
+		t.tokenType = tNec
+	case string(sr[:pos]) == lpos:
+		t.tokenType = tPos
 	case isGreekFormulaVar(string(sr[:pos])):
 		t.tokenType = tPredicate
 	case isFormulaSet(string(sr[:pos])):

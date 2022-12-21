@@ -93,6 +93,14 @@ func tokenizeLatex(s []string) (tokenStr, error) {
 			t.tokenType = tEx
 			t.str = lex
 
+		case e == `\lnec`:
+			t.tokenType = tNec
+			t.str = lnec
+
+		case e == `\lpos`:
+			t.tokenType = tPos
+			t.str = lpos
+
 		case !oPL:
 			t.tokenType = tAtomicSentence
 			t.str = e
@@ -371,6 +379,10 @@ func nextSentence(ts tokenStr) (tn tokenStr, err error) {
 		return append(ts[:1], ns...), err
 	}
 
+	if ts[0].isModalOperator() {
+		ns, err := nextSentence(ts[1:])
+		return append(ts[:1], ns...), err
+	}
 	if ts[0].isOpenb() {
 		e := findMatchingBracket(ts, 0)
 		if e == -1 {

@@ -39,6 +39,7 @@ var (
 	oPL   = false
 	oTHM  = false
 	oCOND = true
+	oML   = true
 )
 
 func init() {

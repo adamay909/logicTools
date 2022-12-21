@@ -35,17 +35,28 @@ in Γ .</li>
 <li><strong>Universal Quantifier Elimination (∀E)</strong> From Γ ⊢ ∀υφ(υ), infer Γ ⊢ φ(κ ),
 for any constant κ.</li>
 <li><strong>Existential Quantifier Introduction (∃I)</strong> Given a constant κ , infer from
-Γ ⊢ φ( κ) to Γ ⊢ ∃υφ(υ).</li>
+Γ ⊢ φ(κ) to Γ ⊢ ∃υφ*(υ).  (φ*(υ) is φ(κ) with one or more inistance of κ replaced with  υ.)</li>
 <li><strong>Existential Quantifier Elimination (∃E)</strong> From Γ ⊢ ∃υφ(υ) and ∆, φ (κ) ⊢ ψ,
 infer Γ, ∆ ⊢ ψ , provided κ does not appear in any of Γ, ∆ , and ψ.</li>
 </ul>
-<p>Finally, there are two rules for identity:</p>
+<p>There are two rules for identity:</p>
 <ul>
 <li><strong>Identity Introduction (=I)</strong> For any constant κ, infer ⊢ κ=κ.</li>
 <li><strong>Identity Elimination (=E)</strong> For any constants κ1 and κ2 , infer
-⊢ (κ1=κ2 ∧ φ(κ1)) ⊃ φ∗(κ2) where φ∗(κ2) is any formula you can
-obtain by substituting at least one instance of κ1 in φ with κ2 .</li>
+⊢ (κ1=κ2 ∧ φ(κ1)) ⊃ φ*(κ2) ((φ*(κ2) is φ(κ1) with one or more inistance of κ1 replaced with  κ2.)</li>
 </ul>
+<p>The system also works with modal logic (even more experimental than the other stuff). There are two rules each for the two modal operators:</p>
+<ul>
+<li><strong>Necessity Introduction (□I)</strong> from Γ ⊢ φ
+infer Γ ⊢ □φ, provided Γ contains no contingent claims.</li>
+<li><strong>Necessity Elimination (□I)</strong> from Γ ⊢ □φ
+infer Γ ⊢φ.</li>
+<li><strong>Possibility Introduction (◇I)</strong> from Γ ⊢ φ
+infer Γ ⊢ ◇φ.</li>
+<li><strong>Possibility Elimination (∃E)</strong> From Γ ⊢ ◇φ and ∆, φ ⊢ ψ,
+infer Γ, ∆ ⊢ ψ , provided Γ,∆,ψ contain no contingent claims.</li>
+</ul>
+<p>'Contingent claims' in the above rules are formulas that are neither formulas whose main connectives are modal operators nor are negations of such formulas.</p>
 <p>For annotations, the proof checker requires you to use the abbreviations given in parentheses.</p>
 <p>There are three more rules for rewriting the antecedent side of sequents:</p>
 <ul>
@@ -104,14 +115,20 @@ obtain by substituting at least one instance of κ1 in φ with κ2 .</li>
 </ul>
 <h4>Theorems of Predicate Logic</h4>
 <ul>
-<li><strong>Quantifier Exchange (QE)</strong> ⊢ ∃xFx ⊃ ¬∀x(¬Fx)</li>
-<li><strong>Quantifier Exchange (QE)</strong> ⊢ ¬∀x(¬Fx) ⊃ ∃xFx</li>
-<li><strong>Quantifier Exchange (QE)</strong> ⊢ ∀xFx ⊃ ¬∃x(¬Fx)</li>
-<li><strong>Quantifier Exchange (QE)</strong> ⊢ ¬∃x(¬Fx) ⊃ ∀xFx</li>
-<li><strong>Quantifier Exchange (QE)</strong> ⊢ ∃x(¬Fx) ⊃ ¬∀xFx</li>
-<li><strong>Quantifier Exchange (QE)</strong> ⊢ ¬∀xFx ⊃ ∃x(¬Fx)</li>
-<li><strong>Quantifier Exchange (QE)</strong> ⊢ ∀x(¬Fx) ⊃ ¬∃xFx</li>
-<li><strong>Quantifier Exchange (QE)</strong> ⊢ ¬∃xFx ⊃ ∀x(¬Fx)</li>
+<li><strong>Quantifier Exchange (QE)</strong> ⊢ ∃xFx ⊃ ¬∀x¬Fx</li>
+<li><strong>Quantifier Exchange (QE)</strong> ⊢ ¬∀x¬Fx ⊃ ∃xFx</li>
+<li><strong>Quantifier Exchange (QE)</strong> ⊢ ∀xFx ⊃ ¬∃x¬Fx</li>
+<li><strong>Quantifier Exchange (QE)</strong> ⊢ ¬∃x¬Fx ⊃ ∀xFx</li>
+<li><strong>Quantifier Exchange (QE)</strong> ⊢ ∃x¬Fx ⊃ ¬∀xFx</li>
+<li><strong>Quantifier Exchange (QE)</strong> ⊢ ¬∀xFx ⊃ ∃x¬Fx</li>
+<li><strong>Quantifier Exchange (QE)</strong> ⊢ ∀x¬Fx ⊃ ¬∃xFx</li>
+<li><strong>Quantifier Exchange (QE)</strong> ⊢ ¬∃xFx ⊃ ∀x¬Fx</li>
+</ul>
+<h3>Theorems of Modal Logic</h3>
+<ul>
+<li><strong>K</strong>  ⊢ □(p⊃q)⊃(□p⊃□q)</li>
+<li><strong>S4</strong> □p⊃□□p</li>
+<li><strong>S5</strong> ⊢ ◇p⊃□◇p</li>
 </ul>
 <p>The proof checker will recognize instances of theorems. Here is an example of a use of EM:</p>
 <ol>

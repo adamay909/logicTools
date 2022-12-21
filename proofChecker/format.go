@@ -175,7 +175,12 @@ func getDotIdx(l []string) int {
 }
 
 func stringOf(src []string) string {
-	return strings.Join(src, "")
+
+	var r string
+
+	for r = strings.Join(src, ""); r != strings.ReplaceAll(r, "\u25a1\u25a1", "\u25a1&thinsp;\u25a1"); r = strings.ReplaceAll(r, "\u25a1\u25a1", "\u25a1&thinsp;\u25a1") {
+	}
+	return r
 }
 
 func spaceyStringOf(src []string) string {

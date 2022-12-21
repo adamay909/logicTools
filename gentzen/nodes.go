@@ -165,6 +165,10 @@ func (n *Node) IsDisjunction() bool {
 	return n.MainConnective() == disj
 }
 
+func (n *Node) IsModal() bool {
+	return n.MainConnective() == nec || n.MainConnective() == pos
+}
+
 func (n *Node) BracketClass() int {
 
 	c := 0
@@ -186,6 +190,11 @@ func (n *Node) BracketClass() int {
 	}
 
 	if n.IsQuantifier() {
+		c = n.subnode1.BracketClass()
+		return c
+	}
+
+	if n.IsModal() {
 		c = n.subnode1.BracketClass()
 		return c
 	}
@@ -476,12 +485,7 @@ func sameStructure(s1, s2 string) bool {
 	}
 
 	for i := range ns1 {
-		if ns1[i].IsQuantifier() {
-			if ns1[i].MainConnective() != ns2[i].MainConnective() {
-				return false
-			}
-			ns1[i].variable = ns2[i].variable
-		}
+
 		if ns1[i].IsAtomic() {
 			old := ns1[i].Formula()
 			repl := ns2[i].Formula()
@@ -493,11 +497,14 @@ func sameStructure(s1, s2 string) bool {
 					}
 				}
 			}
+			continue
 		}
-		continue
-
 		if ns1[i].MainConnective() != ns2[i].MainConnective() {
 			return false
+		}
+
+		if ns1[i].IsQuantifier() {
+			ns1[i].variable = ns2[i].variable
 		}
 	}
 
