@@ -1,13 +1,13 @@
 To enable editing, click on the input area (try different points if necessary). If input is active, the frame will turn blue and the cursor starts blinking.
 
-You can switch between Sentential and Predicate Logic by clicking on the upper left corner where it tells you which system is in use. 
+Click on name of logical system to switch between Sentential and Predicate Logic.
 
 You can edit the title by clicking on the blue bar.
   
 You need a physical keyboard. 
 
 The only way to move around the input area is through the keyboard (arrow keys, home, 
-and end; delete and backspace). For editing the title, the only way to edit something you have already typed is by using backspace.
+and end; delete and backspace). For editing title, deletion  only works with backspace.
 
 How to input logical symbols:
 - &#x00AC; : &emsp; - (the minus sign)
@@ -35,6 +35,12 @@ The editor will format your derivation on the fly. It is not possible to control
 Inference rules must be specified by abbreviations used in the course material (see README).
 
 Theorems must be specified by abbreviations used in the course material (see README).
+
+The menu button on the upper left gives some more commands: 
+- "copy to clipboard" copies the content of the current screen as plain text. Formatting is lost;
+- "import/export" im(ex)ports the entire history as a JSON file. Useful if you want to move history between browsers;
+- "copy LaTeX" produces output for typesetting course material. Not useful without custom commands.
+
 
 
 <div>

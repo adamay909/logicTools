@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 	"syscall/js"
 )
@@ -27,7 +26,7 @@ func editTitle() {
 
 	js.Global().Call("addEventListener", "keydown", titleEditorFunc, true)
 
-	avail = combineBindings(keyBindings, punctBindings, connBindings, plBindings, turnstileBindings, greekBindings, extraBindings)
+	avail = combineBindings(keyBindings, punctBindings, connBindings, plBindings, mlBindings, turnstileBindings, greekBindings, extraBindings)
 	focusInput()
 }
 
@@ -53,7 +52,6 @@ func typetitle() {
 func typetitleNew() {
 	dsp.Title = rmString(dsp.Title, tcursor)
 	titleString = []rune(dsp.Title)
-	fmt.Println(titleString)
 	key := getInputString()
 	if key == "Shift" {
 		return

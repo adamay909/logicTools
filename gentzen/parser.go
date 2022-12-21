@@ -38,6 +38,12 @@ func parseTokens(t tokenStr) (*Node, error) {
 	n.SetFormula(t.String())
 	switch {
 	case t[0].isUnary():
+		if !oML {
+			if t[0].isModalOperator() {
+				err = errors.New("Modal Logic not allowed")
+				return &n, err
+			}
+		}
 		n.SetConnective(t[0].tokenType.logicConstant())
 		n.variable = t[0].variable
 		s1 := findNextSentence(t[1:])

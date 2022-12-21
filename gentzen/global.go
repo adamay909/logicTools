@@ -95,6 +95,8 @@ var infRules = [][]string{
 	{`=i`, `\iI`, `\iI`, `=I`},
 	{`=e`, `\iE`, `\iE`, `=E`},
 	{li, `\necI`, `\necI`, "\u25a1I"},
+	{mli, `M\necI`, `M\necI`, "M\u25a1I"},
+	{pli, `P\necI`, `P\necI`, "P\u25a1I"},
 	{le, `\necE`, `\necE`, "\u25a1E"},
 	{mi, `\posI`, `\posI`, "\u25c7I"},
 	{me, `\posE`, `\posE`, "\u25c7E"},

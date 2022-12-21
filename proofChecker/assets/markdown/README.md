@@ -47,21 +47,8 @@ There are two rules for identity:
 
 - **Identity Introduction (=I)** For any constant κ, infer ⊢ κ=κ.
 - **Identity Elimination (=E)** For any constants κ1 and κ2 , infer
-⊢ (κ1=κ2 ∧ φ(κ1)) ⊃ φ\*(κ2) ((φ\*(κ2) is φ(κ1) with one or more inistance of κ1 replaced with  κ2.)
+⊢ (κ1=κ2 ∧ φ(κ1)) ⊃ φ\*(κ2) (φ\*(κ2) is φ(κ1) with one or more inistance of κ1 replaced with  κ2.)
 
-
-The system also works with modal logic (even more experimental than the other stuff). There are two rules each for the two modal operators:
-
-- **Necessity Introduction (&#x25a1;I)** from Γ ⊢ φ
-infer Γ ⊢ &#x25a1;φ, provided Γ contains no contingent claims.
-- **Necessity Elimination (&#x25a1;I)** from Γ ⊢ &#x25a1;φ
-infer Γ ⊢φ.
-- **Possibility Introduction (&#x25c7;I)** from Γ ⊢ φ
-infer Γ ⊢ &#x25c7;φ.
-- **Possibility Elimination (∃E)** From Γ ⊢ &#x25c7;φ and ∆, φ ⊢ ψ,
-infer Γ, ∆ ⊢ ψ , provided Γ,∆,ψ contain no contingent claims.
-
-'Contingent claims' in the above rules are formulas that are neither formulas whose main connectives are modal operators nor are negations of such formulas.
  
 
 
@@ -75,7 +62,7 @@ There are three more rules for rewriting the antecedent side of sequents:
 - You may delete duplicate items within the antecedent of a sequent.
 - You may add arbitrary items to the antecedent of a sequent.
 
-These sequent rewrite rules have no names. When you use them, just give the relevant line numbers in the annotations. The proof checker allows you to use the first two silently. E.g., instead of:
+These sequent rewrite rules have no names. When you use them, just give the  number of the line being rewritten in the annotation. The proof checker allows you to use the first two silently. E.g., instead of:
 1. P ⊢ P...A
 2. Q ⊢ Q...A
 3. P,Q ⊢ P∧Q...1,2,∧I
@@ -101,9 +88,9 @@ You must write the above as:
 Notice the use of the keyword "premise" in the annotation. That is what you must use for a premise that is not an assumption (an assumption must take the form s ⊢ s). 
 
 
-### Theorems
+### Theorems 
 
-To make life easier, you can choose to allow the use of a few theorems. If you do use theorems, you must use their abbreviations in the annotations. The theorems are:
+To make life easier, the proof checker allows appeal to a limited number of theorems. They are:
 
 #### Theorems of Sentential Logic
 - **Identity (ID)** ⊢ p ⊃ p
@@ -134,14 +121,9 @@ To make life easier, you can choose to allow the use of a few theorems. If you d
 - **Quantifier Exchange (QE)** ⊢ ∀x¬Fx ⊃ ¬∃xFx
 - **Quantifier Exchange (QE)** ⊢ ¬∃xFx ⊃ ∀x¬Fx
 
-#### Axioms of Modal Logic
-
-- **K**  ⊢ □(p⊃q)⊃(□p⊃□q)
-- **S4** □p⊃□□p
-- **S5** ⊢ ◇p⊃□◇p
 
 
-The proof checker will recognize instances of theorems (and axioms). Here is an example of a use of EM:
+If you use a theorem in a derivation, you must use its abbreviation in the annotation. The proof checker will recognize instances of theorems (and axioms). Here is an example of a use of EM:
 
 1. Γ ⊢ P⊃Q...premise
 2. ⊢ P∨¬P...EM
@@ -153,9 +135,20 @@ The proof checker will recognize instances of theorems (and axioms). Here is an 
 8. Γ ⊢ ¬P∨Q...2,5,7,∨E
 
 
+### Derived Rules
+
+If derived rules are enabled (default), you may given a theorem listed above of the form s1⊃s2 use the derived rule of inference: From Γ ⊢ s1 , infer Γ ⊢ s2.
+
+This will save you having to go through Conditional Elimination. If you use a derived rule, append R to the end of the name of the corresponding theorem. E.g.:
+
+1. Γ⊢p⊃q...premise
+2. Γ⊢¬q⊃¬p...1,CPR
+
+The R in CPR indicates that we are taking Contraposition and turning it into a derived rule.
+
 ### The Proof Checker
 
-The proof checker checks you whether each line is in accordance with the proof system. But it does not check whether you have managed to show what you set out to show. You'll have to check that yourself---usually a matter of inspecting the last line of your derivation, possibly in combination with the premises.
+The proof checker checks whether  each line is in accordance with the proof system. But it does not check whether you have managed to show what you set out to show. You'll have to check that yourself---usually a matter of inspecting the last line of your derivation, possibly in combination with the premises.
 
 You may have to go through several rounds of checking and fixing a derivation because the proof checker does not always list all the problems at once.
 
@@ -172,6 +165,40 @@ Apart from the above limitations, The editor is designed to be as transparent as
 The proof checker will attempt to store the current state of the editor so that when you open the proof checker again, you will be presented with the last state of things before you quit (or the program crashed). The proof checker will also store a series of snapshots of the editor. This last happens whenever you clear the screen or make edits in the history. All history is stored in the browser as off-line data so how much history is stored for how long depends on your browser settings and the like. 
 
 You can go back and forth in history using the 'back' and 'forward' buttons.
+
+
+### Extension for Modal Logic
+
+The proof checker can deal with modal logic (even more experimental than other stuff). Given any wff. of sentential logic/predicate logic, prefixing it with &#x25a1; or &#x25c7; results in another wff. The proof checker accepts the following inference rules:
+
+- **Necessity Introduction (&#x25a1;I)** from  ⊢ φ
+infer  ⊢ &#x25a1;φ.
+- **Necessity Elimination (&#x25a1;I)** from Γ ⊢ &#x25a1;φ
+infer Γ ⊢φ.
+- **Possibility Introduction (&#x25c7;I)** from Γ ⊢ φ
+infer Γ ⊢ &#x25c7;φ.
+- **Possibility Elimination (&#x25c7;E)** From Γ ⊢ &#x25c7;φ and ∆, φ ⊢ ψ,
+infer Γ, ∆ ⊢ ψ , provided Γ,∆,ψ contain no contingent claims.
+
+If you are comfortable with S4, you could use:
+- **Physical Necessity Introduction (P&#x25a1;I)** from Γ ⊢ φ
+infer Γ ⊢ &#x25a1;φ, provided Γ contains no claims that are not necessary.
+
+If you are comfortable with S5, you could also use:
+
+- **Metaphysical Necessity Introduction (M&#x25a1;I)** from Γ ⊢ φ
+infer Γ ⊢ &#x25a1;φ, provided Γ contains no contingent claims.
+
+'Contingent claims' in the above rules are formulas that are neither formulas whose main connectives are modal operators nor are negations of such formulas. A claim is  necessary iff. its main connective is the necessity operator.
+
+You could also stick with Necessity Introduction, and use the following axioms:
+
+- **K**  ⊢ □(p⊃q)⊃(□p⊃□q)
+- **S4** ⊢ □p⊃□□p
+- **S5** ⊢ ◇p⊃□◇p
+
+As far as the proof checker is concerned, axioms behave just like theorems.
+
  
 ### Installation
 

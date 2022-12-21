@@ -43,20 +43,8 @@ infer Γ, ∆ ⊢ ψ , provided κ does not appear in any of Γ, ∆ , and ψ.</
 <ul>
 <li><strong>Identity Introduction (=I)</strong> For any constant κ, infer ⊢ κ=κ.</li>
 <li><strong>Identity Elimination (=E)</strong> For any constants κ1 and κ2 , infer
-⊢ (κ1=κ2 ∧ φ(κ1)) ⊃ φ*(κ2) ((φ*(κ2) is φ(κ1) with one or more inistance of κ1 replaced with  κ2.)</li>
+⊢ (κ1=κ2 ∧ φ(κ1)) ⊃ φ*(κ2) (φ*(κ2) is φ(κ1) with one or more inistance of κ1 replaced with  κ2.)</li>
 </ul>
-<p>The system also works with modal logic (even more experimental than the other stuff). There are two rules each for the two modal operators:</p>
-<ul>
-<li><strong>Necessity Introduction (□I)</strong> from Γ ⊢ φ
-infer Γ ⊢ □φ, provided Γ contains no contingent claims.</li>
-<li><strong>Necessity Elimination (□I)</strong> from Γ ⊢ □φ
-infer Γ ⊢φ.</li>
-<li><strong>Possibility Introduction (◇I)</strong> from Γ ⊢ φ
-infer Γ ⊢ ◇φ.</li>
-<li><strong>Possibility Elimination (∃E)</strong> From Γ ⊢ ◇φ and ∆, φ ⊢ ψ,
-infer Γ, ∆ ⊢ ψ , provided Γ,∆,ψ contain no contingent claims.</li>
-</ul>
-<p>'Contingent claims' in the above rules are formulas that are neither formulas whose main connectives are modal operators nor are negations of such formulas.</p>
 <p>For annotations, the proof checker requires you to use the abbreviations given in parentheses.</p>
 <p>There are three more rules for rewriting the antecedent side of sequents:</p>
 <ul>
@@ -64,7 +52,7 @@ infer Γ, ∆ ⊢ ψ , provided Γ,∆,ψ contain no contingent claims.</li>
 <li>You may delete duplicate items within the antecedent of a sequent.</li>
 <li>You may add arbitrary items to the antecedent of a sequent.</li>
 </ul>
-<p>These sequent rewrite rules have no names. When you use them, just give the relevant line numbers in the annotations. The proof checker allows you to use the first two silently. E.g., instead of:</p>
+<p>These sequent rewrite rules have no names. When you use them, just give the  number of the line being rewritten in the annotation. The proof checker allows you to use the first two silently. E.g., instead of:</p>
 <ol>
 <li>P ⊢ P...A</li>
 <li>Q ⊢ Q...A</li>
@@ -92,7 +80,7 @@ infer Γ, ∆ ⊢ ψ , provided Γ,∆,ψ contain no contingent claims.</li>
 </ol>
 <p>Notice the use of the keyword &quot;premise&quot; in the annotation. That is what you must use for a premise that is not an assumption (an assumption must take the form s ⊢ s).</p>
 <h3>Theorems</h3>
-<p>To make life easier, you can choose to allow the use of a few theorems. If you do use theorems, you must use their abbreviations in the annotations. The theorems are:</p>
+<p>To make life easier, the proof checker allows appeal to a limited number of theorems. They are:</p>
 <h4>Theorems of Sentential Logic</h4>
 <ul>
 <li><strong>Identity (ID)</strong> ⊢ p ⊃ p</li>
@@ -124,13 +112,7 @@ infer Γ, ∆ ⊢ ψ , provided Γ,∆,ψ contain no contingent claims.</li>
 <li><strong>Quantifier Exchange (QE)</strong> ⊢ ∀x¬Fx ⊃ ¬∃xFx</li>
 <li><strong>Quantifier Exchange (QE)</strong> ⊢ ¬∃xFx ⊃ ∀x¬Fx</li>
 </ul>
-<h4>Axioms of Modal Logic</h4>
-<ul>
-<li><strong>K</strong>  ⊢ □(p⊃q)⊃(□p⊃□q)</li>
-<li><strong>S4</strong> □p⊃□□p</li>
-<li><strong>S5</strong> ⊢ ◇p⊃□◇p</li>
-</ul>
-<p>The proof checker will recognize instances of theorems (and axioms). Here is an example of a use of EM:</p>
+<p>If you use a theorem in a derivation, you must use its abbreviation in the annotation. The proof checker will recognize instances of theorems (and axioms). Here is an example of a use of EM:</p>
 <ol>
 <li>Γ ⊢ P⊃Q...premise</li>
 <li>⊢ P∨¬P...EM</li>
@@ -141,8 +123,16 @@ infer Γ, ∆ ⊢ ψ , provided Γ,∆,ψ contain no contingent claims.</li>
 <li>¬P ⊢ ¬P∨Q...6,∨I</li>
 <li>Γ ⊢ ¬P∨Q...2,5,7,∨E</li>
 </ol>
+<h3>Derived Rules</h3>
+<p>If derived rules are enabled (default), you may given a theorem listed above of the form s1⊃s2 use the derived rule of inference: From Γ ⊢ s1 , infer Γ ⊢ s2.</p>
+<p>This will save you having to go through Conditional Elimination. If you use a derived rule, append R to the end of the name of the corresponding theorem. E.g.:</p>
+<ol>
+<li>Γ⊢p⊃q...premise</li>
+<li>Γ⊢¬q⊃¬p...1,CPR</li>
+</ol>
+<p>The R in CPR indicates that we are taking Contraposition and turning it into a derived rule.</p>
 <h3>The Proof Checker</h3>
-<p>The proof checker checks you whether each line is in accordance with the proof system. But it does not check whether you have managed to show what you set out to show. You'll have to check that yourself---usually a matter of inspecting the last line of your derivation, possibly in combination with the premises.</p>
+<p>The proof checker checks whether  each line is in accordance with the proof system. But it does not check whether you have managed to show what you set out to show. You'll have to check that yourself---usually a matter of inspecting the last line of your derivation, possibly in combination with the premises.</p>
 <p>You may have to go through several rounds of checking and fixing a derivation because the proof checker does not always list all the problems at once.</p>
 <h3>The Editor</h3>
 <p>The editor is very primitive with limited functionality. It works like an old-school, keyboard-only editor. You can move the cursor around with the arrow keys, home and end for moving to the start or end of line, and delete and backspace should work more or less normally (sometimes more, sometimes less...). But no more advanced navigation around the input area, no positioning the cursor with your mouse,  and no copying and pasting and the like. Given the intended use, it should be enough (it works for me...).  You will need a physical keyboard.</p>
@@ -150,6 +140,36 @@ infer Γ, ∆ ⊢ ψ , provided Γ,∆,ψ contain no contingent claims.</li>
 <h3>Preservation of History</h3>
 <p>The proof checker will attempt to store the current state of the editor so that when you open the proof checker again, you will be presented with the last state of things before you quit (or the program crashed). The proof checker will also store a series of snapshots of the editor. This last happens whenever you clear the screen or make edits in the history. All history is stored in the browser as off-line data so how much history is stored for how long depends on your browser settings and the like.</p>
 <p>You can go back and forth in history using the 'back' and 'forward' buttons.</p>
+<h3>Extension for Modal Logic</h3>
+<p>The proof checker can deal with modal logic (even more experimental than other stuff). Given any wff. of sentential logic/predicate logic, prefixing it with □ or ◇ results in another wff. The proof checker accepts the following inference rules:</p>
+<ul>
+<li><strong>Necessity Introduction (□I)</strong> from  ⊢ φ
+infer  ⊢ □φ.</li>
+<li><strong>Necessity Elimination (□I)</strong> from Γ ⊢ □φ
+infer Γ ⊢φ.</li>
+<li><strong>Possibility Introduction (◇I)</strong> from Γ ⊢ φ
+infer Γ ⊢ ◇φ.</li>
+<li><strong>Possibility Elimination (◇E)</strong> From Γ ⊢ ◇φ and ∆, φ ⊢ ψ,
+infer Γ, ∆ ⊢ ψ , provided Γ,∆,ψ contain no contingent claims.</li>
+</ul>
+<p>If you are comfortable with S4, you could use:</p>
+<ul>
+<li><strong>Physical Necessity Introduction (P□I)</strong> from Γ ⊢ φ
+infer Γ ⊢ □φ, provided Γ contains no claims that are not necessary.</li>
+</ul>
+<p>If you are comfortable with S5, you could also use:</p>
+<ul>
+<li><strong>Metaphysical Necessity Introduction (M□I)</strong> from Γ ⊢ φ
+infer Γ ⊢ □φ, provided Γ contains no contingent claims.</li>
+</ul>
+<p>'Contingent claims' in the above rules are formulas that are neither formulas whose main connectives are modal operators nor are negations of such formulas. A claim is  necessary iff. its main connective is the necessity operator.</p>
+<p>You could also stick with Necessity Introduction, and use the following axioms:</p>
+<ul>
+<li><strong>K</strong>  ⊢ □(p⊃q)⊃(□p⊃□q)</li>
+<li><strong>S4</strong> ⊢ □p⊃□□p</li>
+<li><strong>S5</strong> ⊢ ◇p⊃□◇p</li>
+</ul>
+<p>As far as the proof checker is concerned, axioms behave just like theorems.</p>
 <h3>Installation</h3>
 <p>This proof-checker is designed to run completely inside the browser so it is easy to host it yourself so long as you are able to host static websites. The docs folder of the GitHub repository contains all the files you need.</p>
 <h3>Copyright</h3>

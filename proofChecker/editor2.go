@@ -10,6 +10,7 @@ type console struct {
 	SystemPL            bool
 	SystemML            bool
 	Theorems            bool
+	DerivedRules        bool
 	xpos, ypos          int
 	xprev, yprev        int
 	xcursor, ycursor    int
@@ -152,7 +153,7 @@ func handleSpecial(key string) {
 	case "`":
 		toggleMenuButton()
 	case "c":
-		toClipboard()
+		toClipboardLatex()
 	default:
 	}
 	sp1 = ""
@@ -163,7 +164,7 @@ func handleSpecial(key string) {
 var menubutton = false
 
 func toggleMenuButton() {
-	menubutton = !menubutton
+	menubutton = true
 	if menubutton {
 		show("menuButton")
 		return

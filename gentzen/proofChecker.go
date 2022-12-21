@@ -20,25 +20,27 @@ type argLine struct {
 }
 
 const (
-	ni = "ni"
-	ne = "ne"
-	ki = "ki"
-	ke = "ke"
-	di = "di"
-	de = "de"
-	ci = "ci"
-	ce = "ce"
-	a  = "a"
-	ui = "ui"
-	ue = "ue"
-	ei = "ei"
-	ee = "ee"
-	ii = "=i"
-	ie = "=e"
-	li = `\lnecI` //use l and m for necessity and possibility
-	le = `\lnecE`
-	mi = `\lposI`
-	me = `\lposE`
+	ni  = "ni"
+	ne  = "ne"
+	ki  = "ki"
+	ke  = "ke"
+	di  = "di"
+	de  = "de"
+	ci  = "ci"
+	ce  = "ce"
+	a   = "a"
+	ui  = "ui"
+	ue  = "ue"
+	ei  = "ei"
+	ee  = "ee"
+	ii  = "=i"
+	ie  = "=e"
+	li  = `li` //use l and m for necessity and possibility
+	le  = `le`
+	mi  = `mi`
+	me  = `me`
+	mli = `mli`
+	pli = `pli`
 )
 
 var checkLog strings.Builder
@@ -72,10 +74,19 @@ func checkDerivation(lines []string, offset int) bool {
 
 	for i, l := range al {
 		logger.SetPrefix("line " + strconv.Itoa(i+1) + ": ")
+
 		//check the line references first
 		if !checkLineRef(l.inf, i+offset, offset, l.lines) {
 			hasE = true
 			continue
+		}
+
+		//if we are dealing with a derived rule
+		if oDR {
+			if strings.HasSuffix(l.inf, "R") {
+				aE(!derivR(l.inf, al[l.lines[0]-offset].seq, l.seq))
+				continue
+			}
 		}
 
 		switch l.inf {
@@ -126,6 +137,12 @@ func checkDerivation(lines []string, offset int) bool {
 
 		case li: //necessity introduction
 			aE(!necI(al[l.lines[0]-offset].seq, l.seq))
+
+		case pli: //necessity introduction
+			aE(!necI_S4(al[l.lines[0]-offset].seq, l.seq))
+
+		case mli: //necessity introduction
+			aE(!necI_S5(al[l.lines[0]-offset].seq, l.seq))
 
 		case le: //necessity elim
 			aE(!necE(al[l.lines[0]-offset].seq, l.seq))
@@ -353,6 +370,10 @@ func lineSpec(infRule string) int {
 		return 1
 	case li:
 		return 1
+	case mli:
+		return 1
+	case pli:
+		return 1
 	case me:
 		return 2
 	case mi:
@@ -369,8 +390,24 @@ func lineSpec(infRule string) int {
 }
 
 func checkLineRef(infRule string, cur int, offset int, lines []int) bool {
-	thm := theorems
 
+	for n := range lines {
+		if lines[n] >= cur || lines[n] < offset {
+			logger.Print("illegel reference to line ", lines[n])
+			return false
+		}
+	}
+	if oDR {
+		if strings.HasSuffix(infRule, "R") {
+			if len(lines) != 1 {
+				logger.Print("derived rule must refer to one other line")
+				return false
+			}
+			return true
+		}
+	}
+
+	thm := theorems
 	if oML {
 		thm = append(thm, modalTheorems...)
 	}
@@ -403,12 +440,6 @@ func checkLineRef(infRule string, cur int, offset int, lines []int) bool {
 		return false
 	}
 
-	for n := range lines {
-		if lines[n] >= cur || lines[n] < offset {
-			logger.Print("illegel reference to line ", lines[n])
-			return false
-		}
-	}
 	return true
 }
 
@@ -444,6 +475,15 @@ func fullName(i string) string {
 		return "Identity Elimination"
 	case ii:
 		return "Identity Introduction"
+	case li:
+		return "Necessity Introduction"
+	case le:
+		return "Necessity Elimination"
+	case mi:
+		return "Possibility Introduction"
+	case me:
+		return "Possibility Elimination"
+
 	default:
 		return i
 	}

@@ -196,8 +196,8 @@ func exportHistory() {
 	obj := js.Global().Get("Blob").New([]any{strings.Join(history, "\n")})
 	url := js.Global().Get("URL").Call("createObjectURL", obj).String()
 
-	obj2 := js.Global().Get("Blob").New([]any{historyToLatex()})
-	url2 := js.Global().Get("URL").Call("createObjectURL", obj2).String()
+	//obj2 := js.Global().Get("Blob").New([]any{historyToLatex()})
+	//url2 := js.Global().Get("URL").Call("createObjectURL", obj2).String()
 
 	stopInput()
 	hide("console")
@@ -208,8 +208,18 @@ func exportHistory() {
 	show("backButton")
 	hide("console")
 
-	setTextByID("historyDialog", `<a href="`+url+`">right-click to download history as JSON</a>`+"<br /><br />"+`<a href="`+url2+`">right-click to download history as LaTeX</a>`)
+	html := `<h3> Export History</h3>
+<a href="` + url + `">right-click to download history as JSON</a>`
 
+	/**+ "<br /><br />" + `<a href="` + url2 + `">right-click to download history as LaTeX</a></ br></ br>`**/
+
+	html = html + `<h3>Import History</h3>
+	Paste JSON into box.
+
+<textarea name="textarea" id="historyinputarea" rows="15" cols="40"></textarea>
+	 <button id="importHistory">Import</button>`
+
+	setTextByID("historyDialog", html)
 }
 
 func importHistory() {
@@ -231,7 +241,11 @@ func importHistory() {
 
 func rewriteHistory() {
 	stopInput()
-	history = strings.Split(dom.GetWindow().Document().GetElementByID("historyinputarea").(*dom.HTMLTextAreaElement).Value(), "\n")
+	input := dom.GetWindow().Document().GetElementByID("historyinputarea").(*dom.HTMLTextAreaElement).Value()
+	if len(strings.TrimSpace(input)) > 0 {
+		history = nil
+		history = strings.Split(input, "\n")
+	}
 	dom.GetWindow().Document().GetElementByID("historyinputarea").(*dom.HTMLTextAreaElement).SetValue("")
 	historyPosition = len(history)
 	saveHistory()

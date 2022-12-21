@@ -40,6 +40,7 @@ var (
 	oTHM  = false
 	oCOND = true
 	oML   = true
+	oDR   = true
 )
 
 func init() {
@@ -97,6 +98,20 @@ func SetConditional(v bool) {
 func SetPL(v bool) {
 
 	oPL = v
+
+}
+
+// SetML specifies whether we allows modal logic
+func SetML(v bool) {
+
+	oML = v
+
+}
+
+// SetDR specifies whether we allow derived rules
+func SetDR(v bool) {
+
+	oDR = v
 
 }
 

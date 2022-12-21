@@ -32,6 +32,9 @@ func (s sequent) datumSlice() datumSlice {
 	d := strings.Split(dstr, ",")
 
 	for i := range d {
+		if len(strings.TrimSpace(d[i])) == 0 {
+			continue
+		}
 		r = append(r, datum(strings.TrimSpace(d[i])))
 	}
 

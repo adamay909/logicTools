@@ -29,7 +29,9 @@ var indexHtml, helpHtml, styleCSS string
 var (
 	oPL = true
 
-	oML = true
+	oML = false
+
+	oDR = false
 
 	oTHM = true
 
@@ -141,6 +143,8 @@ func onClick() {
 		clearInput()
 	case "toClipboard":
 		toClipboard()
+	case "toLatex":
+		toClipboardLatex()
 	case "print":
 		toPrinter()
 	case "toggleHelp":
@@ -153,10 +157,15 @@ func onClick() {
 		togglePL()
 	case "setOffset":
 		setOffset()
-	case "togglethm":
-		toggleTheorems()
+	case "toggleDR":
+		toggleDR()
+	case "toggleML":
+		toggleML()
 	case "togglereadme":
 		toggleReadme()
+
+	case "imp-export":
+		exportHistory()
 
 	case "loadExercise":
 		toggleExercises()
@@ -289,6 +298,8 @@ func resetDisplay() {
 
 	oEXTHM = false
 	oPL = true
+	oDR = false
+	oML = false
 	oHELP = false
 	oMENU = true
 	oABOUT = false
@@ -313,8 +324,11 @@ func resetDisplay() {
 	display()
 	toggleClipboardType()
 	toggleTheorems()
+	toggleDR()
+	toggleML()
 	togglePL()
 	toggleSettings()
+	toggleMenuButton()
 	setDisplay()
 	focusInput()
 	exercises = nil
@@ -323,12 +337,14 @@ func resetDisplay() {
 
 func toggleTheorems() {
 	stopInput()
+	oTHM = true
+	/**
 	oTHM = !oTHM
 	if oTHM {
 		setTextByID("togglethm", "With Theorems")
 	} else {
 		setTextByID("togglethm", "No Theorems")
-	}
+	}**/
 	dsp.Theorems = oTHM
 	gentzen.SetAllowTheorems(oTHM)
 	return
@@ -352,6 +368,28 @@ func togglePL() {
 	return
 }
 
+func toggleDR() {
+	stopInput()
+	oDR = !oDR
+	if oDR {
+		setTextByID("toggleDR", `Derived Rules&emsp; &#x2713;`)
+	} else {
+		setTextByID("toggleDR", `Derived Rules`)
+	}
+	dsp.DerivedRules = oDR
+	gentzen.SetDR(oDR)
+}
+func toggleML() {
+	stopInput()
+	oML = !oML
+	if oML {
+		setTextByID("toggleML", `Modal Logic&emsp; &#x2713;`)
+	} else {
+		setTextByID("toggleML", `Modal Logic`)
+	}
+	dsp.SystemML = oML
+	gentzen.SetML(oML)
+}
 func toggleHelp() {
 	if oABOUT {
 		return
@@ -404,6 +442,9 @@ func backToNormal() {
 
 func toggleClipboardType() {
 	stopInput()
+	oClipboard = oTextOutput
+	return
+
 	if oPRIVATE {
 		oClipboard = (oClipboard + 1) % 3
 	} else {
@@ -519,7 +560,16 @@ func toClipboard() {
 
 	return
 }
+func toClipboardLatex() {
+	if oABOUT {
+		return
+	}
+	stopInput()
 
+	copyToClipboard(latexOutput())
+
+	return
+}
 func startInput() {
 
 	acceptInput = true

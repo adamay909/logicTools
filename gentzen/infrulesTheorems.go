@@ -44,8 +44,8 @@ var modalTheorems = [][]string{
 	{"S5", "S5", "><p[<p"},
 }
 
-func theorem(seq sequent, inf string) bool {
-	var tf []string
+func theoremsInUse() [][]string {
+
 	thm := theorems
 
 	if oML {
@@ -60,6 +60,14 @@ func theorem(seq sequent, inf string) bool {
 		}
 		thm = append(thm, quantifierRules...)
 	}
+
+	return thm
+}
+
+func theorem(seq sequent, inf string) bool {
+	var tf []string
+
+	thm := theoremsInUse()
 
 	inf = strings.TrimSpace(inf)
 	for i := range thm {

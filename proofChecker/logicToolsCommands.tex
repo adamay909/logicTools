@@ -18,7 +18,11 @@
 %existential quantifier
 \def\lthereis{\ensuremath{\exists}}
 
-%derivable
+%modal operators
+\def\lnec{\ensuremath{\Box}}
+\def\lpos{\ensuremath{\Diamond}}
+
+%turnstile
 \def\lproves{\ensuremath{\vdash}}
 
 %primitive Inference Rules
@@ -45,6 +49,11 @@
 
 \newcommand{\iI}{\ensuremath{=}I}
 \newcommand{\iE}{\ensuremath{=}E}
+
+\newcommand{\necE}{\lnec E}
+\newcommand{\necI}{\lnec I}
+\newcommand{\posE}{\lpos E}
+\newcommand{\posI}{\lpos I}
 
 %for typestting derivations
 \newenvironment{argumentN}[1][1]%
