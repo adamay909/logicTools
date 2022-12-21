@@ -42,6 +42,10 @@ var modalTheorems = [][]string{
 	{"Distribution", "K", ">[>pq>[p[q"},
 	{"S4", "S4", ">[p[[p"},
 	{"S5", "S5", "><p[<p"},
+	{"Duality", "DL", ">[p-<-p"},
+	{"Duality", "DL", "><p-[-p"},
+	{"Duality", "DL", ">-[-p<p"},
+	{"Duality", "DL", ">-<-p[p"},
 }
 
 func theoremsInUse() [][]string {

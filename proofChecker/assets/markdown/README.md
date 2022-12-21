@@ -191,11 +191,15 @@ infer Γ ⊢ &#x25a1;φ, provided Γ contains no contingent claims.
 
 'Contingent claims' in the above rules are formulas that are neither formulas whose main connectives are modal operators nor are negations of such formulas. A claim is  necessary iff. its main connective is the necessity operator.
 
-You could also stick with Necessity Introduction, and use the following axioms:
+The proof checker also accepts the following axioms (so you can stick to the plain Necessity Introduction rule):
 
 - **K**  ⊢ □(p⊃q)⊃(□p⊃□q)
 - **S4** ⊢ □p⊃□□p
 - **S5** ⊢ ◇p⊃□◇p
+- **Duality (DU)** ⊢ □p⊃¬◇¬p
+- **Duality (DU)** ⊢ ¬◇¬p⊃□p
+- **Duality (DU)** ⊢ ◇p⊃¬□¬p
+- **Duality (DU)** ⊢ ¬□¬p⊃◇p
 
 As far as the proof checker is concerned, axioms behave just like theorems.
 
