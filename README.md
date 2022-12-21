@@ -134,13 +134,14 @@ To make life easier, you can choose to allow the use of a few theorems. If you d
 - **Quantifier Exchange (QE)** ⊢ ∀x¬Fx ⊃ ¬∃xFx
 - **Quantifier Exchange (QE)** ⊢ ¬∃xFx ⊃ ∀x¬Fx
 
-### Theorems of Modal Logic
+#### Axioms of Modal Logic
+
 - **K**  ⊢ □(p⊃q)⊃(□p⊃□q)
 - **S4** □p⊃□□p
 - **S5** ⊢ ◇p⊃□◇p
 
 
-The proof checker will recognize instances of theorems. Here is an example of a use of EM:
+The proof checker will recognize instances of theorems (and axioms). Here is an example of a use of EM:
 
 1. Γ ⊢ P⊃Q...premise
 2. ⊢ P∨¬P...EM

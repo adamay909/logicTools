@@ -124,13 +124,13 @@ infer Γ, ∆ ⊢ ψ , provided Γ,∆,ψ contain no contingent claims.</li>
 <li><strong>Quantifier Exchange (QE)</strong> ⊢ ∀x¬Fx ⊃ ¬∃xFx</li>
 <li><strong>Quantifier Exchange (QE)</strong> ⊢ ¬∃xFx ⊃ ∀x¬Fx</li>
 </ul>
-<h3>Theorems of Modal Logic</h3>
+<h4>Axioms of Modal Logic</h4>
 <ul>
 <li><strong>K</strong>  ⊢ □(p⊃q)⊃(□p⊃□q)</li>
 <li><strong>S4</strong> □p⊃□□p</li>
 <li><strong>S5</strong> ⊢ ◇p⊃□◇p</li>
 </ul>
-<p>The proof checker will recognize instances of theorems. Here is an example of a use of EM:</p>
+<p>The proof checker will recognize instances of theorems (and axioms). Here is an example of a use of EM:</p>
 <ol>
 <li>Γ ⊢ P⊃Q...premise</li>
 <li>⊢ P∨¬P...EM</li>
