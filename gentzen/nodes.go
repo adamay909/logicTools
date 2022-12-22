@@ -443,7 +443,7 @@ func getSubnodes(n *Node) []*Node {
 }
 
 // order nodes by depth
-func reorderNodes(nodes []*Node) (out []*Node) {
+func _reorderNodes(nodes []*Node) (out []*Node) {
 
 	d := findMaxDepth(nodes)
 
@@ -451,6 +451,23 @@ func reorderNodes(nodes []*Node) (out []*Node) {
 
 		for _, j := range nodes {
 			if j.Generation() == i {
+				out = append(out, j)
+			}
+		}
+	}
+	return out
+}
+
+// get subnodes orderd by class
+func orderedNodes(n *Node) (out []*Node) {
+
+	d := n.Class() - 1
+	nodes := getSubnodes(n)
+
+	for i := d; i >= 0; i-- {
+
+		for _, j := range nodes {
+			if j.Class()-1 == i {
 				out = append(out, j)
 			}
 		}
@@ -474,41 +491,37 @@ func findMaxDepth(nodes []*Node) int {
 // check if s2 is instance of s1
 func sameStructure(s1, s2 string) bool {
 
-	ns1 := getSubnodes(Parse(s1))
-	ns2 := getSubnodes(Parse(s2))
+	ns1 := orderedNodes(Parse(s1))
+	ns2 := orderedNodes(Parse(s2))
 
-	ns1 = reorderNodes(ns1)
-	ns2 = reorderNodes(ns2)
+	//	fmt.Println("target: ", ns1[0].Formula(), "check: ", ns2[0].Formula())
 
 	if len(ns2) < len(ns1) {
 		return false
 	}
 
 	for i := range ns1 {
-
+		//		fmt.Println("compare ", ns2[i].Formula(), " against ", ns1[i].Formula())
 		if ns1[i].IsAtomic() {
 			old := ns1[i].Formula()
 			repl := ns2[i].Formula()
-			for _, n := range ns1 {
-				if n.IsAtomic() && !n.HasFlag("c") {
-					if n.Formula() == old {
-						n.SetFormula(repl)
-						n.SetFlag("c")
+			for j := range ns1 {
+				if ns1[j].Formula() == old {
+					if ns2[j].Formula() != repl {
+						return false
 					}
 				}
 			}
-			continue
 		}
+		continue
+
 		if ns1[i].MainConnective() != ns2[i].MainConnective() {
+			//			fmt.Println("mc mis 1: ", ns1[i].MainConnective(), "2 :", ns2[i].MainConnective())
+			//			fmt.Println("Fail  ", ns1[i].Formula(), "  ", ns2[i].Formula())
 			return false
 		}
-
-		if ns1[i].IsQuantifier() {
-			ns1[i].variable = ns2[i].variable
-		}
 	}
-
-	return printNodePolish(ns1[0]) == printNodePolish(ns2[0])
+	return true
 
 }
 

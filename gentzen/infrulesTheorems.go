@@ -71,12 +71,10 @@ func theoremsInUse() [][]string {
 func theorem(seq sequent, inf string) bool {
 	var tf []string
 
-	thm := theoremsInUse()
-
 	inf = strings.TrimSpace(inf)
-	for i := range thm {
-		if inf == thm[i][0] || inf == thm[i][1] {
-			tf = append(tf, thm[i][2])
+	for _, thm := range theoremsInUse() {
+		if inf == thm[1] {
+			tf = append(tf, thm[2])
 		}
 	}
 
@@ -84,6 +82,9 @@ func theorem(seq sequent, inf string) bool {
 		logger.Print(inf, "is not a theorem")
 		return false
 	}
+
+	//	tf = nil
+	//	tf = append(tf, quantifierRules[0][2])
 
 	for _, thc := range tf {
 		if sameStructure(thc, seq.succedent().String()) {
