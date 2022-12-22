@@ -41,6 +41,7 @@ const (
 	me  = `me`
 	mli = `mli`
 	pli = `pli`
+	mme = "mme"
 )
 
 var checkLog strings.Builder
@@ -152,6 +153,9 @@ func checkDerivation(lines []string, offset int) bool {
 
 		case me: //possibility elim
 			aE(!posE(al[l.lines[0]-offset].seq, al[l.lines[1]-offset].seq, l.seq))
+
+		case mme: //possibility elim
+			aE(!posE_S5(al[l.lines[0]-offset].seq, al[l.lines[1]-offset].seq, l.seq))
 
 		case "premise": //premise
 
@@ -376,6 +380,8 @@ func lineSpec(infRule string) int {
 		return 1
 	case me:
 		return 2
+	case mme:
+		return 2
 	case mi:
 		return 1
 	case "premise":
@@ -477,12 +483,18 @@ func fullName(i string) string {
 		return "Identity Introduction"
 	case li:
 		return "Necessity Introduction"
+	case mli:
+		return "Metaphysical Necessity Introduction"
+	case pli:
+		return "Physical Necessity Introduction"
 	case le:
 		return "Necessity Elimination"
 	case mi:
 		return "Possibility Introduction"
 	case me:
 		return "Possibility Elimination"
+	case mme:
+		return "Metaphysical Possibility Introduction"
 
 	default:
 		return i

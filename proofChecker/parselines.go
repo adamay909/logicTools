@@ -245,6 +245,7 @@ func replaceInfrules(s string) string {
 		[2]string{`M\lnecI`, `mli`},
 		[2]string{`P\lnecI`, `pli`},
 		[2]string{`\lposE`, `me`},
+		[2]string{`M\lposE`, `mme`},
 		[2]string{`\lposI`, `mi`},
 	}
 	s = strings.ReplaceAll(s, " ", "")

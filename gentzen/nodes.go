@@ -1,6 +1,7 @@
 package gentzen
 
 import (
+	"fmt"
 	"sort"
 )
 
@@ -13,11 +14,6 @@ type Node struct {
 	predicateLetter    string
 	term               []string
 	flags              []string
-}
-
-// SetFlag sets a flag for n. Use for storing extra information.
-func (n *Node) SetFlag(f string) {
-	n.flags = append(n.flags, f)
 }
 
 // Child1 returns first chile of n if it exists. Returns ok=false
@@ -91,6 +87,11 @@ func (n *Node) ParentMust() (m *Node) {
 	return n.parent
 }
 
+// SetFlag sets a flag for n. Use for storing extra information.
+func (n *Node) SetFlag(f string) {
+	n.flags = append(n.flags, f)
+}
+
 func (n *Node) RmFlag(f string) {
 	var newflags []string
 
@@ -109,7 +110,6 @@ func (n *Node) HasFlag(f string) bool {
 		if s == f {
 			return true
 		}
-		return false
 	}
 	return false
 }
@@ -491,6 +491,49 @@ func findMaxDepth(nodes []*Node) int {
 // check if s2 is instance of s1
 func sameStructure(s1, s2 string) bool {
 
+	n1 := getSubnodes(Parse(s1))
+	n2 := getSubnodes(Parse(s2))
+
+	if len(n1) > len(n2) {
+		return false
+	}
+
+	atomic := n1[0].AtomicSentences()
+
+	for _, a := range atomic {
+		fmt.Println("looking for ", a)
+		for i := range n1 {
+			if !n1[i].IsAtomic() {
+				if n1[i].MainConnective() != n2[i].MainConnective() {
+					return false
+				}
+			}
+			if n1[i].Formula() == a {
+				target := n2[i].Formula()
+				fmt.Println("look for ", a, target)
+				for j := range n2 {
+					if n2[j].Formula() == target {
+						if n2[j].HasFlag("c") {
+							continue
+						}
+						n2[j].SetFormula(a)
+						n2[j].SetAtomic()
+						n2[j].SetFlag("c")
+					}
+				}
+				break
+			}
+		}
+		n2 = getSubnodes(n2[0])
+	}
+
+	return n1[0].Formula() == n2[0].Formula()
+
+}
+
+// check if s2 is instance of s1
+func _sameStructure(s1, s2 string) bool {
+
 	ns1 := orderedNodes(Parse(s1))
 	ns2 := orderedNodes(Parse(s2))
 
@@ -525,7 +568,7 @@ func sameStructure(s1, s2 string) bool {
 
 }
 
-func (n *Node) AtomicCount() int {
+func (n *Node) AtomicSentences() []string {
 
 	var as []string
 
@@ -543,5 +586,5 @@ func (n *Node) AtomicCount() int {
 		as = append(as, e.String())
 	}
 
-	return len(as)
+	return as
 }
