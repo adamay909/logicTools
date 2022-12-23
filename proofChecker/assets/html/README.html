@@ -150,19 +150,19 @@ infer Γ ⊢φ.</li>
 <li><strong>Possibility Introduction (◇I)</strong> from Γ ⊢ φ
 infer Γ ⊢ ◇φ.</li>
 <li><strong>Possibility Elimination (◇E)</strong> From Γ ⊢ ◇φ and ∆, φ ⊢ ψ,
-infer Γ, ∆ ⊢ ψ , provided Γ,∆,ψ contain no contingent claims.</li>
+infer Γ, ∆ ⊢ ◇ψ , provided Γ,∆ contain no formulas that are not necessities.</li>
 </ul>
 <p>If you are comfortable with S4, you could use:</p>
 <ul>
 <li><strong>Physical Necessity Introduction (P□I)</strong> from Γ ⊢ φ
-infer Γ ⊢ □φ, provided Γ contains no claims that are not necessary.</li>
+infer Γ ⊢ □φ, provided Γ contains no formulas that are not necessities.</li>
 </ul>
 <p>If you are comfortable with S5, you could also use:</p>
 <ul>
 <li><strong>Metaphysical Necessity Introduction (M□I)</strong> from Γ ⊢ φ
-infer Γ ⊢ □φ, provided Γ contains no contingent claims.</li>
+infer Γ ⊢ □φ, provided Γ contains no contingent formulas.</li>
 </ul>
-<p>'Contingent claims' in the above rules are formulas that are neither formulas whose main connectives are modal operators nor are negations of such formulas. A claim is  necessary iff. its main connective is the necessity operator.</p>
+<p>'Contingent formulas' in the above rules are formulas that are neither formulas whose main connectives are modal operators nor are negations of such formulas. A formula is a necessity iff. its main connective is the necessity operator.</p>
 <p>The proof checker also accepts the following axioms (so you can stick to the plain Necessity Introduction rule):</p>
 <ul>
 <li><strong>K</strong>  ⊢ □(p⊃q)⊃(□p⊃□q)</li>

@@ -178,18 +178,18 @@ infer Γ ⊢φ.
 - **Possibility Introduction (&#x25c7;I)** from Γ ⊢ φ
 infer Γ ⊢ &#x25c7;φ.
 - **Possibility Elimination (&#x25c7;E)** From Γ ⊢ &#x25c7;φ and ∆, φ ⊢ ψ,
-infer Γ, ∆ ⊢ ψ , provided Γ,∆,ψ contain no contingent claims.
+infer Γ, ∆ ⊢ &#x25c7;ψ , provided Γ,∆ contain no formulas that are not necessities.
 
 If you are comfortable with S4, you could use:
 - **Physical Necessity Introduction (P&#x25a1;I)** from Γ ⊢ φ
-infer Γ ⊢ &#x25a1;φ, provided Γ contains no claims that are not necessary.
+infer Γ ⊢ &#x25a1;φ, provided Γ contains no formulas that are not necessities.
 
 If you are comfortable with S5, you could also use:
 
 - **Metaphysical Necessity Introduction (M&#x25a1;I)** from Γ ⊢ φ
-infer Γ ⊢ &#x25a1;φ, provided Γ contains no contingent claims.
+infer Γ ⊢ &#x25a1;φ, provided Γ contains no contingent formulas.
 
-'Contingent claims' in the above rules are formulas that are neither formulas whose main connectives are modal operators nor are negations of such formulas. A claim is  necessary iff. its main connective is the necessity operator.
+'Contingent formulas' in the above rules are formulas that are neither formulas whose main connectives are modal operators nor are negations of such formulas. A formula is a necessity iff. its main connective is the necessity operator.
 
 The proof checker also accepts the following axioms (so you can stick to the plain Necessity Introduction rule):
 

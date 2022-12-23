@@ -192,6 +192,11 @@ func onClick() {
 		exportHistory()
 	case "importHistory":
 		rewriteHistory()
+	case "duplicateScreen":
+		duplicateHistoryItem()
+	case "deleteAllHistory":
+		clearHistory()
+
 	case "backButton":
 		backToNormal()
 
@@ -280,6 +285,7 @@ func focusInput() {
 
 func clearInput() {
 	saveHistory()
+	appendHistory()
 	clearScreen()
 	saveState()
 	focusInput()

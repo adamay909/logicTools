@@ -588,3 +588,9 @@ func (n *Node) AtomicSentences() []string {
 
 	return as
 }
+
+func (n *Node) AtomicCount() int {
+
+	return len(n.AtomicSentences())
+
+}

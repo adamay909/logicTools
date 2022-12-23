@@ -13,6 +13,32 @@ var historyPosition int
 
 var stash string
 
+func appendHistory() {
+
+	historyPosition++
+	if historyPosition >= len(history) {
+		historyPosition = len(history)
+		return
+	}
+
+	h1 := history[:historyPosition]
+	h2 := history[historyPosition:]
+
+	history = nil
+
+	history = append(history, h1...)
+	history = append(history, "")
+	history = append(history, h2...)
+
+}
+
+func duplicateHistoryItem() {
+
+	appendHistory()
+	history[historyPosition] = history[historyPosition-1]
+
+}
+
 func saveHistory() {
 
 	c := dsp.marshalJson()
@@ -50,6 +76,8 @@ func backHistory() {
 		return
 	}
 
+	saveHistory()
+
 	if historyPosition == len(history) {
 		stashState()
 	}
@@ -61,6 +89,8 @@ func backHistory() {
 
 func forwardHistory() {
 
+	saveHistory()
+
 	historyPosition = historyPosition + 1
 
 	if historyPosition > len(history) {
@@ -70,6 +100,7 @@ func forwardHistory() {
 
 	if historyPosition == len(history) {
 		reloadStash()
+		historyPosition--
 		return
 	}
 
@@ -183,7 +214,30 @@ func rmFromHistory() {
 
 func cleanHistory() {
 
+	if historyPosition < len(history) {
+		return
+	}
+
 	history = slicesCleanDuplicates(history)
+
+	var dummy console
+	var newhist []string
+
+	for _, j := range history {
+		json.Unmarshal([]byte(j), dummy)
+		if dummy.Title != "" {
+			newhist = append(newhist, j)
+			continue
+		}
+		if len(dummy.Input) != 0 {
+			newhist = append(newhist, j)
+			continue
+		}
+		continue
+	}
+
+	history = nil
+	history = append(history, newhist...)
 
 	historyPosition = len(history)
 	if historyPosition < 0 {
@@ -275,4 +329,19 @@ func historyToLatex() string {
 	reloadStash()
 
 	return out
+}
+
+func clearHistory() {
+	dsp.clear()
+	history = nil
+	stash = ""
+	historyPosition = len(history)
+	saveHistory()
+	display()
+	printMessage("")
+	hide("messages")
+	hideExtra()
+	show("console")
+	stopInput()
+	return
 }
