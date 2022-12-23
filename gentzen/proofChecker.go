@@ -42,7 +42,18 @@ const (
 	mli = `mli`
 	pli = `pli`
 	mme = "mme"
+	sc  = "sc"
 )
+
+type infRule struct {
+	abbr     string
+	fullName string
+	latex    string
+	mathjax  string
+	text     string
+	spec     int
+	rule     func() bool
+}
 
 var checkLog strings.Builder
 var logger *log.Logger
@@ -157,6 +168,8 @@ func checkDerivation(lines []string, offset int) bool {
 		case mme: //possibility elim
 			aE(!posE_S5(al[l.lines[0]-offset].seq, al[l.lines[1]-offset].seq, l.seq))
 
+		case sc: //possibility elim
+			aE(!scopeReplacement(al[l.lines[0]-offset].seq, l.seq))
 		case "premise": //premise
 
 		case "": //sequent rewrite
@@ -384,6 +397,8 @@ func lineSpec(infRule string) int {
 		return 2
 	case mi:
 		return 1
+	case sc:
+		return 1
 	case "premise":
 		return 0
 	case "":
@@ -495,7 +510,8 @@ func fullName(i string) string {
 		return "Possibility Elimination"
 	case mme:
 		return "Metaphysical Possibility Introduction"
-
+	case sc:
+		return "Scope Replacement"
 	default:
 		return i
 	}
