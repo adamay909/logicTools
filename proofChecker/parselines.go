@@ -248,6 +248,7 @@ func replaceInfrules(s string) string {
 		[2]string{`M\lposE`, `mme`},
 		[2]string{`\lposI`, `mi`},
 		[2]string{`SC`, `sc`},
+		[2]string{`SL`, `sl`},
 	}
 	s = strings.ReplaceAll(s, " ", "")
 	a := strings.Split(s, ",")

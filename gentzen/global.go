@@ -102,6 +102,7 @@ var infRules = [][]string{
 	{me, `\posE`, `\posE`, "\u25c7E"},
 	{mme, `M\posE`, `M\posE`, "M\u25c7E"},
 	{sc, "SC", "SC", "SC"},
+	{sl, "SL", "SL", "SL"},
 }
 
 var greekUCBindings = [][3]string{

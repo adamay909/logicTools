@@ -43,6 +43,7 @@ const (
 	pli = `pli`
 	mme = "mme"
 	sc  = "sc"
+	sl  = "sl"
 )
 
 type infRule struct {
@@ -170,6 +171,10 @@ func checkDerivation(lines []string, offset int) bool {
 
 		case sc: //possibility elim
 			aE(!scopeReplacement(al[l.lines[0]-offset].seq, l.seq))
+
+		case sl: //possibility elim
+			aE(!sententialLogic(al[l.lines[0]-offset].seq, l.seq))
+
 		case "premise": //premise
 
 		case "": //sequent rewrite
@@ -399,6 +404,8 @@ func lineSpec(infRule string) int {
 		return 1
 	case sc:
 		return 1
+	case sl:
+		return 1
 	case "premise":
 		return 0
 	case "":
@@ -512,6 +519,8 @@ func fullName(i string) string {
 		return "Metaphysical Possibility Introduction"
 	case sc:
 		return "Scope Replacement"
+	case sl:
+		return "Sentential Logic"
 	default:
 		return i
 	}
