@@ -196,17 +196,17 @@ The proof checker also accepts the following axioms (so you can stick to the pla
 - **K**  ⊢ □(p⊃q)⊃(□p⊃□q)
 - **S4** ⊢ □p⊃□□p
 - **S5** ⊢ ◇p⊃□◇p
-- **Duality (DU)** ⊢ □p⊃¬◇¬p
-- **Duality (DU)** ⊢ ¬◇¬p⊃□p
-- **Duality (DU)** ⊢ ◇p⊃¬□¬p
-- **Duality (DU)** ⊢ ¬□¬p⊃◇p
+- **Duality (DL)** ⊢ □p⊃¬◇¬p
+- **Duality (DL)** ⊢ ¬◇¬p⊃□p
+- **Duality (DL)** ⊢ ◇p⊃¬□¬p
+- **Duality (DL)** ⊢ ¬□¬p⊃◇p
 
 It also accepts the following theorems:
 
-- **Duality (DU)** ⊢ -□p⊃◇¬p
-- **Duality (DU)** ⊢ □-p⊃¬◇p
-- **Duality (DU)** ⊢ -◇p⊃□¬p
-- **Duality (DU)** ⊢ ◇-p⊃¬□p
+- **Duality (DL)** ⊢ -□p⊃◇¬p
+- **Duality (DL)** ⊢ □-p⊃¬◇p
+- **Duality (DL)** ⊢ -◇p⊃□¬p
+- **Duality (DL)** ⊢ ◇-p⊃¬□p
 
 As far as the proof checker is concerned, axioms behave just like theorems.
 
