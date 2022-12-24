@@ -447,7 +447,7 @@ func checkLineRef(infRule string, cur int, offset int, lines []int) bool {
 	}
 
 	if lineSpec(infRule) == -1 {
-		logger.Print("unknown inference rule or theoremi: ", infRule)
+		logger.Print("unknown inference rule or theorem: ", infRule)
 		return false
 	}
 

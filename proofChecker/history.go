@@ -72,11 +72,10 @@ func loadHistory() {
 
 func backHistory() {
 
+	saveHistory()
 	if historyPosition == 0 {
 		return
 	}
-
-	saveHistory()
 
 	if historyPosition == len(history) {
 		stashState()
@@ -219,7 +218,6 @@ func cleanHistory() {
 	}
 
 	history = slicesCleanDuplicates(history)
-
 	var dummy console
 	var newhist []string
 

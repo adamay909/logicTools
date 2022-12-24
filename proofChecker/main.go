@@ -69,7 +69,7 @@ func main() {
 	resetDisplay()
 	hideExtra()
 	loadHistory()
-	cleanHistory()
+	//	cleanHistory()
 	recoverState()
 	stopInput()
 
