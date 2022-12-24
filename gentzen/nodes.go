@@ -594,3 +594,21 @@ func (n *Node) AtomicCount() int {
 	return len(n.AtomicSentences())
 
 }
+
+func (n *Node) IsPureSL() bool {
+
+	ns := getSubnodes(n)
+
+	for _, n := range ns {
+
+		if n.IsQuantifier() {
+			return false
+		}
+		if n.IsModal() {
+			return false
+		}
+
+	}
+
+	return true
+}

@@ -201,6 +201,13 @@ The proof checker also accepts the following axioms (so you can stick to the pla
 - **Duality (DU)** ⊢ ◇p⊃¬□¬p
 - **Duality (DU)** ⊢ ¬□¬p⊃◇p
 
+It also accepts the following theorems:
+
+- **Duality (DU)** ⊢ -□p⊃◇¬p
+- **Duality (DU)** ⊢ □-p⊃¬◇p
+- **Duality (DU)** ⊢ -◇p⊃□¬p
+- **Duality (DU)** ⊢ ◇-p⊃¬□p
+
 As far as the proof checker is concerned, axioms behave just like theorems.
 
  

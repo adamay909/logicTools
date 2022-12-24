@@ -46,6 +46,10 @@ var modalTheorems = [][]string{
 	{"Duality", "DL", "><p-[-p"},
 	{"Duality", "DL", ">-[-p<p"},
 	{"Duality", "DL", ">-<-p[p"},
+	{"Duality", "DL", ">[-p-<p"},
+	{"Duality", "DL", "><-p-[p"},
+	{"Duality", "DL", ">-<p[-p"},
+	{"Duality", "DL", ">-[p<-p"},
 }
 
 func theoremsInUse() [][]string {
