@@ -189,7 +189,7 @@ func posEhelper_S5(seq1, seq2, seq3 sequent) (v bool, msg string) {
 		return
 	}
 
-	if !Parse(seq2.succedent().String()).IsModal() {
+	if !isModalClaim(seq2.succedent().String()) {
 		msg = "proviso not met"
 		return
 	}
@@ -228,7 +228,7 @@ func posEhelper_S5(seq1, seq2, seq3 sequent) (v bool, msg string) {
 			msg = "all datum items must be modal claims"
 			return
 		}
-		if !Parse(d.String()).IsModal() {
+		if !isModalClaim(d.String()) {
 			msg = "all datum items must be modal claims"
 			return
 		}
@@ -242,7 +242,7 @@ func posEhelper_S5(seq1, seq2, seq3 sequent) (v bool, msg string) {
 			msg = "all datum items must be modal claims"
 			return
 		}
-		if !Parse(d.String()).IsModal() {
+		if !isModalClaim(d.String()) {
 			msg = "all datum items must be modal claims"
 			return
 		}
