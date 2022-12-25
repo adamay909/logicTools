@@ -1,5 +1,7 @@
 package gentzen
 
+import "strconv"
+
 func SLform(n *Node) *Node {
 
 	if oPL {
@@ -9,16 +11,12 @@ func SLform(n *Node) *Node {
 
 	atomic := n.AtomicSentences()
 
-	letters := []string{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "w", "y", "z"}
 	count := 0
 
 	var nextLetter func() string
 	nextLetter = func() string {
-		ret := letters[count]
+		ret := "p_" + strconv.Itoa(count)
 		count++
-		if count > len(letters)-1 {
-			return "K"
-		}
 		if slicesContains(atomic, ret) {
 			ret = nextLetter()
 		}
@@ -31,7 +29,7 @@ func SLform(n *Node) *Node {
 		found = false
 		for _, e := range ns {
 
-			if e.IsQuantifier() || e.IsModal() {
+			if !e.HasFlag("c") && (e.IsQuantifier() || e.IsModal() || e.IsAtomic()) {
 				s := nextLetter()
 				target := e.Formula()
 				for j := range ns {
@@ -52,19 +50,27 @@ func SLform(n *Node) *Node {
 
 func equivSL(s1, s2 string) bool {
 
+	restorePL := false
+
+	n1 := Parse(s1)
+	n2 := Parse(s2)
+
 	if oPL {
-		logger.Print("some functionality not available for Predicate Logic")
-		return false
-	}
-	s1 = Parse(s1).Formula()
-	s2 = Parse(s2).Formula()
-
-	n1 := SLform(Parse(lconj + lcond + s1 + s2 + lcond + s2 + s1))
-
-	if !IsTautology(n1.Formula()) {
-		return false
+		restorePL = true
+		oPL = false
 	}
 
+	s1 = SLform(n1).Formula()
+	s2 = SLform(n2).Formula()
+
+	s3 := lconj + lcond + s1 + s2 + lcond + s2 + s1
+
+	if !IsTautology(s3) {
+		oPL = restorePL
+		return false
+	}
+
+	oPL = restorePL
 	return true
 }
 
