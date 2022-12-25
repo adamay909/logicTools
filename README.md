@@ -178,18 +178,9 @@ infer Γ ⊢φ.
 - **Possibility Introduction (&#x25c7;I)** from Γ ⊢ φ
 infer Γ ⊢ &#x25c7;φ.
 - **Possibility Elimination (&#x25c7;E)** From Γ ⊢ &#x25c7;φ and ∆, φ ⊢ ψ,
-infer Γ, ∆ ⊢ &#x25c7;ψ , provided Γ,∆ contain no formulas that are not necessities.
+infer Γ, ∆ ⊢ &#x25c7;ψ , provided ∆ contain no formulas that are not necessities.
 
-If you are comfortable with S4, you could use:
-- **Physical Necessity Introduction (P&#x25a1;I)** from Γ ⊢ φ
-infer Γ ⊢ &#x25a1;φ, provided Γ contains no formulas that are not necessities.
 
-If you are comfortable with S5, you could also use:
-
-- **Metaphysical Necessity Introduction (M&#x25a1;I)** from Γ ⊢ φ
-infer Γ ⊢ &#x25a1;φ, provided Γ contains no contingent formulas.
-
-'Contingent formulas' in the above rules are formulas that are neither formulas whose main connectives are modal operators nor are negations of such formulas. A formula is a necessity iff. its main connective is the necessity operator.
 
 The proof checker also accepts the following axioms (so you can stick to the plain Necessity Introduction rule):
 
@@ -210,7 +201,19 @@ It also accepts the following theorems:
 
 As far as the proof checker is concerned, axioms behave just like theorems.
 
- 
+Here are some stronger, non-standard, inference rules:
+
+- **S4 Necessity Introduction (S4&#x25a1;I)** from Γ ⊢ φ
+infer Γ ⊢ &#x25a1;φ, provided Γ contains no formulas that are not necessities.
+
+- **S5 Necessity Introduction (S5&#x25a1;I)** from Γ ⊢ φ
+infer Γ ⊢ &#x25a1;φ, provided Γ contains no non-modal formulas.
+
+- **S5 Possibility Elimination (S5&#x25c7;E)** From Γ ⊢ &#x25c7;φ and ∆, φ ⊢ ψ,
+infer Γ, ∆ ⊢ &#x25c7;ψ , provided ψ is a modal formula and Γ, ∆  contain no non-modal formulas.
+
+A modal formula is a formula prefixed with a modal operator or the negation of such a formula.
+
 ### Installation
 
 This proof-checker is designed to run completely inside the browser so it is easy to host it yourself so long as you are able to host static websites. The docs folder of the GitHub repository contains all the files you need.

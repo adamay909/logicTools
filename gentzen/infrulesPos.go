@@ -101,35 +101,35 @@ func posEhelper(seq1, seq2, seq3 sequent) (v bool, msg string) {
 	**/
 
 	datum1 := seq1.datumSlice()
-	for _, d := range datum1 {
-		if len(d) == 0 {
-			continue
-		}
+	/**	for _, d := range datum1 {
+			if len(d) == 0 {
+				continue
+			}
 
-		if Parse(d.String()).Formula() == Parse(seq1.succedent()).Formula() {
-			continue
-		}
+			if Parse(d.String()).Formula() == Parse(seq1.succedent()).Formula() {
+				continue
+			}
 
-		if isFormulaSet(d.String()) {
-			msg = "all datum items must be modal claims"
-			return
+			if isFormulaSet(d.String()) {
+				msg = "all datum items must be modal claims"
+				return
+			}
+			if Parse(d.String()).MainConnective() != nec {
+				msg = "all datum items must be necessity claims"
+				return
+			}
 		}
-		if Parse(d.String()).MainConnective() != nec {
-			msg = "all datum items must be necessity claims"
-			return
-		}
-	}
-
+	**/
 	for _, d := range datum2 {
 		if len(d) == 0 {
 			continue
 		}
 		if isFormulaSet(d.String()) {
-			msg = "all datum items must be modal claims"
+			msg = "proviso about datum not respected"
 			return
 		}
 		if Parse(d.String()).MainConnective() != nec {
-			msg = "all datum items must be necessity claims"
+			msg = "proviso about datum not respected"
 			return
 		}
 	}
@@ -189,6 +189,11 @@ func posEhelper_S5(seq1, seq2, seq3 sequent) (v bool, msg string) {
 		return
 	}
 
+	if !Parse(seq2.succedent().String()).IsModal() {
+		msg = "proviso not met"
+		return
+	}
+
 	found := false
 
 	datum2 := seq2.datumSlice()
@@ -209,11 +214,6 @@ func posEhelper_S5(seq1, seq2, seq3 sequent) (v bool, msg string) {
 		return
 	}
 
-	if !isModalClaim(seq3.s.String()) {
-		msg = "target conclusion must be a modal claim"
-		return
-	}
-
 	datum1 := seq1.datumSlice()
 	for _, d := range datum1 {
 		if len(d) == 0 {
@@ -228,8 +228,8 @@ func posEhelper_S5(seq1, seq2, seq3 sequent) (v bool, msg string) {
 			msg = "all datum items must be modal claims"
 			return
 		}
-		if Parse(d.String()).MainConnective() != nec {
-			msg = "all datum items must be necessity claims"
+		if !Parse(d.String()).IsModal() {
+			msg = "all datum items must be modal claims"
 			return
 		}
 	}
@@ -242,8 +242,8 @@ func posEhelper_S5(seq1, seq2, seq3 sequent) (v bool, msg string) {
 			msg = "all datum items must be modal claims"
 			return
 		}
-		if Parse(d.String()).MainConnective() != nec {
-			msg = "all datum items must be necessity claims"
+		if !Parse(d.String()).IsModal() {
+			msg = "all datum items must be modal claims"
 			return
 		}
 	}

@@ -150,19 +150,8 @@ infer Γ ⊢φ.</li>
 <li><strong>Possibility Introduction (◇I)</strong> from Γ ⊢ φ
 infer Γ ⊢ ◇φ.</li>
 <li><strong>Possibility Elimination (◇E)</strong> From Γ ⊢ ◇φ and ∆, φ ⊢ ψ,
-infer Γ, ∆ ⊢ ◇ψ , provided Γ,∆ contain no formulas that are not necessities.</li>
+infer Γ, ∆ ⊢ ◇ψ , provided ∆ contain no formulas that are not necessities.</li>
 </ul>
-<p>If you are comfortable with S4, you could use:</p>
-<ul>
-<li><strong>Physical Necessity Introduction (P□I)</strong> from Γ ⊢ φ
-infer Γ ⊢ □φ, provided Γ contains no formulas that are not necessities.</li>
-</ul>
-<p>If you are comfortable with S5, you could also use:</p>
-<ul>
-<li><strong>Metaphysical Necessity Introduction (M□I)</strong> from Γ ⊢ φ
-infer Γ ⊢ □φ, provided Γ contains no contingent formulas.</li>
-</ul>
-<p>'Contingent formulas' in the above rules are formulas that are neither formulas whose main connectives are modal operators nor are negations of such formulas. A formula is a necessity iff. its main connective is the necessity operator.</p>
 <p>The proof checker also accepts the following axioms (so you can stick to the plain Necessity Introduction rule):</p>
 <ul>
 <li><strong>K</strong>  ⊢ □(p⊃q)⊃(□p⊃□q)</li>
@@ -181,6 +170,19 @@ infer Γ ⊢ □φ, provided Γ contains no contingent formulas.</li>
 <li><strong>Duality (DL)</strong> ⊢ ◇-p⊃¬□p</li>
 </ul>
 <p>As far as the proof checker is concerned, axioms behave just like theorems.</p>
+<p>Here are some stronger, non-standard, inference rules:</p>
+<ul>
+<li><p><strong>S4 Necessity Introduction (S4□I)</strong> from Γ ⊢ φ
+infer Γ ⊢ □φ, provided Γ contains no formulas that are not necessities.</p>
+</li>
+<li><p><strong>S5 Necessity Introduction (S5□I)</strong> from Γ ⊢ φ
+infer Γ ⊢ □φ, provided Γ contains no non-modal formulas.</p>
+</li>
+<li><p><strong>S5 Possibility Elimination (S5◇E)</strong> From Γ ⊢ ◇φ and ∆, φ ⊢ ψ,
+infer Γ, ∆ ⊢ ◇ψ , provided ψ is a modal formula and Γ, ∆  contain no non-modal formulas.</p>
+</li>
+</ul>
+<p>A modal formula is a formula prefixed with a modal operator or the negation of such a formula.</p>
 <h3>Installation</h3>
 <p>This proof-checker is designed to run completely inside the browser so it is easy to host it yourself so long as you are able to host static websites. The docs folder of the GitHub repository contains all the files you need.</p>
 <h3>Copyright</h3>

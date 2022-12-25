@@ -506,9 +506,9 @@ func fullName(i string) string {
 	case li:
 		return "Necessity Introduction"
 	case mli:
-		return "Metaphysical Necessity Introduction"
+		return "S5 Necessity Introduction"
 	case pli:
-		return "Physical Necessity Introduction"
+		return "S4 Necessity Introduction"
 	case le:
 		return "Necessity Elimination"
 	case mi:
@@ -516,7 +516,7 @@ func fullName(i string) string {
 	case me:
 		return "Possibility Elimination"
 	case mme:
-		return "Metaphysical Possibility Introduction"
+		return "S5 Possibility Introduction"
 	case sc:
 		return "Scope Replacement"
 	case sl:
