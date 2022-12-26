@@ -13,9 +13,13 @@ div#messages>p {
 padding: 0em;
 margin:0.2em;}
 
-div#pagenumber {
+#info {
  font-size: 0.8em;
  float: right;
+}
+
+#versionnumber {
+ color: grey;
 }
 
 img {

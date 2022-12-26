@@ -99,6 +99,9 @@ func setupPage() {
 	setTextByID("readme", string(d))
 	dom.GetWindow().Document().GetElementByID("readme").SetAttribute("style", "display: none")
 
+	d, _ = assets.ReadFile("assets/html/version")
+	setTextByID("versionnumber", "v"+string(d)+"&emsp;&emsp;")
+
 	if !oPRIVATE {
 		setAttributeByID("loadExercise", "style", "display:none")
 	}
