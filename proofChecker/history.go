@@ -24,33 +24,53 @@ func readHistoryFromFile() {
 	fmt.Println(blob)
 }
 
-func appendHistory() {
+func insertEmptyHistoryItem() {
 
-	historyPosition++
-	if historyPosition >= len(history) {
-		historyPosition = len(history)
-		return
+	saveHistory()
+	if historyPosition == len(history) {
+		h2 := ""
+		history = append(history, h2)
+		//		cleanHistory()
+	} else {
+
+		h1 := history[:historyPosition]
+		h2 := history[historyPosition:]
+
+		history = nil
+
+		history = append(history, h1...)
+		history = append(history, "")
+		history = append(history, h2...)
 	}
 
-	h1 := history[:historyPosition]
-	h2 := history[historyPosition:]
-
-	history = nil
-
-	history = append(history, h1...)
-	history = append(history, "")
-	history = append(history, h2...)
+	saveHistory()
+	forwardHistory()
+	moveInHistory()
+	display()
+	return
 
 }
 
 func duplicateHistoryItem() {
+	insertEmptyHistoryItem()
+	history[historyPosition] = history[historyPosition-1]
+	saveHistory()
+	moveInHistory()
+	display()
+	return
+}
+
+/*
+*
+func _duplicateHistoryItem() {
 
 	appendHistory()
 	history[historyPosition] = history[historyPosition-1]
 	display()
 
 }
-
+*
+*/
 func saveHistory() {
 
 	c := dsp.marshalJson()
@@ -61,7 +81,7 @@ func saveHistory() {
 		history[historyPosition] = c
 	}
 
-	cleanHistory()
+	//cleanHistory()
 
 	json := strings.Join(history, "\n")
 
@@ -76,8 +96,9 @@ func loadHistory() {
 	if json == "" {
 		return
 	}
-
 	history = strings.Split(json, "\n")
+	historyPosition = len(history)
+	cleanHistory()
 	historyPosition = len(history)
 
 }
@@ -230,8 +251,12 @@ func cleanHistory() {
 	}
 
 	history = slicesCleanDuplicates(history)
-	var dummy console
+	//	return
 	var newhist []string
+	dummy := new(console)
+	dummy.Title = ""
+	line := inputLine([]string{""})
+	dummy.Input = []inputLine{line}
 
 	for _, j := range history {
 		json.Unmarshal([]byte(j), dummy)
@@ -243,16 +268,13 @@ func cleanHistory() {
 			newhist = append(newhist, j)
 			continue
 		}
-		continue
 	}
 
 	history = nil
 	history = append(history, newhist...)
 
 	historyPosition = len(history)
-	if historyPosition < 0 {
-		historyPosition = 0
-	}
+	saveHistory()
 }
 
 func exportHistory() {
@@ -310,13 +332,14 @@ func importHistory() {
 func rewriteHistory() {
 	stopInput()
 	input := dom.GetWindow().Document().GetElementByID("historyinputarea").(*dom.HTMLTextAreaElement).Value()
+	dom.GetWindow().Document().GetElementByID("historyinputarea").(*dom.HTMLTextAreaElement).SetValue("")
+
 	if len(strings.TrimSpace(input)) > 0 {
 		history = nil
 		history = strings.Split(input, "\n")
 	}
-	dom.GetWindow().Document().GetElementByID("historyinputarea").(*dom.HTMLTextAreaElement).SetValue("")
 	historyPosition = len(history)
-	saveHistory()
+	cleanHistory()
 	dsp.clear()
 	display()
 	printMessage("")

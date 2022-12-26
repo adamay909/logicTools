@@ -119,11 +119,11 @@ func setupJS() {
 	mainEditorFunc = js.FuncOf(jsWrap(typeformula)).Value
 	titleEditorFunc = js.FuncOf(jsWrap(typetitle)).Value
 	clickFunc = js.FuncOf(jsWrap(onClick)).Value
-	loadFunc = js.FuncOf(jsWrap(readHistoryFromFile)).Value
+	//	loadFunc = js.FuncOf(jsWrap(readHistoryFromFile)).Value
 
 	js.Global().Call("addEventListener", "keydown", mainEditorFunc, true)
 	js.Global().Call("addEventListener", "click", clickFunc, true)
-	js.Global().Call("addEventListener", "change", loadFunc, true)
+	// js.Global().Call("addEventListener", "change", loadFunc, true)
 }
 
 func onClick() {
@@ -289,7 +289,7 @@ func focusInput() {
 
 func clearInput() {
 	saveHistory()
-	appendHistory()
+	insertEmptyHistoryItem()
 	clearScreen()
 	saveState()
 	focusInput()
