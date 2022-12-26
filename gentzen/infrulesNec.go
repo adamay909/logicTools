@@ -59,6 +59,57 @@ func necI(seq1, seq2 sequent) bool {
 	return true
 
 }
+
+func necI_T(seq1, seq2 sequent) bool {
+
+	if !oML {
+		logger.Print("Modal Logic not allowed")
+		return false
+	}
+	if Parse(seq2.succedent().String()).MainConnective() != nec {
+		logger.Print("conclusion must be necessary truth")
+		return false
+	}
+	if !isModalInstanceOf(seq1.succedent().String(), seq2.succedent().String()) {
+		logger.Print("conclusion not a necessitation of premise")
+		return false
+	}
+
+	if Parse(seq1.succedent().String()).IsModal() {
+		logger.Print("cannot necessitate modal formulas")
+		return false
+	}
+
+	for _, d := range seq1.datumSlice() {
+		if len(d) == 0 {
+			continue
+		}
+		if isFormulaSet(d.String()) {
+			logger.Print("all datum items must be modal claims")
+			return false
+		}
+		if Parse(d.String()).MainConnective() != nec {
+			logger.Print("all datum items must be necessity claims")
+			return false
+		}
+	}
+
+	if strictCheck {
+		if !datumsEqual(seq1.datumSlice(), seq2.datumSlice()) {
+			logger.Print("datum cannot change")
+			return false
+		}
+	} else {
+		if !datumsEquiv(seq1.datumSlice(), seq2.datumSlice()) {
+			logger.Print("datum cannot change")
+			return false
+		}
+	}
+
+	return true
+
+}
+
 func necI_S4(seq1, seq2 sequent) bool {
 
 	if !oML {

@@ -41,6 +41,7 @@ const (
 	me  = `me`
 	mli = `mli`
 	pli = `pli`
+	tli = `tli`
 	mme = "mme"
 	sc  = "sc"
 	sl  = "sl"
@@ -150,6 +151,9 @@ func checkDerivation(lines []string, offset int) bool {
 
 		case li: //necessity introduction
 			aE(!necI(al[l.lines[0]-offset].seq, l.seq))
+
+		case tli: //necessity introduction
+			aE(!necI_T(al[l.lines[0]-offset].seq, l.seq))
 
 		case pli: //necessity introduction
 			aE(!necI_S4(al[l.lines[0]-offset].seq, l.seq))
@@ -395,6 +399,8 @@ func lineSpec(infRule string) int {
 	case mli:
 		return 1
 	case pli:
+		return 1
+	case tli:
 		return 1
 	case me:
 		return 2

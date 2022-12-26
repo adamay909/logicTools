@@ -244,6 +244,7 @@ func replaceInfrules(s string) string {
 		[2]string{`\lnecI`, `li`},
 		[2]string{`S5\lnecI`, `mli`},
 		[2]string{`S4\lnecI`, `pli`},
+		[2]string{`T\lnecI`, `tli`},
 		[2]string{`\lposE`, `me`},
 		[2]string{`S5\lposE`, `mme`},
 		[2]string{`\lposI`, `mi`},
