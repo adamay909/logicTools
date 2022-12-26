@@ -10,14 +10,16 @@ var cursor = `<div id="cursor">&thinsp;</div>`
 func (d *console) typeset() string {
 
 	var html string
-
 	html = `<h3 id="extitle"></h3>`
 	if d.Title != "" {
 		html = `<h3 id="extitle">` + prettyGreek(d.Title) + `</h3>`
 	}
 	html = html + `<div id="deriv">`
 	html = html + strings.Join(d.html, "\n")
-	return html + `</div>`
+
+	html = html + `</div>`
+
+	return html
 }
 
 func (d *console) format() {

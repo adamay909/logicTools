@@ -22,7 +22,8 @@ var oPRIVATE = true
 
 var mainEditorFunc,
 	titleEditorFunc,
-	clickFunc js.Value
+	clickFunc,
+	loadFunc js.Value
 
 var indexHtml, helpHtml, styleCSS string
 
@@ -118,9 +119,11 @@ func setupJS() {
 	mainEditorFunc = js.FuncOf(jsWrap(typeformula)).Value
 	titleEditorFunc = js.FuncOf(jsWrap(typetitle)).Value
 	clickFunc = js.FuncOf(jsWrap(onClick)).Value
+	loadFunc = js.FuncOf(jsWrap(readHistoryFromFile)).Value
 
 	js.Global().Call("addEventListener", "keydown", mainEditorFunc, true)
 	js.Global().Call("addEventListener", "click", clickFunc, true)
+	js.Global().Call("addEventListener", "change", loadFunc, true)
 }
 
 func onClick() {
@@ -247,6 +250,7 @@ func display() {
 	dsp.format()
 	setTextByID("display", dsp.typeset())
 	setTextByID("dummy", `<h3 id="title">`+prettyGreek(dsp.Title)+`</h3>`)
+	setTextByID("pagenumber", "page: "+strconv.Itoa(historyPosition+1))
 
 	// setTextByID("dummy", "")
 }

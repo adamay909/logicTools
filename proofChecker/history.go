@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 	"syscall/js"
 
@@ -12,6 +13,16 @@ var history []string
 var historyPosition int
 
 var stash string
+
+func readHistoryFromFile() {
+
+	blob := js.Global().Get("document").Call("getElementById", "inputfile").Get("files").Index(0).Call("text").Call("then").String()
+
+	//	s := js.Global().Get("Promise").Call("resolve", blob).String()
+
+	fmt.Println("file read @")
+	fmt.Println(blob)
+}
 
 func appendHistory() {
 
@@ -36,6 +47,7 @@ func duplicateHistoryItem() {
 
 	appendHistory()
 	history[historyPosition] = history[historyPosition-1]
+	display()
 
 }
 
@@ -269,8 +281,9 @@ func exportHistory() {
 	Paste JSON into box.
 
 <textarea name="textarea" id="historyinputarea" rows="15" cols="40"></textarea>
-	 <button id="importHistory">Import</button>`
+	 <button id="importHistory">Import</button>
 
+`
 	setTextByID("historyDialog", html)
 }
 
@@ -286,7 +299,10 @@ func importHistory() {
 
 	html := `<h3>Paste JSON</h3>
 <textarea name="textarea" id="historyinputarea" rows="15" cols="40"></textarea>
-	 <button id="importHistory">Import</button>`
+	 <button id="importHistory">Import</button>
+
+	<input type="file" id="inputfile />
+	 `
 
 	setTextByID("historyDialog", html)
 }

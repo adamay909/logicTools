@@ -16,7 +16,6 @@ func checkDerivation() {
 	show("messages")
 	gentzen.SetStrict(false)
 	gentzen.ClearLog()
-
 	arglines, ok := getArglines(dsp.Input)
 	if !ok {
 		printMessage(gentzen.ShowLog())

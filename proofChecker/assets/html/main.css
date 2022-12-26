@@ -13,6 +13,11 @@ div#messages>p {
 padding: 0em;
 margin:0.2em;}
 
+div#pagenumber {
+ font-size: 0.8em;
+ float: right;
+}
+
 img {
   width: 1em;
   height: auto;
@@ -362,6 +367,7 @@ h3 {
 width: 100%;
 height: 1.5em;
 background-color: lightblue;
+margin-top:0em;
 }
 
 @media print{
