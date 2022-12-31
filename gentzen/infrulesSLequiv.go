@@ -77,7 +77,7 @@ func equivSL(s1, s2 string) bool {
 func sententialLogic(s1, s2 sequent) bool {
 
 	if !oML {
-		logger.Print("appeal to SL only allowed with Modal Logic.")
+		logger.Print("appeal to logic only allowed with Modal Logic.")
 		return false
 	}
 

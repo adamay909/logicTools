@@ -133,7 +133,7 @@ div#display {
  position: relative;
  height: 40rem;
  border: solid;
- border-width:1.5px;
+ border-width:2px;
     margin-left: 0.5em;
  overflow-y: hidden;
 }
@@ -144,6 +144,14 @@ div#display.active {
 
 div#display.inactive {
  border-color: lightgrey;
+}
+
+div#display.inactive-fail {
+ border-color: red;
+}
+
+div#display.inactive-success {
+ border-color: lightgreen;
 }
 
 div#dummy{

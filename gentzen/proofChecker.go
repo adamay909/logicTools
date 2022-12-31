@@ -181,7 +181,7 @@ func checkDerivation(lines []string, offset int) bool {
 
 		case "premise": //premise
 
-		case "": //sequent rewrite
+		case "rewrite": //sequent rewrite
 			aE(!seqRewrite(l.seq, al[l.lines[0]-offset].seq, l.lines[0]))
 
 		default: //check if we are dealing with a theorem
@@ -269,6 +269,8 @@ func parseArgline(s string) (al argLine, err error) {
 	}
 	if len(ln[i:]) != 0 {
 		al.inf = strings.TrimSpace(ln[i])
+	} else {
+		al.inf = "rewrite"
 	}
 	return
 }
@@ -414,6 +416,8 @@ func lineSpec(infRule string) int {
 		return 1
 	case "premise":
 		return 0
+	case "rewrite":
+		return 1
 	case "":
 		return 1
 	case "theorem":
@@ -526,7 +530,7 @@ func fullName(i string) string {
 	case sc:
 		return "Scope Replacement"
 	case sl:
-		return "Sentential Logic"
+		return "Logic"
 	default:
 		return i
 	}

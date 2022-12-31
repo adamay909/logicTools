@@ -12,6 +12,7 @@ func checkDerivation() {
 		return
 	}
 
+	setAttributeByID("display", "class", "inactive-fail")
 	printMessage("")
 	show("messages")
 	gentzen.SetStrict(false)
@@ -27,6 +28,7 @@ func checkDerivation() {
 	if gentzen.CheckDeriv(arglines, dsp.Offset) {
 		printMessage("No Illegal Moves Found")
 		showPrettyDeriv(dsp)
+		setAttributeByID("display", "class", "inactive-success")
 		return
 	}
 
