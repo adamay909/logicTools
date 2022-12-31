@@ -253,7 +253,7 @@ func display() {
 	dsp.format()
 	setTextByID("display", dsp.typeset())
 	setTextByID("dummy", `<h3 id="title">`+prettyGreek(dsp.Title)+`</h3>`)
-	setTextByID("pagenumber", "page: "+strconv.Itoa(historyPosition+1))
+	setTextByID("pagenumber", "page: "+strconv.Itoa(historyPosition+1)+"/"+strconv.Itoa(len(history)))
 
 	// setTextByID("dummy", "")
 }

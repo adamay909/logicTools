@@ -160,6 +160,12 @@ func moveInHistory() {
 
 	setTextByID("messages", "")
 	hide("messages")
+	if acceptInput {
+		setAttributeByID("display", "class", "active")
+	} else {
+		setAttributeByID("display", "class", "inactive")
+	}
+
 	display()
 }
 
@@ -224,6 +230,11 @@ func recoverState() {
 func rmFromHistory() {
 
 	if historyPosition >= len(history) {
+		dsp.Input = nil
+		dsp.setTitle("")
+		saveState()
+		stashState()
+		display()
 		return
 	}
 
@@ -236,12 +247,15 @@ func rmFromHistory() {
 	history = append(history, h2...)
 
 	js.Global().Get("localStorage").Call("setItem", "history", strings.Join(history, "\n"))
-
+	/**
 	if historyPosition == 0 {
-		forwardHistory()
+		moveInHistory()
 		return
 	}
-	backHistory()
+	**/
+	saveState()
+	stashState()
+	moveInHistory()
 }
 
 func cleanHistory() {
