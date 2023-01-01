@@ -1,6 +1,8 @@
 package gentzen
 
-import "strings"
+import (
+	"strings"
+)
 
 var theorems = [][]string{
 	{"Identity", "ID", ">pp"},

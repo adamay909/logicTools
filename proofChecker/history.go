@@ -16,11 +16,10 @@ var historyPosition int
 var stash string
 
 func readHistoryFromFile() {
-
+	/**
 	blob := js.Global().Get("document").Call("getElementById", "inputfile").Get("files").Index(0).Call("text").Call("then").String()
+	**/
 
-	fmt.Println("file read @")
-	fmt.Println(blob)
 }
 
 func insertEmptyHistoryItem() {
@@ -81,7 +80,6 @@ func loadHistory() {
 
 	historyPosition, err = strconv.Atoi(js.Global().Get("localStorage").Call("getItem", "historyPosition").String())
 
-	fmt.Println("hp is ", historyPosition)
 	if err != nil {
 		fmt.Println("could not read current position in history")
 		historyPosition = 0
@@ -91,7 +89,6 @@ func loadHistory() {
 
 	history[historyPosition] = js.Global().Get("localStorage").Call("getItem", "current").String()
 	moveInHistory()
-	fmt.Println("2. hp is ", historyPosition)
 
 }
 
@@ -137,7 +134,6 @@ func forwardHistory() {
 
 func moveInHistory() {
 
-	fmt.Println("mv hp: ", historyPosition)
 	js.Global().Get("localStorage").Call("setItem", "historyPosition", strconv.Itoa(historyPosition))
 
 	json.Unmarshal([]byte(history[historyPosition]), dsp)

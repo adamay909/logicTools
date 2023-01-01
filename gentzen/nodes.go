@@ -1,8 +1,9 @@
 package gentzen
 
 import (
-	"fmt"
 	"sort"
+	"strconv"
+	"strings"
 )
 
 type Node struct {
@@ -491,6 +492,8 @@ func findMaxDepth(nodes []*Node) int {
 // check if s2 is instance of s1
 func sameStructure(s1, s2 string) bool {
 
+	sn := normalize(s1, s2)
+	s1, s2 = sn[0], sn[1]
 	n1 := getSubnodes(Parse(s1))
 	n2 := getSubnodes(Parse(s2))
 
@@ -501,7 +504,6 @@ func sameStructure(s1, s2 string) bool {
 	atomic := n1[0].AtomicSentences()
 
 	for _, a := range atomic {
-		fmt.Println("looking for ", a)
 		for i := range n1 {
 			if !n1[i].IsAtomic() {
 				if n1[i].MainConnective() != n2[i].MainConnective() {
@@ -510,12 +512,11 @@ func sameStructure(s1, s2 string) bool {
 			}
 			if n1[i].Formula() == a {
 				target := n2[i].Formula()
-				fmt.Println("look for ", a, target)
 				for j := range n2 {
+					if n2[j].HasFlag("c") {
+						continue
+					}
 					if n2[j].Formula() == target {
-						if n2[j].HasFlag("c") {
-							continue
-						}
 						n2[j].SetFormula(a)
 						n2[j].SetAtomic()
 						n2[j].SetFlag("c")
@@ -528,6 +529,71 @@ func sameStructure(s1, s2 string) bool {
 	}
 
 	return n1[0].Formula() == n2[0].Formula()
+
+}
+
+func normalize(s ...string) []string {
+
+	var out []string
+
+	var allAtomic []string
+
+	var nextatomic func() string
+
+	for _, e := range s {
+		allAtomic = append(allAtomic, Parse(e).AtomicSentences()...)
+	}
+
+	count := -1
+	nextatomic = func() (ret string) {
+
+		count++
+		if !oPL {
+			ret = `z` + `_` + strconv.Itoa(count)
+
+		} else {
+
+			ret = `Z` + `_` + strconv.Itoa(count)
+		}
+
+		if slicesContains(allAtomic, ret) {
+			return nextatomic()
+		}
+		return ret
+	}
+
+	for _, e := range s {
+
+		atomic := Parse(e).AtomicSentences()
+
+		for _, a := range atomic {
+			if !oPL {
+				e = Parse(e).ReplaceAtomic(a, nextatomic()).Formula()
+			} else {
+				terms := strings.TrimPrefix(a, Parse(a).predicateLetter)
+				e = Parse(e).ReplaceAtomic(a, nextatomic()+terms).Formula()
+			}
+
+		}
+		out = append(out, e)
+	}
+	return out
+
+}
+
+func (n *Node) ReplaceAtomic(old, repl string) *Node {
+
+	n1 := getSubnodes(n)
+
+	for i := range n1 {
+		if !n1[i].IsAtomic() {
+			continue
+		}
+		if n1[i].Formula() == old {
+			n1[i].SetFormula(repl)
+		}
+	}
+	return n1[0]
 
 }
 
