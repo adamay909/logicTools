@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 	"syscall/js"
 
@@ -18,8 +19,6 @@ func readHistoryFromFile() {
 
 	blob := js.Global().Get("document").Call("getElementById", "inputfile").Get("files").Index(0).Call("text").Call("then").String()
 
-	//	s := js.Global().Get("Promise").Call("resolve", blob).String()
-
 	fmt.Println("file read @")
 	fmt.Println(blob)
 }
@@ -27,10 +26,9 @@ func readHistoryFromFile() {
 func insertEmptyHistoryItem() {
 
 	saveHistory()
-	if historyPosition == len(history) {
+	if atHistoryEnd() {
 		h2 := ""
 		history = append(history, h2)
-		//		cleanHistory()
 	} else {
 
 		h1 := history[:historyPosition]
@@ -45,8 +43,6 @@ func insertEmptyHistoryItem() {
 
 	saveHistory()
 	forwardHistory()
-	moveInHistory()
-	display()
 	return
 
 }
@@ -56,32 +52,12 @@ func duplicateHistoryItem() {
 	history[historyPosition] = history[historyPosition-1]
 	saveHistory()
 	moveInHistory()
-	display()
 	return
 }
 
-/*
-*
-func _duplicateHistoryItem() {
-
-	appendHistory()
-	history[historyPosition] = history[historyPosition-1]
-	display()
-
-}
-*
-*/
 func saveHistory() {
 
-	c := dsp.marshalJson()
-
-	if historyPosition == len(history) {
-		history = append(history, c)
-	} else {
-		history[historyPosition] = c
-	}
-
-	//cleanHistory()
+	history[historyPosition] = dsp.marshalJson()
 
 	json := strings.Join(history, "\n")
 
@@ -91,30 +67,56 @@ func saveHistory() {
 
 func loadHistory() {
 
+	history = nil
+
 	json := js.Global().Get("localStorage").Call("getItem", "history").String()
 
-	if json == "" {
+	if json != "" {
+		history = strings.Split(json, "\n")
+	} else {
+		history = append(history, dsp.marshalJson())
+	}
+
+	var err error
+
+	historyPosition, err = strconv.Atoi(js.Global().Get("localStorage").Call("getItem", "historyPosition").String())
+
+	fmt.Println("hp is ", historyPosition)
+	if err != nil {
+		fmt.Println("could not read current position in history")
+		historyPosition = 0
+		moveInHistory()
 		return
 	}
-	history = strings.Split(json, "\n")
-	historyPosition = len(history)
-	cleanHistory()
-	historyPosition = len(history)
+
+	history[historyPosition] = js.Global().Get("localStorage").Call("getItem", "current").String()
+	moveInHistory()
+	fmt.Println("2. hp is ", historyPosition)
+
+}
+
+func jumpToHistoryEnd() {
+
+	historyPosition = len(history) - 1
+	moveInHistory()
+}
+
+func jumpToHistoryTop() {
+
+	historyPosition = 0
+	moveInHistory()
 
 }
 
 func backHistory() {
 
 	saveHistory()
-	if historyPosition == 0 {
+
+	if atHistoryTop() {
 		return
 	}
 
-	if historyPosition == len(history) {
-		stashState()
-	}
-
-	historyPosition = historyPosition - 1
+	historyPosition--
 
 	moveInHistory()
 }
@@ -123,18 +125,11 @@ func forwardHistory() {
 
 	saveHistory()
 
-	historyPosition = historyPosition + 1
-
-	if historyPosition > len(history) {
-		historyPosition--
+	if atHistoryEnd() {
 		return
 	}
 
-	if historyPosition == len(history) {
-		reloadStash()
-		historyPosition--
-		return
-	}
+	historyPosition++
 
 	moveInHistory()
 
@@ -142,9 +137,8 @@ func forwardHistory() {
 
 func moveInHistory() {
 
-	if historyPosition >= len(history) {
-		return
-	}
+	fmt.Println("mv hp: ", historyPosition)
+	js.Global().Get("localStorage").Call("setItem", "historyPosition", strconv.Itoa(historyPosition))
 
 	json.Unmarshal([]byte(history[historyPosition]), dsp)
 
@@ -165,7 +159,7 @@ func moveInHistory() {
 	} else {
 		setAttributeByID("display", "class", "inactive")
 	}
-
+	saveState()
 	display()
 }
 
@@ -229,11 +223,16 @@ func recoverState() {
 
 func rmFromHistory() {
 
-	if historyPosition >= len(history) {
-		dsp.Input = nil
-		dsp.setTitle("")
-		saveState()
-		stashState()
+	if atHistoryEnd() {
+		if atHistoryTop() {
+			history = nil
+			dsp.clear()
+			history = append(history, dsp.marshalJson())
+		} else {
+			history = history[:len(history)-1]
+		}
+		jumpToHistoryEnd()
+		saveHistory()
 		display()
 		return
 	}
@@ -247,12 +246,6 @@ func rmFromHistory() {
 	history = append(history, h2...)
 
 	js.Global().Get("localStorage").Call("setItem", "history", strings.Join(history, "\n"))
-	/**
-	if historyPosition == 0 {
-		moveInHistory()
-		return
-	}
-	**/
 	saveState()
 	stashState()
 	moveInHistory()
@@ -260,7 +253,7 @@ func rmFromHistory() {
 
 func cleanHistory() {
 
-	if historyPosition < len(history) {
+	if !atHistoryEnd() {
 		return
 	}
 
@@ -287,7 +280,7 @@ func cleanHistory() {
 	history = nil
 	history = append(history, newhist...)
 
-	historyPosition = len(history)
+	jumpToHistoryEnd()
 	saveHistory()
 }
 
@@ -352,10 +345,8 @@ func rewriteHistory() {
 		history = nil
 		history = strings.Split(input, "\n")
 	}
-	historyPosition = len(history)
+	jumpToHistoryEnd()
 	cleanHistory()
-	dsp.clear()
-	display()
 	printMessage("")
 	hide("messages")
 	hideExtra()
@@ -395,4 +386,15 @@ func clearHistory() {
 	show("console")
 	stopInput()
 	return
+}
+
+func atHistoryEnd() bool {
+
+	return historyPosition == len(history)-1
+
+}
+
+func atHistoryTop() bool {
+	return historyPosition == 0
+
 }

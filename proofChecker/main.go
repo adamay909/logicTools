@@ -70,8 +70,6 @@ func main() {
 	resetDisplay()
 	hideExtra()
 	loadHistory()
-	//	cleanHistory()
-	recoverState()
 	stopInput()
 
 	<-make(chan bool)
