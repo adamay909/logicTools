@@ -1,6 +1,7 @@
 package gentzen
 
 import (
+	"fmt"
 	"sort"
 	"strconv"
 	"strings"
@@ -489,46 +490,38 @@ func findMaxDepth(nodes []*Node) int {
 	return ds[len(ds)-1]
 }
 
-// check if s2 is instance of s1
-func sameStructure(s1, s2 string) bool {
+// check if s1 is instance of s0
+func sameStructure(s0, s1 string) bool {
 
-	sn := normalize(s1, s2)
-	s1, s2 = sn[0], sn[1]
-	n1 := getSubnodes(Parse(s1))
-	n2 := getSubnodes(Parse(s2))
+	sn := normalize(s0, s1)
+	n0 := getSubnodes(Parse(sn[0]))
+	n1 := getSubnodes(Parse(sn[1]))
 
-	if len(n1) > len(n2) {
+	if len(n0) > len(n1) {
 		return false
 	}
 
-	atomic := n1[0].AtomicSentences()
+	atomic := n0[0].AtomicSentences()
 
 	for _, a := range atomic {
-		for i := range n1 {
-			if !n1[i].IsAtomic() {
-				if n1[i].MainConnective() != n2[i].MainConnective() {
-					return false
-				}
-			}
-			if n1[i].Formula() == a {
-				target := n2[i].Formula()
-				for j := range n2 {
-					if n2[j].HasFlag("c") {
+		for i := range n0 {
+			if n0[i].Formula() == a {
+				repl := n1[i].Formula()
+				n1[i].SetAtomic()
+				for j := range n0 {
+					if n0[j].HasFlag("c") {
 						continue
 					}
-					if n2[j].Formula() == target {
-						n2[j].SetFormula(a)
-						n2[j].SetAtomic()
-						n2[j].SetFlag("c")
+					if n0[j].Formula() == a {
+						n0[j].SetFormula(repl)
+						n0[j].SetFlag("c")
 					}
 				}
-				break
+				n1 = getSubnodes(n1[0])
 			}
 		}
-		n2 = getSubnodes(n2[0])
 	}
-
-	return n1[0].Formula() == n2[0].Formula()
+	return n0[0].Formula() == n1[0].Formula()
 
 }
 
@@ -538,29 +531,37 @@ func normalize(s ...string) []string {
 
 	var allAtomic []string
 
+	// set up function for returning series of sentence/predicate letters
 	var nextatomic func() string
 
 	for _, e := range s {
 		allAtomic = append(allAtomic, Parse(e).AtomicSentences()...)
+	}
+	availLetters := []string{"P", "Q", "R", "S", "T", "F", "G", "H"}
+	var normal []string
+
+	for _, l := range availLetters {
+		for n := 0; n < 10; n++ {
+			normal = append(normal, l+"_"+strconv.Itoa(n))
+		}
 	}
 
 	count := -1
 	nextatomic = func() (ret string) {
 
 		count++
-		if !oPL {
-			ret = `z` + `_` + strconv.Itoa(count)
-
-		} else {
-
-			ret = `Z` + `_` + strconv.Itoa(count)
+		if count == len(normal) {
+			fmt.Println("Too many atomic sentences/predicates")
+			return "K"
 		}
+		ret = normal[count]
 
 		if slicesContains(allAtomic, ret) {
 			return nextatomic()
 		}
 		return ret
 	}
+	// done setting things up
 
 	for _, e := range s {
 
