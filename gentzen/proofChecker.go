@@ -2,7 +2,6 @@ package gentzen
 
 import (
 	"errors"
-	"log"
 	"strconv"
 	"strings"
 )
@@ -57,13 +56,14 @@ type infRule struct {
 	rule     func() bool
 }
 
-var checkLog strings.Builder
-var logger *log.Logger
 var strictCheck bool
 
 func checkDerivation(lines []string, offset int) bool {
+
 	var al []argLine
 	var hasE bool
+
+	Debug("<--Begin Derivation Check--")
 
 	//record if there is an error
 	aE := func(v bool) {
@@ -189,6 +189,7 @@ func checkDerivation(lines []string, offset int) bool {
 			aE(!theorem(l.seq, l.inf))
 		}
 	}
+	Debug("--done Derivation Check-->")
 	return !hasE
 }
 

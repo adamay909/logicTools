@@ -1,7 +1,6 @@
 package gentzen
 
 import (
-	"fmt"
 	"sort"
 	"strconv"
 	"strings"
@@ -503,7 +502,11 @@ func sameStructure(s0, s1 string) bool {
 
 	atomic := n0[0].AtomicSentences()
 
-	for _, a := range atomic {
+	Debug("<--sameStructure*************************")
+	for k, a := range atomic {
+
+		Debug("Round", k, ": compare ", n0[0].display(), " against ", n1[0].display())
+
 		for i := range n0 {
 			if n0[i].Formula() == a {
 				repl := n1[i].Formula()
@@ -517,11 +520,24 @@ func sameStructure(s0, s1 string) bool {
 						n0[j].SetFlag("c")
 					}
 				}
-				n1 = getSubnodes(n1[0])
 			}
+			n0 = getSubnodes(n0[0])
+			n1 = getSubnodes(n1[0])
 		}
 	}
+	Debug("Result: ", n0[0].display(), " against ", n1[0].display())
+	Debug("--done structure check-->")
+
 	return n0[0].Formula() == n1[0].Formula()
+
+}
+
+//display is for displaying the text of a node that might have
+//non-standard raw text
+
+func (n *Node) display() string {
+
+	return Parse(n.String()).StringPlain()
 
 }
 
@@ -551,7 +567,7 @@ func normalize(s ...string) []string {
 
 		count++
 		if count == len(normal) {
-			fmt.Println("Too many atomic sentences/predicates")
+			Debug("Too many atomic sentences/predicates")
 			return "K"
 		}
 		ret = normal[count]
@@ -595,43 +611,6 @@ func (n *Node) ReplaceAtomic(old, repl string) *Node {
 		}
 	}
 	return n1[0]
-
-}
-
-// check if s2 is instance of s1
-func _sameStructure(s1, s2 string) bool {
-
-	ns1 := orderedNodes(Parse(s1))
-	ns2 := orderedNodes(Parse(s2))
-
-	//	fmt.Println("target: ", ns1[0].Formula(), "check: ", ns2[0].Formula())
-
-	if len(ns2) < len(ns1) {
-		return false
-	}
-
-	for i := range ns1 {
-		//		fmt.Println("compare ", ns2[i].Formula(), " against ", ns1[i].Formula())
-		if ns1[i].IsAtomic() {
-			old := ns1[i].Formula()
-			repl := ns2[i].Formula()
-			for j := range ns1 {
-				if ns1[j].Formula() == old {
-					if ns2[j].Formula() != repl {
-						return false
-					}
-				}
-			}
-		}
-		continue
-
-		if ns1[i].MainConnective() != ns2[i].MainConnective() {
-			//			fmt.Println("mc mis 1: ", ns1[i].MainConnective(), "2 :", ns2[i].MainConnective())
-			//			fmt.Println("Fail  ", ns1[i].Formula(), "  ", ns2[i].Formula())
-			return false
-		}
-	}
-	return true
 
 }
 

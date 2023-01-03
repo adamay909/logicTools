@@ -8,6 +8,7 @@ import (
 )
 
 func checkDerivation() {
+	debug("start proof checker")
 	if dsp.empty() {
 		return
 	}

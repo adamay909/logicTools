@@ -4,6 +4,7 @@ import (
 	"embed"
 	_ "embed"
 	"encoding/json"
+	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -13,11 +14,15 @@ import (
 	"honnef.co/go/js/dom/v2"
 )
 
+// set to true for debug log to stdout
+var oDEBUG = false
+
 //go:embed assets/html/* assets/files assets/samples
 var assets embed.FS
 
 // Enable some features for personal teaching material.
 // Not useful for general consumption.
+
 var oPRIVATE = true
 
 var mainEditorFunc,
@@ -66,6 +71,10 @@ var dsp *console
 func main() {
 
 	gentzen.SetStandardPolish(false)
+	if oDEBUG {
+		gentzen.SetDebuglog(os.Stdout)
+		debug("debug logging activated")
+	}
 	setupJS()
 	resetDisplay()
 	hideExtra()
@@ -73,6 +82,15 @@ func main() {
 	stopInput()
 
 	<-make(chan bool)
+}
+
+func debug(m ...any) {
+	if !oDEBUG {
+		return
+	}
+	dm := []any{"PC: "}
+	m = append(dm, m...)
+	gentzen.Debug(m...)
 }
 
 func setupPage() {
@@ -364,6 +382,7 @@ func toggleTheorems() {
 func togglePL() {
 	stopInput()
 	oPL = !oPL
+	logConstBindings = nil
 	if oPL {
 		logConstBindings = append(connBindings, plBindings...)
 		setTextByID("toggleSystem", "Predicate Logic")

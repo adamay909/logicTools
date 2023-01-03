@@ -58,7 +58,9 @@ var modalTheorems = [][]string{
 
 func theoremsInUse() [][]string {
 
-	thm := theorems
+	var thm [][]string
+
+	thm = append(thm, theorems...)
 
 	if oML {
 		thm = append(thm, modalTheorems...)
@@ -73,14 +75,29 @@ func theoremsInUse() [][]string {
 		thm = append(thm, quantifierRules...)
 	}
 
+	if !oPL {
+		for i := range thm {
+			thm[i][2] = strings.ReplaceAll(thm[i][2], "Fx", "p")
+			thm[i][2] = strings.ReplaceAll(thm[i][2], "Gx", "q")
+			thm[i][2] = strings.ReplaceAll(thm[i][2], "Hx", "r")
+		}
+	}
+
 	return thm
 }
 
 func theorem(seq sequent, inf string) bool {
 	var tf []string
 
+	thms := theoremsInUse()
+
+	Debug("Theorems:============")
+	for _, e := range thms {
+		Debug(Parse(e[2]).display())
+	}
+	Debug("=================")
 	inf = strings.TrimSpace(inf)
-	for _, thm := range theoremsInUse() {
+	for _, thm := range thms {
 		if inf == thm[1] {
 			tf = append(tf, thm[2])
 		}
@@ -95,12 +112,21 @@ func theorem(seq sequent, inf string) bool {
 	//	tf = append(tf, quantifierRules[0][2])
 
 	for _, thc := range tf {
+		Debug("<--Theorem check: ", Parse(seq.succedent().String()).StringPlain(), " against: ", Parse(thc).StringPlain())
 		if sameStructure(thc, seq.succedent().String()) {
+
+			Debug("ok")
+			Debug("--done theorem check-->")
+
 			return true
 		}
 	}
 
 	logger.Print("not instance of ", inf)
+
+	Debug("fail")
+	Debug("--done theorem check-->")
+
 	return false
 
 }

@@ -41,10 +41,19 @@ func derivR(infrule string, seq1, seq2 sequent) bool {
 	sn := `>` + s1 + s2
 
 	for _, thc := range tf {
+		Debug("<--Derived Rule check: ", Parse(sn).StringPlain(), " against: ", Parse(thc).StringPlain())
 		if sameStructure(thc, sn) {
+
+			Debug("ok")
+			Debug("--done derived rule check-->")
+
 			return true
 		}
 	}
 	logger.Print("not valid application of ", infrule)
+
+	Debug("fail")
+	Debug("--done derived rule check-->")
+
 	return false
 }

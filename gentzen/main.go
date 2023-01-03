@@ -28,20 +28,28 @@ There is a parser for an infix notation. That is designed to be used with the on
 package gentzen
 
 import (
-	"fmt"
+	"io"
 	"log"
 	"math/rand"
 	"strconv"
+	"strings"
 	"time"
 )
 
 var (
-	oPL   = false
-	oTHM  = false
-	oCOND = true
-	oML   = true
-	oDR   = true
+	oPL    = false
+	oTHM   = false
+	oCOND  = true
+	oML    = true
+	oDR    = true
+	oDEBUG = false
 )
+
+var checkLog strings.Builder
+var dLog strings.Builder
+
+var logger *log.Logger
+var debug *log.Logger
 
 func init() {
 
@@ -49,6 +57,32 @@ func init() {
 	SetStandardPolish(true)
 	//connectives = append(connectivesSL, connectivesPL...)
 	logger = log.New(&checkLog, "", 0)
+	debug = log.New(&dLog, "gentzen: ", 0)
+
+}
+
+func SetDebug(v bool) {
+	oDEBUG = v
+}
+
+// SetDebuglog sets debugLog to w
+func SetDebuglog(w io.Writer) {
+	SetDebug(true)
+	debug = log.New(w, "", 0)
+}
+
+// Debug adds debug message
+func Debug(a ...any) {
+	if !oDEBUG {
+		return
+	}
+	debug.Print(a...)
+}
+
+// ShowDebugLog displays debug log.
+func ShowDebugLog() string {
+
+	return dLog.String()
 
 }
 
@@ -271,7 +305,7 @@ func Parse[S ~string](s S) *Node {
 	n, err := ParseStrict(s)
 
 	if err != nil {
-		fmt.Println("malformed formula: ", s, " ", err.Error())
+		Debug("malformed formula: ", s, " ", err.Error())
 	}
 	return n
 }
