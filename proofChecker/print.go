@@ -27,7 +27,7 @@ func plainTextDeriv(withTitle bool) string {
 		if len(l) == 0 {
 			continue
 		}
-		output = output + strconv.Itoa(i+dsp.Offset) + plainOutput(l) + "\n"
+		output = output + strconv.Itoa(i+dsp.Offset) + `.` + plainOutput(l) + "\n"
 	}
 	return output + "\n"
 

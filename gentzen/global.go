@@ -39,15 +39,9 @@ var brackets = [][2]string{
 	{"(", ")"},
 	{"[", "]"},
 	{`\{`, `\}`},
-	//	{`\big(`, `\big)`},
-	//	{`\big[`, `\big]`},
-	//	{`\big\{`, `\big\}`},
 	{`\Big(`, `\Big)`},
 	{`\Big[`, `\Big]`},
 	{`\Big\{`, `\Big\}`},
-	//	{`\bigg(`, `\bigg)`},
-	//	{`\bigg[`, `\bigg]`},
-	//	{`\bigg\{`, `\bigg\}`},
 	{`\Bigg(`, `\Bigg)`},
 	{`\Bigg[`, `\Bigg]`},
 	{`\Bigg\{`, `\Bigg\}`},
@@ -62,20 +56,6 @@ var textBrackets = [][2]string{
 	{`$\Bigg\langle$`, `$\Bigg\rangle$`},
 }
 
-/*
-	var connectivesSL = [][]string{
-		{string(neg), `\lnot `, `\neg `, "\u00ac", "\u00ac", " it is not the case that "},
-		{string(conj), `\land `, `\wedge `, "\u2227", "\u2227", " and "},
-		{string(disj), `\lor `, `\vee `, "\u2228", "\u2228", " or "},
-		{string(cond), `\limplies `, `\supset `, "\u2283", "\u2283", " if, then "},
-	}
-
-	var connectivesPL = [][]string{
-		{string(uni), `\lforall `, `\forall `, "\u2200", "\u2200", " for all "},
-		{string(ex), `\lthereis `, `\exists `, "\u2203", "\u2203", " there is a "},
-		{string(ident), `\mathbin{=}`, `\mathbin{=}`, `=`, `=`, " equals "},
-	}
-*/
 var connectivesSL, connectivesPL, connectivesML [][6]string
 
 var infRules = [][]string{
@@ -254,84 +234,6 @@ func SetStandardPolish(v bool) {
 	connectives = append(connectivesSL, connectivesPL...)
 	connectives = append(connectives, connectivesML...)
 
-	return
-}
-
-// SetStandardPolish sets whether to use more standard notations for the
-// logical constants.
-func _SetStandardPolish(v bool) {
-
-	if v {
-
-		lneg = "N"
-		lconj = "K"
-		ldisj = "A"
-		lcond = "C"
-		luni = "U"
-		lex = "X"
-		lnec = "L"
-		lpos = "M"
-
-		neg = logicalConstant(lneg)
-		conj = logicalConstant(lconj)
-		disj = logicalConstant(ldisj)
-		cond = logicalConstant(lcond)
-		uni = logicalConstant(luni)
-		ex = logicalConstant(lex)
-		nec = logicalConstant(lnec)
-		pos = logicalConstant(lpos)
-		ident = logicalConstant("=")
-		none = logicalConstant(`*`)
-
-		connectivesSL = [][6]string{
-			{string(neg), `\lnot `, `\neg `, "\u00ac", "\u00ac", " it is not the case that "},
-			{string(conj), `\land `, `\wedge `, "\u2227", "\u2227", " and "},
-			{string(disj), `\lor `, `\vee `, "\u2228", "\u2228", " or "},
-			{string(cond), `\limplies `, `\supset `, "\u2283", "\u2283", " if , then "},
-		}
-
-		connectivesPL = [][6]string{
-			{string(uni), `\lforall `, `\forall `, "\u2200", "\u2200", " for all "},
-			{string(ex), `\lthereis `, `\exists `, "\u2203", "\u2203", " there is a "},
-			{string(ident), `\mathbin{=}`, `\mathbin{=}`, `=`, `=`, " equals "},
-		}
-		connectives = append(connectivesSL, connectivesPL...)
-
-		return
-	}
-
-	lneg = "-"
-	lconj = "^"
-	ldisj = "V"
-	lcond = ">"
-	luni = "U"
-	lex = "X"
-	lnec = "["
-	lpos = "<"
-
-	neg = logicalConstant(lneg)
-	conj = logicalConstant(lconj)
-	disj = logicalConstant(ldisj)
-	cond = logicalConstant(lcond)
-	uni = logicalConstant(luni)
-	ex = logicalConstant(lex)
-	ident = logicalConstant("=")
-	none = logicalConstant(`*`)
-
-	connectivesSL = [][6]string{
-		{string(neg), `\lnot `, `\neg `, "\u00ac", "\u00ac", " it is not the case that "},
-		{string(conj), `\land `, `\wedge `, "\u2227", "\u2227", " and "},
-		{string(disj), `\lor `, `\vee `, "\u2228", "\u2228", " or "},
-		{string(cond), `\limplies `, `\supset `, "\u2283", "\u2283", " if , then "},
-	}
-
-	connectivesPL = [][6]string{
-		{string(uni), `\lforall `, `\forall `, "\u2200", "\u2200", " for all "},
-		{string(ex), `\lthereis `, `\exists `, "\u2203", "\u2203", " there is a "},
-		{string(ident), `\mathbin{=}`, `\mathbin{=}`, `=`, `=`, " equals "},
-	}
-
-	connectives = append(connectivesSL, connectivesPL...)
 	return
 }
 

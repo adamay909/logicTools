@@ -20,7 +20,7 @@ func InfixParser(s []string) (n *Node, err error) {
 	}
 
 	if !bracketsOK(ts) {
-		err = errors.New("Not enough brackets.")
+		err = errors.New("not enough brackets")
 		return
 	}
 
