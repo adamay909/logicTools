@@ -423,6 +423,8 @@ func lineSpec(infRule string) int {
 		return 1
 	case "theorem":
 		return 0
+	case "derived rule":
+		return 1
 	default:
 		return -1
 	}
@@ -438,26 +440,13 @@ func checkLineRef(infRule string, cur int, offset int, lines []int) bool {
 	}
 	if oDR {
 		if strings.HasSuffix(infRule, "R") {
-			if len(lines) != 1 {
-				logger.Print("derived rule must refer to one other line")
-				return false
-			}
-			return true
+			infRule = "derived rule"
 		}
 	}
 
-	thm := theorems
-	if oML {
-		thm = append(thm, modalTheorems...)
-	}
-
-	if oPL {
-		thm = append(thm, quantifierRules...)
-	}
-
 	if oTHM {
-		for i := range thm {
-			if infRule == thm[i][0] || infRule == thm[i][1] {
+		for _, thm := range theoremsInUse() {
+			if infRule == thm[0] || infRule == thm[1] {
 				infRule = "theorem"
 				break
 			}
@@ -537,7 +526,7 @@ func fullName(i string) string {
 	}
 }
 
-func isTheorem(s sequent) bool {
+func _isTheorem(s sequent) bool {
 	return s.d == ""
 }
 

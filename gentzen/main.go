@@ -36,6 +36,25 @@ import (
 	"time"
 )
 
+type config struct {
+	oPL,
+	oTHM,
+	oCOND,
+	oML,
+	oDR,
+	oDEBUG bool
+}
+
+var conf = config{
+
+	oPL:    false,
+	oTHM:   false,
+	oCOND:  true,
+	oML:    true,
+	oDR:    true,
+	oDEBUG: false,
+}
+
 var (
 	oPL    = false
 	oTHM   = false

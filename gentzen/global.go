@@ -26,12 +26,12 @@ var (
 )
 
 const (
-	mPolish     printMode = 0
-	mLatex      printMode = 1
-	mPlainLatex printMode = 2
-	mPlainText  printMode = 3
-	mSimple     printMode = 4
-	mEnglish    printMode = 5
+	mPolish printMode = iota
+	mLatex
+	mPlainLatex
+	mPlainText
+	mSimple
+	mEnglish
 )
 
 var brackets = [][2]string{

@@ -4,59 +4,59 @@ import (
 	"strings"
 )
 
-var theorems = [][]string{
-	{"Identity", "ID", ">pp"},
-	{"Non-Contradiction", "NC", "-^p-p"},
-	{"Excluded Middle", "EM", "Vp-p"},
-	{"Contraposition", "CP", ">>pq>-q-p"},
-	{"Implication", "IM", ">>pqV-pq"},
-	{"Elimination", "EL", ">Vpq>-pq"},
-	{"DeMorgan", "DM", ">-Vpq^-p-q"},
-	{"DeMorgan", "DM", ">-^pqV-p-q"},
-	{"DeMorgan", "DM", ">V-p-q-^pq"},
-	{"DeMorgan", "DM", ">^-p-q-Vpq"},
-	{"Commutativity of Conjunction", "CC", ">^pq^qp"},
-	{"Commutatitivity of Disjunction", "CD", ">VpqVqp"},
-	{"Associativity of Conjunction", "AC", ">^^pqr^p^qr"},
-	{"Associativity of Conjunction", "AC", ">^p^qr^^pqr"},
-	{"Associativity of Disjunction", "AD", ">VVpqrVpVqr"},
-	{"Associativity of Disjunction", "AD", ">VpVqrVVpqr"},
-	{"Double Negation Introduction", "DN", ">p--p"},
-}
-
-var quantifierRules = [][]string{
-	{"Quantifier Exchange", "QE", ">UxFx-Xx-Fx"},
-	{"Quantifier Exchange", "QE", ">XxFx-Ux-Fx"},
-	{"Quantifier Exchange", "QE", ">-Xx-FxUxFx"},
-	{"Quantifier Exchange", "QE", ">-Ux-FxXxFx"},
-	{"Quantifier Exchange", "QE", ">-UxFxXx-Fx"},
-	{"Quantifier Exchange", "QE", ">-XxFxUx-Fx"},
-	{"Quantifier Exchange", "QE", ">Xx-Fx-UxFx"},
-	{"Quantifier Exchange", "QE", ">Ux-Fx-XxFx"},
-
-	//	{"Confinement", "CF", ">^UxFxUxGxUx^FxGx"},
-	//	{"Confinement", "CF", ">Ux^FxGx^UxFxUxGx"},
-	//	{"Confinement", "CF", ">VUxFxUxGxUxVFxGx"},
-	//	{"Confinement", "CF", ">UxVFxGxVUxFxUxGx"},
-}
-
-var modalTheorems = [][]string{
-	{"Distribution", "K", ">[>pq>[p[q"},
-	{"S4", "S4", ">[p[[p"},
-	{"S4", "S4", "><<p<p"},
-	{"S5", "S5", "><p[<p"},
-	{"S5", "S5", "><[p[p"},
-	{"Duality", "DL", ">[p-<-p"},
-	{"Duality", "DL", "><p-[-p"},
-	{"Duality", "DL", ">-[-p<p"},
-	{"Duality", "DL", ">-<-p[p"},
-	{"Duality", "DL", ">[-p-<p"},
-	{"Duality", "DL", "><-p-[p"},
-	{"Duality", "DL", ">-<p[-p"},
-	{"Duality", "DL", ">-[p<-p"},
-}
-
 func theoremsInUse() [][]string {
+
+	var theorems = [][]string{
+		{"Identity", "ID", ">pp"},
+		{"Non-Contradiction", "NC", "-^p-p"},
+		{"Excluded Middle", "EM", "Vp-p"},
+		{"Contraposition", "CP", ">>pq>-q-p"},
+		{"Implication", "IM", ">>pqV-pq"},
+		{"Elimination", "EL", ">Vpq>-pq"},
+		{"DeMorgan", "DM", ">-Vpq^-p-q"},
+		{"DeMorgan", "DM", ">-^pqV-p-q"},
+		{"DeMorgan", "DM", ">V-p-q-^pq"},
+		{"DeMorgan", "DM", ">^-p-q-Vpq"},
+		{"Commutativity of Conjunction", "CC", ">^pq^qp"},
+		{"Commutatitivity of Disjunction", "CD", ">VpqVqp"},
+		{"Associativity of Conjunction", "AC", ">^^pqr^p^qr"},
+		{"Associativity of Conjunction", "AC", ">^p^qr^^pqr"},
+		{"Associativity of Disjunction", "AD", ">VVpqrVpVqr"},
+		{"Associativity of Disjunction", "AD", ">VpVqrVVpqr"},
+		{"Double Negation Introduction", "DN", ">p--p"},
+	}
+
+	var quantifierRules = [][]string{
+		{"Quantifier Exchange", "QE", ">UxFx-Xx-Fx"},
+		{"Quantifier Exchange", "QE", ">XxFx-Ux-Fx"},
+		{"Quantifier Exchange", "QE", ">-Xx-FxUxFx"},
+		{"Quantifier Exchange", "QE", ">-Ux-FxXxFx"},
+		{"Quantifier Exchange", "QE", ">-UxFxXx-Fx"},
+		{"Quantifier Exchange", "QE", ">-XxFxUx-Fx"},
+		{"Quantifier Exchange", "QE", ">Xx-Fx-UxFx"},
+		{"Quantifier Exchange", "QE", ">Ux-Fx-XxFx"},
+
+		//	{"Confinement", "CF", ">^UxFxUxGxUx^FxGx"},
+		//	{"Confinement", "CF", ">Ux^FxGx^UxFxUxGx"},
+		//	{"Confinement", "CF", ">VUxFxUxGxUxVFxGx"},
+		//	{"Confinement", "CF", ">UxVFxGxVUxFxUxGx"},
+	}
+
+	var modalTheorems = [][]string{
+		{"Distribution", "K", ">[>pq>[p[q"},
+		{"S4", "S4", ">[p[[p"},
+		{"S4", "S4", "><<p<p"},
+		{"S5", "S5", "><p[<p"},
+		{"S5", "S5", "><[p[p"},
+		{"Duality", "DL", ">[p-<-p"},
+		{"Duality", "DL", "><p-[-p"},
+		{"Duality", "DL", ">-[-p<p"},
+		{"Duality", "DL", ">-<-p[p"},
+		{"Duality", "DL", ">[-p-<p"},
+		{"Duality", "DL", "><-p-[p"},
+		{"Duality", "DL", ">-<p[-p"},
+		{"Duality", "DL", ">-[p<-p"},
+	}
 
 	var thm [][]string
 
@@ -112,7 +112,7 @@ func theorem(seq sequent, inf string) bool {
 	//	tf = append(tf, quantifierRules[0][2])
 
 	for _, thc := range tf {
-		Debug("<--Theorem check: ", Parse(seq.succedent().String()).StringPlain(), " against: ", Parse(thc).StringPlain())
+		Debug("<--Theorem check: ", Parse(seq.succedent()).StringPlain(), " against: ", Parse(thc).StringPlain())
 		if sameStructure(thc, seq.succedent().String()) {
 
 			Debug("ok")

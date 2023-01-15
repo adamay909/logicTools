@@ -409,7 +409,7 @@ func (c logicalConstant) Stringf(m printMode) string {
 
 	for _, e := range connectives {
 		if string(c) == e[0] {
-			return e[int(m)]
+			return e[m]
 		}
 	}
 	return ""
