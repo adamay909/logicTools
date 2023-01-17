@@ -1,6 +1,14 @@
 package gentzen
 
-func uniE(seq1, seq2 sequent) bool {
+func uniE(d *derivNode) bool {
+
+	if len(d.supportingLines) != 1 {
+		logger.Print("Universal Elimination depends on one line")
+		return false
+	}
+
+	seq1 := d.supportingLines[0].line.seq
+	seq2 := d.line.seq
 
 	if Parse(seq1.succedent().String()).MainConnective() != uni {
 		logger.Print("premise must be universally quantified")
@@ -28,7 +36,15 @@ func uniE(seq1, seq2 sequent) bool {
 	return true
 }
 
-func uniI(seq1, seq2 sequent) bool {
+func uniI(d *derivNode) bool {
+
+	if len(d.supportingLines) != 1 {
+		logger.Print("Universal Elimination depends on one line")
+		return false
+	}
+
+	seq1 := d.supportingLines[0].line.seq
+	seq2 := d.line.seq
 
 	if Parse(seq2.succedent().String()).MainConnective() != uni {
 		logger.Print("conclusion must be universally quantified")

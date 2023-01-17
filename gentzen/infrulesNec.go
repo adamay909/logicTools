@@ -1,11 +1,19 @@
 package gentzen
 
-func necE(seq1, seq2 sequent) bool {
+func necE(d *derivNode) bool {
 
 	if !oML {
 		logger.Print("Modal Logic not allowed")
 		return false
 	}
+
+	if len(d.supportingLines) != 1 {
+		logger.Print("Necessity Elimination depends on one line")
+		return false
+	}
+
+	seq1 := d.supportingLines[0].line.seq
+	seq2 := d.line.seq
 
 	if Parse(seq1.succedent().String()).MainConnective() != nec {
 		logger.Print("premise must be a necessary truth")
@@ -31,23 +39,33 @@ func necE(seq1, seq2 sequent) bool {
 
 	return true
 }
-func necI(seq1, seq2 sequent) bool {
+func necI(d *derivNode) bool {
 
 	if !oML {
 		logger.Print("Modal Logic not allowed")
 		return false
 	}
+
+	if len(d.supportingLines) != 1 {
+		logger.Print("Necessity Introduction depends on one line")
+		return false
+	}
+
+	seq1 := d.supportingLines[0].line.seq
+	seq2 := d.line.seq
+
+	dep := d.supportingLines[0]
+	if !dep.isTheorem() {
+		logger.Print("Necessity Introduction depends on a theorem")
+		return false
+	}
+
 	if Parse(seq2.succedent().String()).MainConnective() != nec {
 		logger.Print("conclusion must be necessary truth")
 		return false
 	}
 	if !isModalInstanceOf(seq1.succedent().String(), seq2.succedent().String()) {
 		logger.Print("conclusion not a necessitation of premise")
-		return false
-	}
-
-	if len(seq1.datumSlice()) > 0 {
-		logger.Print("must start with theorem")
 		return false
 	}
 
@@ -60,12 +78,21 @@ func necI(seq1, seq2 sequent) bool {
 
 }
 
-func necI_T(seq1, seq2 sequent) bool {
+func necI_T(d *derivNode) bool {
 
 	if !oML {
 		logger.Print("Modal Logic not allowed")
 		return false
 	}
+
+	if len(d.supportingLines) != 1 {
+		logger.Print("Necessity Introduction depends on one line")
+		return false
+	}
+
+	seq1 := d.supportingLines[0].line.seq
+	seq2 := d.line.seq
+
 	if Parse(seq2.succedent().String()).MainConnective() != nec {
 		logger.Print("conclusion must be necessary truth")
 		return false
@@ -80,15 +107,15 @@ func necI_T(seq1, seq2 sequent) bool {
 		return false
 	}
 
-	for _, d := range seq1.datumSlice() {
-		if len(d) == 0 {
+	for _, datum := range seq1.datumSlice() {
+		if len(datum) == 0 {
 			continue
 		}
-		if isFormulaSet(d.String()) {
+		if isFormulaSet(datum.String()) {
 			logger.Print("all datum items must be modal claims")
 			return false
 		}
-		if Parse(d.String()).MainConnective() != nec {
+		if Parse(datum.String()).MainConnective() != nec {
 			logger.Print("all datum items must be necessity claims")
 			return false
 		}
@@ -110,12 +137,20 @@ func necI_T(seq1, seq2 sequent) bool {
 
 }
 
-func necI_S4(seq1, seq2 sequent) bool {
+func necI_S4(d *derivNode) bool {
 
 	if !oML {
 		logger.Print("Modal Logic not allowed")
 		return false
 	}
+	if len(d.supportingLines) != 1 {
+		logger.Print("Necessity Introduction depends on one line")
+		return false
+	}
+
+	seq1 := d.supportingLines[0].line.seq
+	seq2 := d.line.seq
+
 	if Parse(seq2.succedent().String()).MainConnective() != nec {
 		logger.Print("conclusion must be necessary truth")
 		return false
@@ -125,15 +160,15 @@ func necI_S4(seq1, seq2 sequent) bool {
 		return false
 	}
 
-	for _, d := range seq1.datumSlice() {
-		if len(d) == 0 {
+	for _, datum := range seq1.datumSlice() {
+		if len(datum) == 0 {
 			continue
 		}
-		if isFormulaSet(d.String()) {
+		if isFormulaSet(datum.String()) {
 			logger.Print("all datum items must be modal claims")
 			return false
 		}
-		if Parse(d.String()).MainConnective() != nec {
+		if Parse(datum.String()).MainConnective() != nec {
 			logger.Print("all datum items must be necessity claims")
 			return false
 		}
@@ -154,12 +189,20 @@ func necI_S4(seq1, seq2 sequent) bool {
 	return true
 
 }
-func necI_S5(seq1, seq2 sequent) bool {
+func necI_S5(d *derivNode) bool {
 
 	if !oML {
 		logger.Print("Modal Logic not allowed")
 		return false
 	}
+	if len(d.supportingLines) != 1 {
+		logger.Print("Necessity Introduction depends on one line")
+		return false
+	}
+
+	seq1 := d.supportingLines[0].line.seq
+	seq2 := d.line.seq
+
 	if Parse(seq2.succedent().String()).MainConnective() != nec {
 		logger.Print("conclusion must be necessary truth")
 		return false
@@ -169,15 +212,15 @@ func necI_S5(seq1, seq2 sequent) bool {
 		return false
 	}
 
-	for _, d := range seq1.datumSlice() {
-		if len(d) == 0 {
+	for _, datum := range seq1.datumSlice() {
+		if len(datum) == 0 {
 			continue
 		}
-		if isFormulaSet(d.String()) {
+		if isFormulaSet(datum.String()) {
 			logger.Print("all datum items must be modal claims")
 			return false
 		}
-		if !isModalClaim(d.String()) {
+		if !isModalClaim(datum.String()) {
 			logger.Print("all datum items must be modal claims")
 			return false
 		}

@@ -1,6 +1,14 @@
 package gentzen
 
-func conjE(seq1, seq2 sequent) bool {
+func conjE(d *derivNode) bool {
+
+	if len(d.supportingLines) != 1 {
+		logger.Print("Conjunction Elimination depends on a single line")
+		return false
+	}
+
+	seq1 := d.supportingLines[0].line.seq
+	seq2 := d.line.seq
 
 	n1 := Parse(seq1.succedent().String())
 	n2 := Parse(seq2.succedent().String())
@@ -30,7 +38,16 @@ func conjE(seq1, seq2 sequent) bool {
 	return true
 }
 
-func conjI(seq1, seq2, seq3 sequent) bool {
+func conjI(d *derivNode) bool {
+
+	if len(d.supportingLines) != 2 {
+		logger.Print("Conjunction Introduction depends on two lines")
+		return false
+	}
+
+	seq1 := d.supportingLines[0].line.seq
+	seq2 := d.supportingLines[1].line.seq
+	seq3 := d.line.seq
 
 	n1 := Parse(seq1.succedent().String())
 	n2 := Parse(seq2.succedent().String())

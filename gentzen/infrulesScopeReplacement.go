@@ -1,6 +1,6 @@
 package gentzen
 
-func scopeReplacement(s1, s2 sequent) bool {
+func scopeReplacement(d *derivNode) bool {
 
 	if oPL {
 		logger.Print("Scope Replacement not implemented for Predicate Logic")
@@ -11,6 +11,14 @@ func scopeReplacement(s1, s2 sequent) bool {
 		logger.Print("Scope Replament only allowed with Modal Logic")
 		return false
 	}
+
+	if len(d.supportingLines) != 1 {
+		logger.Print("Scope Replacement depends on one line")
+		return false
+	}
+
+	s1 := d.supportingLines[0].line.seq
+	s2 := d.line.seq
 
 	m1 := Parse(s1.succedent()).MainConnective()
 	if m1 != neg && m1 != nec && m1 != pos {

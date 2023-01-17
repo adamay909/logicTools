@@ -1,11 +1,19 @@
 package gentzen
 
-func posI(seq1, seq2 sequent) bool {
+func posI(d *derivNode) bool {
 
 	if !oML {
 		logger.Print("Modal Logic not allowed")
 		return false
 	}
+	if len(d.supportingLines) != 1 {
+		logger.Print("Possibility Introduction depends on two lines")
+		return false
+	}
+
+	seq1 := d.supportingLines[0].line.seq
+	seq2 := d.line.seq
+
 	if Parse(seq2.succedent().String()).MainConnective() != pos {
 		logger.Print("conclusion must be possibility")
 		return false
@@ -32,12 +40,21 @@ func posI(seq1, seq2 sequent) bool {
 
 }
 
-func posE(seq1, seq2, seq3 sequent) bool {
+func posE(d *derivNode) bool {
 
 	if !oML {
 		logger.Print("Modal Logic not allowed")
 		return false
 	}
+	if len(d.supportingLines) != 2 {
+		logger.Print("Possibility Elimination depends on two lines")
+		return false
+	}
+
+	seq1 := d.supportingLines[0].line.seq
+	seq2 := d.supportingLines[1].line.seq
+	seq3 := d.line.seq
+
 	v1, msg1 := posEhelper(seq1, seq2, seq3)
 
 	v2, msg2 := posEhelper(seq2, seq1, seq3)
@@ -152,12 +169,22 @@ func posEhelper(seq1, seq2, seq3 sequent) (v bool, msg string) {
 	return
 
 }
-func posE_S5(seq1, seq2, seq3 sequent) bool {
+func posE_S5(d *derivNode) bool {
 
 	if !oML {
 		logger.Print("Modal Logic not allowed")
 		return false
 	}
+
+	if len(d.supportingLines) != 2 {
+		logger.Print("S5 Possibility Elimination depends on two lines")
+		return false
+	}
+
+	seq1 := d.supportingLines[0].line.seq
+	seq2 := d.supportingLines[1].line.seq
+	seq3 := d.line.seq
+
 	v1, msg1 := posEhelper_S5(seq1, seq2, seq3)
 
 	v2, msg2 := posEhelper_S5(seq2, seq1, seq3)

@@ -46,151 +46,31 @@ const (
 	sl  = "sl"
 )
 
-type infRule struct {
-	abbr     string
-	fullName string
-	latex    string
-	mathjax  string
-	text     string
-	spec     int
-	rule     func() bool
-}
-
 var strictCheck bool
 
 func checkDerivation(lines []string, offset int) bool {
 
-	var al []argLine
-	var hasE bool
-
-	Debug("<--Begin Derivation Check--")
-
-	//record if there is an error
-	aE := func(v bool) {
-		if v {
-			hasE = true
-		}
-	}
-
-	hasE = false
-	for k, i := range lines {
-		logger.SetPrefix("line " + strconv.Itoa(k+1) + ": ")
-		pl, err := parseArgline(i)
-		if err != nil {
-			logger.Print(err.Error())
-			hasE = true
-		}
-		al = append(al, pl)
-	}
-	if hasE {
+	deriv, ok := getDerivation(lines, offset)
+	if !ok {
 		return false
 	}
 
-	for i, l := range al {
-		logger.SetPrefix("line " + strconv.Itoa(i+1) + ": ")
+	if !lineRefsOK(deriv, offset) {
+		return false
+	}
 
-		//check the line references first
-		if !checkLineRef(l.inf, i+offset, offset, l.lines) {
-			hasE = true
-			continue
-		}
-
-		//if we are dealing with a derived rule
-		if oDR {
-			if strings.HasSuffix(l.inf, "R") {
-				aE(!derivR(l.inf, al[l.lines[0]-offset].seq, l.seq))
-				continue
-			}
-		}
-
-		switch l.inf {
-		case a: //assumption
-			aE(!assumption(l.seq))
-
-		case ki: //conjunction intro
-			aE(!conjI(al[l.lines[0]-offset].seq, al[l.lines[1]-offset].seq, l.seq))
-
-		case ke: //conjunction elim
-			aE(!conjE(al[l.lines[0]-offset].seq, l.seq))
-
-		case di: //disjunction intro
-			aE(!disjI(al[l.lines[0]-offset].seq, l.seq))
-
-		case de: //disjunction elim
-			aE(!disjE(al[l.lines[0]-offset].seq, al[l.lines[1]-offset].seq, al[l.lines[2]-offset].seq, l.seq))
-
-		case ci: //conditional intro
-			aE(!condI(al[l.lines[0]-offset].seq, l.seq))
-
-		case ce: //conditional elim
-			aE(!condE(al[l.lines[0]-offset].seq, al[l.lines[1]-offset].seq, l.seq))
-
-		case ni: //negation intro
-			aE(!negI(al[l.lines[0]-offset].seq, al[l.lines[1]-offset].seq, l.seq))
-
-		case ne: //negation elim
-			aE(!negE(al[l.lines[0]-offset].seq, l.seq))
-
-		case ue: //universal elim
-			aE(!uniE(al[l.lines[0]-offset].seq, l.seq))
-
-		case ui: //universal intro
-			aE(!uniI(al[l.lines[0]-offset].seq, l.seq))
-
-		case ei: //existential intro
-			aE(!exI(al[l.lines[0]-offset].seq, l.seq))
-
-		case ee: //existential elimo
-			aE(!exE(al[l.lines[0]-offset].seq, al[l.lines[1]-offset].seq, l.seq))
-
-		case ii: //identity introduction
-			aE(!idI(l.seq))
-
-		case ie: //identity introduction
-			aE(!idE(l.seq))
-
-		case li: //necessity introduction
-			aE(!necI(al[l.lines[0]-offset].seq, l.seq))
-
-		case tli: //necessity introduction
-			aE(!necI_T(al[l.lines[0]-offset].seq, l.seq))
-
-		case pli: //necessity introduction
-			aE(!necI_S4(al[l.lines[0]-offset].seq, l.seq))
-
-		case mli: //necessity introduction
-			aE(!necI_S5(al[l.lines[0]-offset].seq, l.seq))
-
-		case le: //necessity elim
-			aE(!necE(al[l.lines[0]-offset].seq, l.seq))
-
-		case mi: //possibility intro
-			aE(!posI(al[l.lines[0]-offset].seq, l.seq))
-
-		case me: //possibility elim
-			aE(!posE(al[l.lines[0]-offset].seq, al[l.lines[1]-offset].seq, l.seq))
-
-		case mme: //possibility elim
-			aE(!posE_S5(al[l.lines[0]-offset].seq, al[l.lines[1]-offset].seq, l.seq))
-
-		case sc: //possibility elim
-			aE(!scopeReplacement(al[l.lines[0]-offset].seq, l.seq))
-
-		case sl: //possibility elim
-			aE(!sententialLogic(al[l.lines[0]-offset].seq, l.seq))
-
-		case "premise": //premise
-
-		case "rewrite": //sequent rewrite
-			aE(!seqRewrite(l.seq, al[l.lines[0]-offset].seq, l.lines[0]))
-
-		default: //check if we are dealing with a theorem
-			aE(!oTHM)
-			aE(!theorem(l.seq, l.inf))
+	aE := func(v bool) {
+		if !v {
+			ok = false
 		}
 	}
-	Debug("--done Derivation Check-->")
-	return !hasE
+
+	for n := range deriv {
+		logger.SetPrefix("line " + strconv.Itoa(n+1) + ": ")
+		aE(checkStep(getDerivTree(deriv, n)))
+
+	}
+	return ok
 }
 
 func parseArgline(s string) (al argLine, err error) {
@@ -361,173 +241,6 @@ func runeOf[str ~string](s str, m printMode) string {
 		}
 	}
 	return string(s)
-}
-
-func lineSpec(infRule string) int {
-	switch infRule {
-	case a:
-		return 0
-	case ni:
-		return 2
-	case ne:
-		return 1
-	case ki:
-		return 2
-	case ke:
-		return 1
-	case di:
-		return 1
-	case de:
-		return 3
-	case ci:
-		return 1
-	case ce:
-		return 2
-	case ue:
-		return 1
-	case ui:
-		return 1
-	case ee:
-		return 2
-	case ei:
-		return 1
-	case ii:
-		return 0
-	case ie:
-		return 0
-	case le:
-		return 1
-	case li:
-		return 1
-	case mli:
-		return 1
-	case pli:
-		return 1
-	case tli:
-		return 1
-	case me:
-		return 2
-	case mme:
-		return 2
-	case mi:
-		return 1
-	case sc:
-		return 1
-	case sl:
-		return 1
-	case "premise":
-		return 0
-	case "rewrite":
-		return 1
-	case "":
-		return 1
-	case "theorem":
-		return 0
-	case "derived rule":
-		return 1
-	default:
-		return -1
-	}
-}
-
-func checkLineRef(infRule string, cur int, offset int, lines []int) bool {
-
-	for n := range lines {
-		if lines[n] >= cur || lines[n] < offset {
-			logger.Print("illegel reference to line ", lines[n])
-			return false
-		}
-	}
-	if oDR {
-		if strings.HasSuffix(infRule, "R") {
-			infRule = "derived rule"
-		}
-	}
-
-	if oTHM {
-		for _, thm := range theoremsInUse() {
-			if infRule == thm[0] || infRule == thm[1] {
-				infRule = "theorem"
-				break
-			}
-		}
-	}
-
-	if lineSpec(infRule) == -1 {
-		logger.Print("unknown inference rule or theorem: ", infRule)
-		return false
-	}
-
-	if len(lines) != lineSpec(infRule) {
-		if lineSpec(infRule) != 1 {
-			logger.Print(fullName(infRule), " should refer to ", lineSpec(infRule), " lines")
-		} else {
-			logger.Print(fullName(infRule), " should refer to ", lineSpec(infRule), " line")
-		}
-
-		return false
-	}
-
-	return true
-}
-
-func fullName(i string) string {
-	switch i {
-	case a:
-		return "Assumption"
-	case ne:
-		return "Negation Elimination"
-	case ni:
-		return "Negation Introduction"
-	case de:
-		return "Disjunction Elimination"
-	case di:
-		return "Disjunction  Introduction"
-	case ke:
-		return "Conjunction Elimination"
-	case ki:
-		return "Conjunction Introduction"
-	case ce:
-		return "Conditional Elimination"
-	case ci:
-		return "Conditional Introduction"
-	case ue:
-		return "Universal Quantifier Elimination"
-	case ui:
-		return "Universal Quantifier Introduction"
-	case ee:
-		return "Existential Quantifier Elimination"
-	case ei:
-		return "Existential Quantifier Introduction"
-	case ie:
-		return "Identity Elimination"
-	case ii:
-		return "Identity Introduction"
-	case li:
-		return "Necessity Introduction"
-	case mli:
-		return "S5 Necessity Introduction"
-	case pli:
-		return "S4 Necessity Introduction"
-	case le:
-		return "Necessity Elimination"
-	case mi:
-		return "Possibility Introduction"
-	case me:
-		return "Possibility Elimination"
-	case mme:
-		return "S5 Possibility Introduction"
-	case sc:
-		return "Scope Replacement"
-	case sl:
-		return "Logic"
-	default:
-		return i
-	}
-}
-
-func _isTheorem(s sequent) bool {
-	return s.d == ""
 }
 
 func isFormulaSet(s string) bool {

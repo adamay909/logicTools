@@ -86,16 +86,15 @@ func theoremsInUse() [][]string {
 	return thm
 }
 
-func theorem(seq sequent, inf string) bool {
+func theorem(d *derivNode) bool {
+
 	var tf []string
 
 	thms := theoremsInUse()
 
-	Debug("Theorems:============")
-	for _, e := range thms {
-		Debug(Parse(e[2]).display())
-	}
-	Debug("=================")
+	inf := d.line.inf
+	seq := d.line.seq
+
 	inf = strings.TrimSpace(inf)
 	for _, thm := range thms {
 		if inf == thm[1] {
@@ -104,7 +103,7 @@ func theorem(seq sequent, inf string) bool {
 	}
 
 	if len(tf) == 0 {
-		logger.Print(inf, "is not a theorem")
+		logger.Print(inf, " is not a theorem")
 		return false
 	}
 

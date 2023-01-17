@@ -1,6 +1,15 @@
 package gentzen
 
-func condE(seq1, seq2, seq3 sequent) bool {
+func condE(d *derivNode) bool {
+
+	if len(d.supportingLines) != 2 {
+		logger.Print("Conditional Elimination depends on two lines")
+		return false
+	}
+
+	seq1 := d.supportingLines[0].line.seq
+	seq2 := d.supportingLines[1].line.seq
+	seq3 := d.line.seq
 
 	v1, msg1 := condEhelper(seq1, seq2, seq3)
 
@@ -64,7 +73,15 @@ func condEhelper(seq1, seq2, seq3 sequent) (v bool, msg string) {
 
 }
 
-func condI(seq1, seq2 sequent) bool {
+func condI(d *derivNode) bool {
+
+	if len(d.supportingLines) != 1 {
+		logger.Print("Conditional Introduction depends on one line")
+		return false
+	}
+
+	seq1 := d.supportingLines[0].line.seq
+	seq2 := d.line.seq
 
 	n1 := Parse(seq1.succedent().String())
 	n2 := Parse(seq2.succedent().String())

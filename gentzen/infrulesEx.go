@@ -1,6 +1,14 @@
 package gentzen
 
-func exI(seq1, seq2 sequent) bool {
+func exI(d *derivNode) bool {
+
+	if len(d.supportingLines) != 1 {
+		logger.Print("Existential Quantifier Introduction depends on one line")
+		return false
+	}
+
+	seq1 := d.supportingLines[0].line.seq
+	seq2 := d.line.seq
 
 	if Parse(seq2.succedent().String()).MainConnective() != ex {
 		logger.Print("conclusion must be existentially quantified")
@@ -26,8 +34,16 @@ func exI(seq1, seq2 sequent) bool {
 	return val
 }
 
-func exE(seq1, seq2, seq3 sequent) bool {
+func exE(d *derivNode) bool {
 
+	if len(d.supportingLines) != 2 {
+		logger.Print("Existential Quantifier Elimination depends on one line")
+		return false
+	}
+
+	seq1 := d.supportingLines[0].line.seq
+	seq2 := d.supportingLines[1].line.seq
+	seq3 := d.line.seq
 	v1, msg1 := exEhelper(seq1, seq2, seq3)
 
 	v2, msg2 := exEhelper(seq2, seq1, seq3)

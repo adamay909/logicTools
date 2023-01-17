@@ -3,7 +3,17 @@ package gentzen
 var emptySet = "\u2300"
 
 // seq1 is concluding sequent
-func seqRewrite(res, ini sequent, n int) bool {
+func seqRewrite(d *derivNode) bool {
+
+	if len(d.supportingLines) != 1 {
+		logger.Print("Sequent rewrite depends on one line")
+		return false
+	}
+
+	ini := d.supportingLines[0].line.seq
+	res := d.line.seq
+	n := d.line.lines[0]
+
 	if isSeqReduce(ini, res) {
 		return true
 	}

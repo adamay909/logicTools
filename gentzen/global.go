@@ -1,5 +1,10 @@
 package gentzen
 
+/**************************************
+The variables defined here should be treated as constants except by functins defined in this
+file.
+*************************************/
+
 type logicalConstant string
 
 var (

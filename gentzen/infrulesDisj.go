@@ -4,7 +4,15 @@ import (
 	"errors"
 )
 
-func disjI(seq1, seq2 sequent) bool {
+func disjI(d *derivNode) bool {
+
+	if len(d.supportingLines) != 1 {
+		logger.Print("Disjunction Introduction depends on one line")
+		return false
+	}
+
+	seq1 := d.supportingLines[0].line.seq
+	seq2 := d.line.seq
 
 	n1 := Parse(seq1.succedent().String())
 	n2 := Parse(seq2.succedent().String())
@@ -33,14 +41,21 @@ func disjI(seq1, seq2 sequent) bool {
 	return true
 }
 
-func disjE(seq ...sequent) bool {
+func disjE(d *derivNode) bool {
 
-	var seq1, seq2, seq3, seq4 sequent
-	var err error
-
-	if len(seq) != 4 {
+	if len(d.supportingLines) != 3 {
+		logger.Print("Disjunction Introduction depends on three lines")
 		return false
 	}
+
+	seq1 := d.supportingLines[0].line.seq
+	seq2 := d.supportingLines[1].line.seq
+	seq3 := d.supportingLines[2].line.seq
+	seq4 := d.line.seq
+
+	var err error
+
+	seq := []sequent{seq1, seq2, seq3}
 
 	//check if there are premises of the right form
 	for i := 0; i < 3; i++ {
@@ -56,7 +71,6 @@ func disjE(seq ...sequent) bool {
 	}
 
 	//check if non-disjunction premises have the right succedent
-	seq4 = seq[3]
 	err = disjEhelper4(seq2, seq3, seq4)
 	if err != nil {
 		logger.Print(err.Error())

@@ -74,12 +74,20 @@ func equivSL(s1, s2 string) bool {
 	return true
 }
 
-func sententialLogic(s1, s2 sequent) bool {
+func sententialLogic(d *derivNode) bool {
 
 	if !oML {
-		logger.Print("appeal to logic only allowed with Modal Logic.")
+		logger.Print("Appeal to logic only allowed with Modal Logic")
 		return false
 	}
+
+	if len(d.supportingLines) != 1 {
+		logger.Print("Appeal to logic depends on one line")
+		return false
+	}
+
+	s1 := d.supportingLines[0].line.seq
+	s2 := d.line.seq
 
 	if !equivSL(s1.succedent().String(), s2.succedent().String()) {
 		logger.Print("succedents not equivalent in Sentential Logic")

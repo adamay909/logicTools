@@ -2,7 +2,14 @@ package gentzen
 
 import "strings"
 
-func idI(seq sequent) bool {
+func idI(d *derivNode) bool {
+
+	if len(d.supportingLines) != 0 {
+		logger.Print("Identity Introduction depends on no other lines")
+		return false
+	}
+
+	seq := d.line.seq
 
 	if strings.TrimSpace(seq.datum().String()) != "" {
 		logger.Print("datum must be empty")
@@ -35,7 +42,14 @@ func idI(seq sequent) bool {
 
 }
 
-func idE(seq sequent) bool {
+func idE(d *derivNode) bool {
+
+	if len(d.supportingLines) != 0 {
+		logger.Print("Identity Elimination depends on no other lines")
+		return false
+	}
+
+	seq := d.line.seq
 
 	if strings.TrimSpace(seq.datum().String()) != "" {
 		logger.Print("datum must be empty")
