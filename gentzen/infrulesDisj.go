@@ -44,7 +44,7 @@ func disjI(d *derivNode) bool {
 func disjE(d *derivNode) bool {
 
 	if len(d.supportingLines) != 3 {
-		logger.Print("Disjunction Introduction depends on three lines")
+		logger.Print("Disjunction Elimination depends on three lines")
 		return false
 	}
 

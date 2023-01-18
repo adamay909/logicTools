@@ -37,7 +37,7 @@ func exI(d *derivNode) bool {
 func exE(d *derivNode) bool {
 
 	if len(d.supportingLines) != 2 {
-		logger.Print("Existential Quantifier Elimination depends on one line")
+		logger.Print("Existential Quantifier Elimination depends on two lines")
 		return false
 	}
 

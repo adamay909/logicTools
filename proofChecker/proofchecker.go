@@ -21,6 +21,7 @@ func checkDerivation() {
 	arglines, ok := getArglines(dsp.Input)
 	if !ok {
 		printMessage(gentzen.ShowLog())
+		debug("error parsing derivation lines")
 		return
 	}
 

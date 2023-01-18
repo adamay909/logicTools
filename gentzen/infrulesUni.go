@@ -39,7 +39,7 @@ func uniE(d *derivNode) bool {
 func uniI(d *derivNode) bool {
 
 	if len(d.supportingLines) != 1 {
-		logger.Print("Universal Elimination depends on one line")
+		logger.Print("Universal Introduction depends on one line")
 		return false
 	}
 

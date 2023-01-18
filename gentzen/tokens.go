@@ -341,11 +341,11 @@ func tokenizePLround2(t tokenStr) (tokenStr, error) {
 		var n token
 		if e.isQuantifier() {
 			if i > len(t)-2 {
-				err = errors.New("quantifier without variable 1")
+				err = errors.New("quantifier without variable")
 				return t, err
 			}
 			if !t[i+1].isTerm() {
-				err = errors.New("quantifier without variable 2")
+				err = errors.New("quantifier without variable")
 				return t, err
 			}
 			n.tokenType = e.tokenType
@@ -378,11 +378,11 @@ func tokenizePLround2(t tokenStr) (tokenStr, error) {
 				}
 			}
 			if i == len(t)-1 {
-				err = errors.New("predicate without term 1")
+				err = errors.New("predicate without term")
 				return t, err
 			}
 			if !t[i+1].isTerm() {
-				err = errors.New("predicate without term 2, " + t[i+1].str)
+				err = errors.New("predicate without term, " + t[i+1].str)
 				return t, err
 			}
 			n.tokenType = tAtomicSentence

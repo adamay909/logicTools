@@ -86,7 +86,7 @@ func necI_T(d *derivNode) bool {
 	}
 
 	if len(d.supportingLines) != 1 {
-		logger.Print("Necessity Introduction depends on one line")
+		logger.Print("T Necessity Introduction depends on one line")
 		return false
 	}
 
@@ -144,7 +144,7 @@ func necI_S4(d *derivNode) bool {
 		return false
 	}
 	if len(d.supportingLines) != 1 {
-		logger.Print("Necessity Introduction depends on one line")
+		logger.Print("S4 Necessity Introduction depends on one line")
 		return false
 	}
 
@@ -196,7 +196,7 @@ func necI_S5(d *derivNode) bool {
 		return false
 	}
 	if len(d.supportingLines) != 1 {
-		logger.Print("Necessity Introduction depends on one line")
+		logger.Print("S5 Necessity Introduction depends on one line")
 		return false
 	}
 

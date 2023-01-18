@@ -45,7 +45,7 @@ func negE(d *derivNode) bool {
 func negI(d *derivNode) bool {
 
 	if len(d.supportingLines) != 2 {
-		logger.Print("Negation Elimination depends on two lines")
+		logger.Print("Negation Introduction depends on two lines")
 		return false
 	}
 
