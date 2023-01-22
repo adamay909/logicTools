@@ -192,27 +192,17 @@ The proof checker also accepts the following axioms (so you can stick to the pla
 - **Duality (DL)** ⊢ ◇p⊃¬□¬p
 - **Duality (DL)** ⊢ ¬□¬p⊃◇p
 
-It also accepts the following theorems:
+It also accepts the following theorems that make life easier:
 
+- **S4** ⊢ ◇◇p⊃◇p
+- **S5** ⊢ ◇□p⊃□p
 - **Duality (DL)** ⊢ -□p⊃◇¬p
 - **Duality (DL)** ⊢ □-p⊃¬◇p
 - **Duality (DL)** ⊢ -◇p⊃□¬p
 - **Duality (DL)** ⊢ ◇-p⊃¬□p
 
-As far as the proof checker is concerned, axioms behave just like theorems.
+As far as the proof checker is concerned, axioms behave just like theorems. The axioms and theorems of modal logic can be turned into derived rules just as the other axioms/theorems.
 
-Here are some stronger, non-standard, inference rules:
-
-- **S4 Necessity Introduction (S4&#x25a1;I)** from Γ ⊢ φ
-infer Γ ⊢ &#x25a1;φ, provided Γ contains no formulas that are not necessities.
-
-- **S5 Necessity Introduction (S5&#x25a1;I)** from Γ ⊢ φ
-infer Γ ⊢ &#x25a1;φ, provided Γ contains no non-modal formulas.
-
-- **S5 Possibility Elimination (S5&#x25c7;E)** From Γ ⊢ &#x25c7;φ and ∆, φ ⊢ ψ,
-infer Γ, ∆ ⊢ &#x25c7;ψ , provided ψ is a modal formula and Γ, ∆  contain no non-modal formulas.
-
-A modal formula is a formula prefixed with a modal operator or the negation of such a formula.
 
 ### Installation
 
