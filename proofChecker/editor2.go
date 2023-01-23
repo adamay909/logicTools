@@ -154,6 +154,8 @@ func handleSpecial(key string) {
 		toggleMenuButton()
 	case "c":
 		toClipboardLatex()
+	case "v":
+		toggleDebug()
 	default:
 	}
 	sp1 = ""

@@ -70,11 +70,9 @@ var dsp *console
 
 func main() {
 
+	initMessages()
 	gentzen.SetStandardPolish(false)
-	if oDEBUG {
-		gentzen.SetDebuglog(os.Stdout)
-		debug("debug logging activated")
-	}
+	toggleDebug()
 	setupJS()
 	resetDisplay()
 	hideExtra()
@@ -82,6 +80,22 @@ func main() {
 	stopInput()
 
 	<-make(chan bool)
+}
+
+func initMessages() {
+	toggleDebug()
+	debug("You can toggle verbose logging with CTRL-ALT-v in the editor.")
+	toggleDebug()
+	return
+}
+
+func toggleDebug() {
+	oDEBUG = !oDEBUG
+	gentzen.SetDebug(oDEBUG)
+	if oDEBUG {
+		gentzen.SetDebuglog(os.Stdout)
+	}
+	return
 }
 
 func debug(m ...any) {
