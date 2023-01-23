@@ -31,7 +31,7 @@ func lineRefsOK(derivation []argLine, offset int) bool {
 
 	for n := range derivation {
 		for _, l := range derivation[n].lines {
-			if l < offset || l > n+offset {
+			if l < offset || l >= n+offset {
 				logger.Print("illegal reference to line ", l)
 				ok = false
 			}
@@ -47,7 +47,7 @@ func getDerivTree(derivation []argLine, line int) (dt *derivNode) {
 
 	dt = new(derivNode)
 	dt.line = derivation[line]
-	Debug(dt.line.lines, dt.line.inf)
+	//Debug("annotation: ", dt.line.lines, dt.line.inf)
 	if len(dt.line.lines) > 0 {
 		for _, n := range dt.line.lines {
 			dt.supportingLines = append(dt.supportingLines, getDerivTree(derivation, n-1))
@@ -79,8 +79,10 @@ func flattenDerivTree(n *derivNode) []*derivNode {
 
 func (d *derivNode) isTheorem() bool {
 
-	if theorem(d) {
-		return true
+	if len(matchingTheorems(d.line.inf)) > 0 {
+		if foundMatch(d.line.inf, matchingTheorems(d.line.inf)) {
+			return true
+		}
 	}
 
 	plines := flattenDerivTree(d)
@@ -100,12 +102,14 @@ func (d *derivNode) isTheorem() bool {
 
 func checkStep(d *derivNode) bool {
 
+	Debug("check correctness of: ", d.line.seq, d.line.inf)
 	return checkFunc(d.line.inf)(d)
 
 }
 
-func checkFunc(infRule string) func(*derivNode) bool {
-	switch infRule {
+func checkFunc(inf string) func(*derivNode) bool {
+	Debug("received infrule: ", inf)
+	switch inf {
 	case a: //assumption
 		return assumption
 
@@ -152,6 +156,7 @@ func checkFunc(infRule string) func(*derivNode) bool {
 		return idE
 
 	case li: //necessity introduction
+		Debug("checkfunc: found li")
 		return necI
 
 	case tli: //necessity introduction
@@ -188,6 +193,7 @@ func checkFunc(infRule string) func(*derivNode) bool {
 		return seqRewrite
 
 	default: //check if we are dealing with a theorem
+		Debug("defaulting to theorem")
 		return theoremDeriv
 	}
 }
@@ -196,6 +202,7 @@ func theoremDeriv(d *derivNode) bool {
 
 	var tf []string
 
+	Debug("Theorem checker checking for ", d.line.inf)
 	thms := theoremsInUse()
 
 	inf := d.line.inf

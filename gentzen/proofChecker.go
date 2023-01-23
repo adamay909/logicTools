@@ -51,6 +51,8 @@ var strictCheck bool
 func checkDerivation(lines []string, offset int) bool {
 
 	deriv, ok := getDerivation(lines, offset)
+	Debug("length of derivation: ", len(deriv))
+	Debug("offset: ", offset)
 	if !ok {
 		return false
 	}
@@ -59,15 +61,14 @@ func checkDerivation(lines []string, offset int) bool {
 		return false
 	}
 
-	aE := func(v bool) {
-		if !v {
-			ok = false
-		}
-	}
-
 	for n := range deriv {
 		logger.SetPrefix("line " + strconv.Itoa(n+1) + ": ")
-		aE(checkStep(getDerivTree(deriv, n)))
+		Debug("check line no. ", n+1)
+		if !checkStep(getDerivTree(deriv, n)) {
+			Debug("check fail")
+			ok = false
+		}
+		Debug("------------------------")
 
 	}
 	return ok

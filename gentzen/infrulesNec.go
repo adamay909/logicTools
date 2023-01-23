@@ -41,6 +41,7 @@ func necE(d *derivNode) bool {
 }
 func necI(d *derivNode) bool {
 
+	Debug("Inference checker checking for li")
 	if !oML {
 		logger.Print("Modal Logic not allowed")
 		return false

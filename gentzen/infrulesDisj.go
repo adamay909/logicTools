@@ -6,6 +6,7 @@ import (
 
 func disjI(d *derivNode) bool {
 
+	Debug("checking for di")
 	if len(d.supportingLines) != 1 {
 		logger.Print("Disjunction Introduction depends on one line")
 		return false

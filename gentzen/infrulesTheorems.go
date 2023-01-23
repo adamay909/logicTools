@@ -86,14 +86,11 @@ func theoremsInUse() [][]string {
 	return thm
 }
 
-func theorem(d *derivNode) bool {
+func matchingTheorems(inf string) []string {
 
 	var tf []string
 
 	thms := theoremsInUse()
-
-	inf := d.line.inf
-	seq := d.line.seq
 
 	inf = strings.TrimSpace(inf)
 	for _, thm := range thms {
@@ -102,23 +99,40 @@ func theorem(d *derivNode) bool {
 		}
 	}
 
-	if len(tf) == 0 {
-		logger.Print(inf, " is not a theorem")
-		return false
-	}
+	return tf
+}
 
-	//	tf = nil
-	//	tf = append(tf, quantifierRules[0][2])
+func foundMatch(c string, tf []string) bool {
 
 	for _, thc := range tf {
-		Debug("<--Theorem check: ", Parse(seq.succedent()).StringPlain(), " against: ", Parse(thc).StringPlain())
-		if sameStructure(thc, seq.succedent().String()) {
-
+		Debug("<--Theorem check: ", c, " against: ", Parse(thc).StringPlain())
+		if sameStructure(thc, c) {
 			Debug("ok")
 			Debug("--done theorem check-->")
 
 			return true
 		}
+	}
+	return false
+
+}
+
+func theorem(d *derivNode) bool {
+
+	var tf []string
+
+	inf := d.line.inf
+	seq := d.line.seq
+
+	tf = matchingTheorems(inf)
+
+	if len(tf) == 0 {
+		logger.Print(inf, " is not a theorem")
+		return false
+	}
+
+	if foundMatch(seq.succedent().String(), tf) {
+		return true
 	}
 
 	logger.Print("not instance of ", inf)
