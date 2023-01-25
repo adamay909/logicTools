@@ -51,6 +51,7 @@ var strictCheck bool
 func checkDerivation(lines []string, offset int) bool {
 
 	deriv, ok := getDerivation(lines, offset)
+	Debug("start derivation checking**********")
 	Debug("length of derivation: ", len(deriv))
 	Debug("offset: ", offset)
 	if !ok {
@@ -71,19 +72,17 @@ func checkDerivation(lines []string, offset int) bool {
 		Debug("------------------------")
 
 	}
+	Debug("finished derivation checking**********")
 	return ok
 }
 
-func parseArgline(s string) (al argLine, err error) {
+func isSequent(c string) (err error) {
 
-	s = strings.ReplaceAll(s, " ", "")
-	s = strings.ReplaceAll(s, "\t", "")
+	fields := strings.Split(c, ";")
 
-	fields := strings.Split(s, ";")
-	//check we have enough fields
-	if len(fields) < 3 {
-		err = errors.New("you need: datum, succedent and at least one of: line references, inference rule")
-		return
+	if len(fields) != 2 {
+		err = errors.New("Not a sequent")
+		return err
 	}
 
 	//check datum is ok
@@ -98,11 +97,11 @@ func parseArgline(s string) (al argLine, err error) {
 
 		if containsFormulaSet(d) {
 			err = errors.New("datum: place holders for sets of formulas cannot appear inside a formula")
-			return
+			return err
 		}
 		_, err = ParseStrict(d)
 		if err != nil {
-			return
+			return err
 		}
 	}
 
@@ -119,9 +118,29 @@ func parseArgline(s string) (al argLine, err error) {
 	if err != nil {
 		return
 	}
+	return
+}
+
+func parseArgline(s string) (al argLine, err error) {
+
+	s = strings.ReplaceAll(s, " ", "")
+	s = strings.ReplaceAll(s, "\t", "")
+
+	fields := strings.Split(s, ";")
+	//check we have enough fields
+	if len(fields) < 3 {
+		err = errors.New("you need: datum, succedent and at least one of: line references, inference rule")
+		return
+	}
+
+	err = isSequent(strings.Join(fields[:2], ";"))
+	if err != nil {
+		return
+	}
 
 	al.seq.d = datum(strings.TrimSpace(fields[0]))
 	al.seq.s = plshFormula(strings.TrimSpace(fields[1]))
+
 	if len(fields) == 4 {
 		al.inf = fields[3]
 	}
@@ -145,15 +164,17 @@ func parseArgline(s string) (al argLine, err error) {
 		al.lines = append(al.lines, n)
 	}
 
+	al.inf = "rewrite"
+
+	if len(ln[i:]) > 0 {
+		al.inf = strings.TrimSpace(ln[i])
+	}
+
 	if len(ln[i:]) > 1 {
 		err = errors.New("You must have no more than one inference rule")
 		return
 	}
-	if len(ln[i:]) != 0 {
-		al.inf = strings.TrimSpace(ln[i])
-	} else {
-		al.inf = "rewrite"
-	}
+
 	return
 }
 

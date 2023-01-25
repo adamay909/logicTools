@@ -87,9 +87,42 @@ func latexOutput() string {
 		if len(l) == 0 {
 			continue
 		}
-		output = output + `\item ` + plainOutput(l) + "\n"
+		output = output + `\item ` + attemptLatex(l) + "\n"
 	}
 	return output + `\end{enumerate}` + "\n"
+}
+
+func attemptLatex(l []string) string {
+
+	var ret []string
+
+	for _, e := range l {
+		ret = append(ret, plainText(e))
+	}
+
+	if len(ret) == 0 {
+		return ""
+	}
+
+	var i int
+	var formula *gentzen.Node
+	var err error
+
+	for i = len(ret); i > 0; i-- {
+		txt := spaceyStringOf(ret[:i])
+		formula, err = gentzen.InfixParser(tk(txt))
+		if err == nil {
+			break
+		}
+	}
+
+	if i > 0 {
+
+		return `\p{` + formula.StringLatex() + `}` + plainOutput(l[i:])
+
+	}
+
+	return plainOutput(l)
 }
 
 func isGreek(s string) bool {
