@@ -14,22 +14,28 @@ import (
 func InfixParser(s []string) (n *Node, err error) {
 	var ts tokenStr
 
+	Debug("$$$$$$ Infix Parser")
+	Debug("parsing: ", s)
+
 	ts, err = tokenizeLatex(s)
 	if err != nil {
+		Debug("InfixParser: ", err)
 		return
 	}
 
 	if !bracketsOK(ts) {
 		err = errors.New("not enough brackets")
+		Debug("Infix Parser", err)
 		return
 	}
 
 	n, err = parseLatex(ts)
 
 	if err != nil {
+		Debug("Infix Parser", err)
 		return
 	}
-
+	Debug("found", n.StringPlain())
 	return
 
 }
@@ -101,6 +107,10 @@ func tokenizeLatex(s []string) (tokenStr, error) {
 			t.tokenType = tPos
 			t.str = lpos
 
+		case isIllegalLetter(e):
+			err = errors.New("illegal letter")
+			return ts, err
+
 		case !oPL:
 			t.tokenType = tAtomicSentence
 			t.str = e
@@ -136,6 +146,13 @@ func tokenizeLatex(s []string) (tokenStr, error) {
 
 	}
 	return ts, err
+}
+
+func isIllegalLetter(s string) bool {
+
+	illegal := []string{"...", "⊢"}
+	return slicesContains(illegal, s)
+
 }
 
 func fixBrackets(ts tokenStr) tokenStr {

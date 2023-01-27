@@ -2,7 +2,6 @@ package main
 
 import (
 	"strconv"
-	"strings"
 
 	"github.com/adamay909/logicTools/gentzen"
 )
@@ -27,13 +26,13 @@ func plainTextDeriv(withTitle bool) string {
 		if len(l) == 0 {
 			continue
 		}
-		output = output + strconv.Itoa(i+dsp.Offset) + `.` + plainOutput(l) + "\n"
+		output = output + strconv.Itoa(i+dsp.Offset) + `.` + plainHTMLOutput(l) + "\n"
 	}
 	return output + "\n"
 
 }
 
-func plainOutput(s []string) string {
+func plainHTMLOutput(s []string) string {
 
 	var r string
 
@@ -57,11 +56,50 @@ func plainHTML(s string) string {
 	return s
 }
 
+func plainTextOutput(s []string) string {
+
+	var r string
+
+	for _, e := range s {
+		r = r + plainText(e)
+	}
+	return r
+
+}
+
+func plainLatextOutput(s []string) string {
+
+	var r string
+
+	for _, e := range s {
+		r = r + plainLatex(e)
+	}
+	return r
+
+}
+
+func plainLatex(s string) string {
+
+	for _, e := range greekBindings {
+		if s == e[tktxt] {
+			return e[tktex]
+		}
+	}
+	return s
+}
+
 func plainText(s string) string {
 	for _, e := range greekBindings {
 		if s == e[tktex] {
 			return e[tktxt]
 		}
+	}
+	if s == `\vdash` {
+		s = `⊢`
+	}
+
+	if s == `\ldots` {
+		s = `...`
 	}
 	return s
 }
@@ -72,27 +110,26 @@ func latexOutput() string {
 	}
 
 	output := ""
-	if arglines, ok := getArglines(dsp.Input); ok {
-		output = `\subsubsection*{` + dsp.Title + `}` + "\n"
-		output = strings.ReplaceAll(output, "⊢", `$\lproves$`)
-		output = output + gentzen.PrintDeriv(arglines, dsp.Offset)
-		return output
-	}
-	ln := strconv.Itoa(dsp.Offset - 1)
-	output = `\subsubsection*{` + dsp.Title + `}` + "\n"
+	output = `%title:%` + dsp.Title + "\n"
 
+	if arglines, ok := getArglines(dsp.Input); ok {
+		output = output + gentzen.PrintDeriv(arglines, dsp.Offset)
+		return safeLtx(output)
+	}
+
+	ln := strconv.Itoa(dsp.Offset - 1)
 	output = output + `\begin{enumerate}\setcounter{enumi}{` + ln + `}` + "\n"
 
 	for _, l := range dsp.Input {
 		if len(l) == 0 {
 			continue
 		}
-		output = output + `\item ` + attemptLatex(l) + "\n"
+		output = output + `\item ` + safeLtx(latexfy(l)) + "\n"
 	}
 	return output + `\end{enumerate}` + "\n"
 }
 
-func attemptLatex(l []string) string {
+func findFormula(l []string) (string, int) {
 
 	var ret []string
 
@@ -101,28 +138,45 @@ func attemptLatex(l []string) string {
 	}
 
 	if len(ret) == 0 {
-		return ""
+		return "", 0
 	}
 
 	var i int
 	var formula *gentzen.Node
 	var err error
 
-	for i = len(ret); i > 0; i-- {
+	for i = len(ret); i > 1; i-- {
 		txt := spaceyStringOf(ret[:i])
 		formula, err = gentzen.InfixParser(tk(txt))
 		if err == nil {
-			break
+			debug("findFormula: returning ", formula.StringLatex())
+			return formula.StringLatex(), len(ret[:i])
 		}
 	}
 
-	if i > 0 {
+	return "", 0
+}
 
-		return `\p{` + formula.StringLatex() + `}` + plainOutput(l[i:])
+func latexfy(l []string) string {
 
+	if len(l) == 0 {
+		return ""
 	}
 
-	return plainOutput(l)
+	var out string
+
+	for start := 0; start < len(l); {
+		f, span := findFormula(l[start:])
+		if f != "" {
+			out = out + `\p{` + f + `}`
+			start = start + span
+			continue
+		}
+		out = out + plainTextOutput(l[start:start+1])
+		start++
+	}
+
+	return out
 }
 
 func isGreek(s string) bool {
@@ -133,4 +187,51 @@ func isGreek(s string) bool {
 		}
 	}
 	return false
+}
+
+func tknz(s string) []string {
+
+	var ret []string
+
+	ab := combineBindings(allBindings, extraBindings, connBindings, plBindings, mlBindings)
+
+	for _, c := range s {
+		brk := false
+		for _, t := range ab {
+			if string(c) == t[tktxt] {
+				ret = append(ret, t[tktex]+" ")
+				brk = true
+				break
+			}
+		}
+		if !brk {
+			ret = append(ret, string(c))
+			brk = false
+		}
+	}
+	return ret
+}
+
+func safeLtx(s string) string {
+	var ret string
+	for _, e := range s {
+
+		ret = ret + ltxof(string(e))
+
+	}
+
+	return ret
+}
+
+func ltxof(e string) string {
+
+	ab := combineBindings(greekBindings, extraBindings, connBindings, plBindings, mlBindings, turnstileBindings)
+
+	for _, c := range ab {
+		if e == c[tktxt] {
+			return c[tktex] + " "
+		}
+	}
+
+	return e
 }

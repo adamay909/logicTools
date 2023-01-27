@@ -39,9 +39,9 @@ func printNodeInfix(n *Node, m printMode) (s string) {
 
 	var br [][2]string
 
-	br = brackets
+	br = append(br, brackets...)
 	if m == mPlainText {
-		br = append(brackets[:3], [2]string{`{`, `}`})
+		br = append(br[:3], [2]string{`{`, `}`})
 	}
 	if m == mSimple {
 		br = brackets[:2]

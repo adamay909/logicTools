@@ -72,7 +72,6 @@ func main() {
 
 	initMessages()
 	gentzen.SetStandardPolish(false)
-	toggleDebug()
 	setupJS()
 	resetDisplay()
 	hideExtra()

@@ -127,7 +127,7 @@ func typetitleNew() {
 	stopInput()
 }
 
-func typetitleOld() {
+func _typetitleOld() {
 	titleString = []rune(strings.TrimSuffix(dsp.Title, tcursor))
 	dsp.Title = string(titleString) + tcursor
 
