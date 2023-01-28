@@ -180,6 +180,8 @@ func onClick() {
 		toClipboard()
 	case "toLatex":
 		toClipboardLatex()
+	case "printTree":
+		printTree()
 	case "print":
 		toPrinter()
 	case "toggleHelp":

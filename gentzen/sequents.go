@@ -14,6 +14,10 @@ type sequent struct {
 	s plshFormula
 }
 
+func (s sequent) String() string {
+	return s.d.String() + `;` + s.s.String()
+}
+
 func (d datum) String() string {
 	return string(d)
 }

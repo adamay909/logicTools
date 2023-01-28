@@ -235,3 +235,18 @@ func ltxof(e string) string {
 
 	return e
 }
+
+func printTree() {
+
+	gentzen.SetStrict(false)
+	gentzen.ClearLog()
+	arglines, ok := getArglines(dsp.Input)
+	if !ok {
+		printMessage(gentzen.ShowLog())
+		debug("error parsing derivation lines")
+		return
+	}
+
+	copyToClipboard(gentzen.PrintDerivTree(arglines, dsp.Offset))
+
+}
