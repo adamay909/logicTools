@@ -45,6 +45,29 @@ func (s sequent) datumSlice() datumSlice {
 	return r
 }
 
+func (seq sequent) StringLatex() string {
+	var dat, suc string
+
+	if len(seq.datumSlice()) != 0 {
+
+		for _, d := range seq.datumSlice().StringSlice() {
+			if len(d) == 0 {
+				continue
+			}
+			if d[:1] == `\` {
+				dat = dat + d + `, `
+			} else {
+				dat = dat + printNodeInfix(Parse(d), mLatex) + `, `
+			}
+		}
+		dat = strings.TrimRight(dat, ", ")
+	}
+
+	suc = printNodeInfix(Parse(seq.succedent().String()), mLatex)
+
+	return `\seq{` + dat + `}{` + suc + `}`
+}
+
 func (s sequent) datum() datum {
 	return s.d
 }

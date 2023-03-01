@@ -121,7 +121,7 @@ func isSequent(c string) (err error) {
 	return
 }
 
-func parseArgline(s string) (al argLine, err error) {
+func parseDerivline(s string) (al argLine, err error) {
 
 	s = strings.ReplaceAll(s, " ", "")
 	s = strings.ReplaceAll(s, "\t", "")
@@ -194,9 +194,35 @@ func hasGreek(s string) bool {
 	return false
 }
 
-func printArgLine(s string, m printMode) string {
+func printDerivline(s string, m printMode) string {
 
-	al, _ := parseArgline(s)
+	al, _ := parseDerivline(s)
+
+	return printArgline(al, m)
+
+}
+
+func printArgline(al argLine, m printMode) string {
+
+	datumstring := al.printDatum(m)
+
+	succstring := printNodeInfix(Parse(al.seq.succedent().String()), m)
+
+	annotation := al.printAnnotation(m)
+
+	var resp string
+
+	if m == mLatex {
+		resp = `\ai{` + datumstring + `}{` + succstring + `}{` + annotation + `}` + "\n\n"
+	}
+	if m == mPlainText {
+		resp = strings.ReplaceAll(datumstring+`⊢`+succstring+`...`+annotation, " ", "")
+	}
+	return resp
+}
+
+func (al argLine) printDatum(m printMode) string {
+
 	datumstring := ""
 
 	if len(al.seq.d) != 0 {
@@ -212,7 +238,12 @@ func printArgLine(s string, m printMode) string {
 		datumstring = strings.TrimRight(datumstring, ", ")
 	}
 
-	succstring := printNodeInfix(Parse(al.seq.succedent().String()), m)
+	return datumstring
+
+}
+
+func (al argLine) printAnnotation(m printMode) string {
+
 	annotation := ""
 	if len(al.lines) > 0 {
 		for _, i := range al.lines {
@@ -224,15 +255,8 @@ func printArgLine(s string, m printMode) string {
 
 	annotation = strings.TrimRight(annotation, ",")
 
-	var resp string
+	return annotation
 
-	if m == mLatex {
-		resp = `\ai{` + datumstring + `}{` + succstring + `}{` + annotation + `}` + "\n\n"
-	}
-	if m == mPlainText {
-		resp = strings.ReplaceAll(datumstring+`⊢`+succstring+`...`+annotation, " ", "")
-	}
-	return resp
 }
 
 func symb(s string, m printMode) string {

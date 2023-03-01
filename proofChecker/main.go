@@ -15,7 +15,6 @@ import (
 )
 
 // set to true for debug log to stdout
-var oDEBUG = false
 
 //go:embed assets/html/* assets/files assets/samples
 var assets embed.FS
@@ -48,6 +47,8 @@ var (
 	oABOUT = false
 
 	oEXTHM = false
+
+	oDEBUG = false
 
 	oExercises = false
 
@@ -151,18 +152,14 @@ func setupJS() {
 	mainEditorFunc = js.FuncOf(jsWrap(typeformula)).Value
 	titleEditorFunc = js.FuncOf(jsWrap(typetitle)).Value
 	clickFunc = js.FuncOf(jsWrap(onClick)).Value
-	//	loadFunc = js.FuncOf(jsWrap(readHistoryFromFile)).Value
 
 	js.Global().Call("addEventListener", "keydown", mainEditorFunc, true)
 	js.Global().Call("addEventListener", "click", clickFunc, true)
-	// js.Global().Call("addEventListener", "change", loadFunc, true)
 }
 
 func onClick() {
 
 	target := js.Global().Get("event").Get("target")
-	//	fmt.Println(target.Get("id"))
-	//	fmt.Println(target.Get("outerHTML"))
 	switch target.Get("id").String() {
 	case "dummy":
 		endEditTitle()

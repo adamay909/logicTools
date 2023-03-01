@@ -57,7 +57,7 @@ func slicesRemove[c comparable](s []c, e c) (r []c) {
 	return r
 }
 
-//check if s1 is proper super set of s2. Repeat elements count as distinct.
+// check if s1 is proper super set of s2. Repeat elements count as distinct.
 func slicesSupset[c comparable](s1, s2 []c) bool {
 
 	if len(s1) <= len(s2) {
@@ -88,6 +88,13 @@ func slicesCleanDuplicates[t comparable](old []t) (resp []t) {
 	}
 
 	return
+}
+
+func slicesInvert[t any](old []t) (out []t) {
+	for i := len(old) - 1; i >= 0; i-- {
+		out = append(out, old[i])
+	}
+	return out
 }
 
 func isDatumSlice(x any) bool {

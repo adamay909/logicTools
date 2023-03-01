@@ -11,6 +11,7 @@ type Node struct {
 	connective         logicalConstant
 	subnode1, subnode2 *Node
 	parent             *Node
+	children           []*Node
 	variable           string
 	predicateLetter    string
 	term               []string

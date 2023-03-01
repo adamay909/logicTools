@@ -185,7 +185,16 @@ var connectives [][6]string
 // logical constants.
 func SetStandardPolish(v bool) {
 
-	if v {
+	oSYMB = !v
+
+	setupConnectives()
+
+	return
+}
+
+func setupConnectives() {
+
+	if !oSYMB {
 
 		lneg = "N"
 		lconj = "K"
@@ -193,8 +202,8 @@ func SetStandardPolish(v bool) {
 		lcond = "C"
 		luni = "U"
 		lex = "X"
-		lnec = "L"
-		lpos = "M"
+		lnec = "[" //don't use L and M
+		lpos = "<"
 	} else {
 
 		lneg = "-"
@@ -218,11 +227,14 @@ func SetStandardPolish(v bool) {
 	ident = logicalConstant("=")
 	none = logicalConstant(`*`)
 
+	connectivesSL = nil
+	connectivesPL = nil
+	connectivesML = nil
+
 	connectivesSL = [][6]string{
 		{string(neg), `\lnot `, `\neg `, "\u00ac", "\u00ac", " it is not the case that "},
 		{string(conj), `\land `, `\wedge `, "\u2227", "\u2227", " and "},
 		{string(disj), `\lor `, `\vee `, "\u2228", "\u2228", " or "},
-		{string(cond), `\limplies `, `\supset `, "\u2283", "\u2283", " if , then "},
 	}
 
 	connectivesPL = [][6]string{
@@ -236,10 +248,13 @@ func SetStandardPolish(v bool) {
 		{string(nec), `\lnec `, `\Box `, "\u25a1", "\u25a1", " necessarily "},
 	}
 
+	if oCOND {
+		connectivesSL = append(connectivesSL, [6]string{string(cond), `\limplies `, `\supset `, "\u2283", "\u2283", " if , then "})
+	}
+
 	connectives = append(connectivesSL, connectivesPL...)
 	connectives = append(connectives, connectivesML...)
 
-	return
 }
 
 func greekCharOf(s string) string {

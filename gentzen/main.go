@@ -62,6 +62,7 @@ var (
 	oML    = true
 	oDR    = true
 	oDEBUG = false
+	oSYMB  = false //false means standard Polish
 )
 
 var checkLog strings.Builder
@@ -127,22 +128,11 @@ func WriteLog(s string, p string) {
 
 // SetConditional determines whether we use the conditional.
 func SetConditional(v bool) {
+
 	oCOND = v
-	if oCOND {
-		connectivesSL = [][6]string{
-			{string(neg), `\lnot `, `\neg `, "\u00ac", "\u00ac", " it is not the case that "},
-			{string(conj), `\land `, `\wedge `, "\u2227", "\u2227", " and "},
-			{string(disj), `\lor `, `\vee `, "\u2228", "\u2228", " or "},
-			{string(cond), `\limplies `, `\supset `, "\u2283", "\u2283", " if , then "},
-		}
-	} else {
-		connectivesSL = [][6]string{
-			{string(neg), `\lnot `, `\neg `, "\u00ac", "\u00ac", " it is not the case that "},
-			{string(conj), `\land `, `\wedge `, "\u2227", "\u2227", " and "},
-			{string(disj), `\lor `, `\vee `, "\u2228", "\u2228", " or "},
-		}
-	}
-	connectives = append(connectivesSL, connectivesPL...)
+
+	setupConnectives()
+
 	return
 }
 
@@ -279,7 +269,7 @@ func PrintDeriv(lines []string, offset int) (out string) {
 
 	for i := range lines {
 
-		out = out + printArgLine(lines[i], mLatex)
+		out = out + printDerivline(lines[i], mLatex)
 	}
 
 	out = out + `\end{argumentN}` + "\n\n"
@@ -293,7 +283,7 @@ func PrintDerivText(lines []string, offset int) (out string) {
 
 	for i := range lines {
 
-		out = out + strconv.Itoa(i+offset) + `. ` + printArgLine(lines[i], mPlainText) + "\n"
+		out = out + strconv.Itoa(i+offset) + `. ` + printDerivline(lines[i], mPlainText) + "\n"
 	}
 
 	return out
