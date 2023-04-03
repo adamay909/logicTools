@@ -89,6 +89,12 @@ func (n *Node) ParentMust() (m *Node) {
 	return n.parent
 }
 
+func (n *Node) SetParent(p *Node) {
+
+	n.parent = p
+
+}
+
 // SetFlag sets a flag for n. Use for storing extra information.
 func (n *Node) SetFlag(f string) {
 	n.flags = append(n.flags, f)
@@ -139,6 +145,19 @@ func (n *Node) IsBinary() bool {
 	default:
 		return false
 	}
+}
+
+func (n *Node) IsBasic() bool {
+
+	if n.IsAtomic() {
+		return true
+	}
+	if n.IsNegation() {
+		if n.Child1Must().IsAtomic() {
+			return true
+		}
+	}
+	return false
 }
 
 func (n *Node) IsUnary() bool {
