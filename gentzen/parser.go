@@ -65,6 +65,10 @@ func parseTokens(t tokenStr) (*Node, error) {
 		}
 		n.subnode1.parent = &n
 		s2 := t[len(s1)+1:]
+		if len(s2) < 1 {
+			err = errors.New("malformed: " + t.String())
+			return &n, err
+		}
 		n.subnode2, err = parseTokens(s2)
 		if isFormulaSet(n.subnode2.String()) {
 			err = errors.New("cannot have place holders for sets of formulas inside a formula3")
@@ -112,4 +116,29 @@ func findNextSentence(s tokenStr) tokenStr {
 
 	return s[:i+1]
 
+}
+
+func parseTokens2(t tokenStr) (*Node, error) {
+
+	n := new(Node)
+	var err error
+
+	if len(t) == 0 {
+		err = errors.New("too short")
+		return n, err
+	}
+
+	switch {
+
+	case t[0].isUnary():
+
+		if !oML {
+			if t[0].isModalOperator() {
+				err = errors.New("Modal Logic not allowed")
+				return n, err
+			}
+		}
+
+	}
+	return n, err
 }

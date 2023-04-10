@@ -261,13 +261,33 @@ func sameSentence(n, m *Node) bool {
 
 }
 
+func reduceDisj(s []string) []string {
+
+	var r []string
+
+	for _, e := range s {
+		d := Parse(e)
+		if d.MainConnective() != disj {
+			r = append(r, e)
+			continue
+		}
+		if d.Child1Must().String() != d.Child2Must().String() {
+			r = append(r, e)
+			continue
+		}
+		r = append(r, d.Child1Must().String())
+	}
+
+	return r
+}
+
 type reductionTree struct {
 	set      []string
 	children []*reductionTree
 	parent   *reductionTree
 }
 
-func reduceTree(s []string) *reductionTree {
+func ReduceTree(s []string) *reductionTree {
 
 	sameSet := func(s1, s2 []string) bool {
 		if len(s1) != len(s2) {
@@ -286,36 +306,29 @@ func reduceTree(s []string) *reductionTree {
 
 	n.set = append(n.set, s...)
 
-	m := reduceSentences(s)
-	if !sameSet(s, m) {
-		n.children = append(n.children, reduceTree(m))
+	switch {
+	case !sameSet(s, reduceSentences(s)):
+		n.children = append(n.children, ReduceTree(reduceSentences(s)))
+
+	case !sameSet(s, splitConj(s)):
+		n.children = append(n.children, ReduceTree(splitConj(s)))
+
+	case !sameSet(s, removeDuplicates(s)):
+		n.children = append(n.children, ReduceTree(removeDuplicates(s)))
+
+	case !sameSet(s, reduceDisj(s)):
+		n.children = append(n.children, ReduceTree(reduceDisj(s)))
+
+	case len(splitDisjOnce(s)) == 2:
+		d := splitDisjOnce(s)
+		n.children = append(n.children, ReduceTree(d[0]))
+		n.children = append(n.children, ReduceTree(d[1]))
+
+	default:
 		return n
+
 	}
-
-	l := splitConj(m)
-
-	if !sameSet(m, l) {
-		n.children = append(n.children, reduceTree(l))
-		return n
-	}
-
-	w := removeDuplicates(l)
-
-	if !sameSet(l, w) {
-		n.children = append(n.children, reduceTree(w))
-		return n
-	}
-
-	d := splitDisjOnce(w)
-
-	if len(d) == 2 {
-		n.children = append(n.children, reduceTree(d[0]))
-		n.children = append(n.children, reduceTree(d[1]))
-		return n
-	}
-
 	return n
-
 }
 
 func DNFtree(n *reductionTree) string {
@@ -337,7 +350,7 @@ func DNFtree(n *reductionTree) string {
 
 	lt = func(m *reductionTree) (r string) {
 
-		r = `[ \p{\{` + disp(m) + `\}} `
+		r = `[ \p{` + disp(m) + ` } `
 		r = r + "\n"
 
 		if len(m.children) != 0 {
@@ -361,4 +374,66 @@ DATA\end{forest}
 `
 	return strings.ReplaceAll(templ, `DATA`, lt(n))
 
+}
+
+func DNF(n *reductionTree) *Node {
+
+	t := flattenDNFtree(n)
+
+	var dnf string
+
+	var bc []string
+
+	var bcs [][]string
+
+	for _, s := range t {
+		if len(s.children) != 0 {
+			continue
+		}
+		bcs = append(bcs, s.set)
+	}
+
+	for _, cs := range bcs {
+		var pc string
+
+		for _, j := range cs {
+			pc = lconj + pc + j
+		}
+		pc = pc[1:]
+		bc = append(bc, pc)
+
+	}
+
+	for _, k := range bc {
+		dnf = ldisj + dnf + k
+	}
+
+	dnf = dnf[1:]
+
+	return Parse(dnf)
+
+}
+
+func flattenDNFtree(n *reductionTree) []*reductionTree {
+
+	var gs func(n *reductionTree, list []*reductionTree) []*reductionTree
+
+	gs = func(n *reductionTree, list []*reductionTree) []*reductionTree {
+
+		list = append(list, n)
+
+		if len(n.children) == 0 {
+			return list
+		}
+
+		for _, c := range n.children {
+			list = gs(c, list)
+		}
+
+		return list
+	}
+
+	var list []*reductionTree
+
+	return gs(n, list)
 }

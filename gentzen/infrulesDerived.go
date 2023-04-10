@@ -24,6 +24,11 @@ func derivR(d *derivNode) bool {
 		return false
 	}
 
+	if len(d.supportingLines) != 1 {
+		logger.Print("Derived Rule depends on a single line")
+		return false
+	}
+
 	//check datums
 	if strictCheck {
 		if !datumsEqual(seq1.datumSlice(), seq2.datumSlice()) {
