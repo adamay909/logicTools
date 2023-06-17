@@ -68,6 +68,20 @@ func (n *Node) Child2Must() (m *Node) {
 	return n.subnode2
 }
 
+func (n *Node) mkchild() *Node {
+
+	c := new(Node)
+	c.parent = n
+	c.SetAtomic()
+	n.children = append(n.children, c)
+	n.subnode1 = n.children[0]
+	if len(n.children) > 1 {
+		n.subnode2 = n.children[1]
+	}
+	return c
+
+}
+
 // Parent returns parent of n. If n has no parent, ok is false.
 func (n *Node) Parent() (m *Node, ok bool) {
 
@@ -677,4 +691,38 @@ func (n *Node) IsPureSL() bool {
 	}
 
 	return true
+}
+
+func Conjoin(n1, n2 *Node) *Node {
+
+	s1 := n1.String()
+	s2 := n2.String()
+	s3 := lconj + s1 + s2
+
+	return Parse(s3)
+}
+
+func Disjoin(n1, n2 *Node) *Node {
+
+	s1 := n1.String()
+	s2 := n2.String()
+	s3 := ldisj + s1 + s2
+
+	return Parse(s3)
+}
+
+func Negate(n *Node) *Node {
+	s1 := n.String()
+	s2 := lneg + s1
+
+	return Parse(s2)
+}
+
+func Conditionalize(n1, n2 *Node) *Node {
+
+	s1 := n1.String()
+	s2 := n2.String()
+	s3 := lcond + s1 + s2
+
+	return Parse(s3)
 }

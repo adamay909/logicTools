@@ -25,6 +25,69 @@ func genRand(m, d int, fixed bool) string {
 		m = len(atomicE)
 	}
 
+	s := new(Node)
+	s.raw = chooseAtomic(m)
+	s.SetAtomic()
+
+	for s.ConnectiveCount() < d {
+
+		nodes := getSubnodes(s)
+		changed := false
+		for _, e := range nodes {
+			if !e.IsAtomic() {
+				continue
+			}
+			if rand.Intn(4) == 0 {
+				continue
+			}
+			changed = true
+			e.connective = chooseConnective()
+			c1 := e.mkchild()
+			c1.raw = chooseAtomic(m)
+			c1.SetAtomic()
+
+			if e.IsBinary() {
+				c2 := e.mkchild()
+
+				c2.raw = chooseAtomic(m)
+				c2.SetAtomic()
+			}
+			e.raw = e.String()
+		}
+		if !changed {
+			break
+		}
+	}
+
+	return s.String()
+}
+
+func chooseAtomic(m int) string {
+
+	return atomicE[rand.Intn(m)]
+
+}
+
+func chooseConnective() logicalConstant {
+
+	return logicalConstant(connectivesSL[rand.Intn(len(connectivesSL))][0])
+
+}
+
+/*
+flatten node.
+For each atomic sentence decide whether to replace it with compound.If yes:
+	decide on connective
+	decide on child(ren)
+Repeat until either max depth is reached or no changes were made
+*/
+
+func _genRand(m, d int, fixed bool) string {
+
+	if m > len(atomicE) {
+		m = len(atomicE)
+	}
+
 	cand := generateCandidates(m, fixed)
 
 	var s, sNew, sOld string
