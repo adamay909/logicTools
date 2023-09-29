@@ -18,6 +18,74 @@ type Node struct {
 	flags              []string
 }
 
+func mkNode() *Node {
+
+	c := new(Node)
+	c.raw = ""
+	c.connective = ""
+	c.variable = ""
+	c.predicateLetter = ""
+	return c
+
+}
+func (n *Node) mkchild() *Node {
+
+	c := new(Node)
+	c.parent = n
+	c.SetAtomic()
+	n.children = append(n.children, c)
+	n.subnode1 = n.children[0]
+	if len(n.children) > 1 {
+		n.subnode2 = n.children[1]
+	}
+	return c
+
+}
+
+func (n *Node) mkChild1() *Node {
+
+	c := new(Node)
+	c.parent = n
+	n.subnode1 = c
+	c.connective = ""
+	c.raw = ""
+	return c
+}
+
+func (n *Node) mkChild2() *Node {
+
+	c := new(Node)
+	c.parent = n
+	n.subnode2 = c
+	c.connective = ""
+	c.raw = ""
+	return c
+}
+
+func (n *Node) SetChild1(c *Node) {
+	c.parent = n
+	n.subnode1 = c
+	return
+}
+
+func (n *Node) SetChild2(c *Node) {
+	c.parent = n
+	n.subnode2 = c
+	return
+}
+
+func (n *Node) SetParent(p *Node) {
+
+	n.parent = p
+
+}
+
+func (n *Node) clear() {
+	n.term = nil
+	n.predicateLetter = ""
+	n.variable = ""
+}
+
 // Child1 returns first chile of n if it exists. Returns ok=false
 // if n is atomic.
 func (n *Node) Child1() (m *Node, ok bool) {
@@ -68,20 +136,6 @@ func (n *Node) Child2Must() (m *Node) {
 	return n.subnode2
 }
 
-func (n *Node) mkchild() *Node {
-
-	c := new(Node)
-	c.parent = n
-	c.SetAtomic()
-	n.children = append(n.children, c)
-	n.subnode1 = n.children[0]
-	if len(n.children) > 1 {
-		n.subnode2 = n.children[1]
-	}
-	return c
-
-}
-
 // Parent returns parent of n. If n has no parent, ok is false.
 func (n *Node) Parent() (m *Node, ok bool) {
 
@@ -103,10 +157,23 @@ func (n *Node) ParentMust() (m *Node) {
 	return n.parent
 }
 
-func (n *Node) SetParent(p *Node) {
+func (n *Node) Ancestors() (r []*Node) {
 
-	n.parent = p
+	a := n
+	ok := true
+	for a, ok = a.Parent(); ok; {
+		r = append(r, a)
+		a, ok = a.Parent()
+	}
+	return r
+}
 
+func (n *Node) Branch() (r []*Node) {
+
+	r = append(r, n.Ancestors()...)
+	r = append(r, getSubnodes(n)...)
+
+	return r
 }
 
 // SetFlag sets a flag for n. Use for storing extra information.
@@ -182,6 +249,14 @@ func (n *Node) IsUnary() bool {
 
 func (n *Node) IsQuantifier() bool {
 	return n.MainConnective() == uni || n.MainConnective() == ex
+}
+
+func (n *Node) IsExistentialQ() bool {
+	return n.MainConnective() == ex
+}
+
+func (n *Node) IsUniversalQ() bool {
+	return n.MainConnective() == uni
 }
 
 func (n *Node) IsNegation() bool {
@@ -279,6 +354,10 @@ func (n *Node) MainConnective() logicalConstant {
 
 func (n *Node) SetConnective(s logicalConstant) {
 	n.connective = s
+	n.variable = ""
+	n.predicateLetter = ""
+	n.term = nil
+	n.raw = ""
 	return
 }
 
@@ -321,16 +400,6 @@ func (n *Node) SetAtomic() {
 	n.connective = ""
 }
 
-func (n *Node) SetChild1(c *Node) {
-	n.subnode1 = c
-	return
-}
-
-func (n *Node) SetChild2(c *Node) {
-	n.subnode2 = c
-	return
-}
-
 func (n *Node) IsIdentity() bool {
 
 	if !n.IsAtomic() {
@@ -347,7 +416,7 @@ func (n *Node) IsIdentity() bool {
 
 func (n *Node) HasFreeVars() bool {
 
-	return len(n.FreeVars()) == 0
+	return len(n.FreeVars()) > 0
 }
 
 func (n *Node) FreeVars() []string {
@@ -360,22 +429,23 @@ func (n *Node) FreeVars() []string {
 		if !e.IsAtomic() {
 			continue
 		}
+		var bv []string
 
-		for _, t := range e.Terms() {
+		for _, anc := range e.Ancestors() {
+			if anc.IsQuantifier() {
 
-			f := e
-
-			for ; f.parent != nil; f = f.parent {
-				if f.BoundVariable() == t {
-					break
-				}
+				bv = append(bv, anc.BoundVariable())
 			}
-			if f.parent == nil && f.BoundVariable() != t {
-				fv = append(fv, t)
+		}
+
+		for _, t := range e.term {
+			if !slicesContains(bv, t) {
+				if !slicesContains(fv, t) {
+					fv = append(fv, t)
+				}
 			}
 		}
 	}
-
 	return fv
 }
 
@@ -465,10 +535,11 @@ func getSubnodes(n *Node) []*Node {
 			list = gs(n.subnode1, list)
 		}
 
-		if n.subnode2 != nil {
-			list = gs(n.subnode2, list)
+		if n.IsBinary() {
+			if n.subnode2 != nil {
+				list = gs(n.subnode2, list)
+			}
 		}
-
 		return list
 	}
 
@@ -725,4 +796,32 @@ func Conditionalize(n1, n2 *Node) *Node {
 	s3 := lcond + s1 + s2
 
 	return Parse(s3)
+}
+
+// normalizeQuantifier gets rid of a leading negation (does nothing else)
+func normalizeQuantifier(n *Node) *Node {
+
+	if !n.IsNegation() {
+		return n
+	}
+
+	if !n.Child1Must().IsQuantifier() {
+		return n
+	}
+
+	bv := n.Child1Must().BoundVariable()
+
+	f := n.Child1Must().Child1Must()
+
+	s1 := Negate(f).String()
+
+	if n.Child1Must().IsExistentialQ() {
+		return Parse(luni + bv + s1)
+	}
+	if n.Child1Must().IsUniversalQ() {
+		return Parse(lex + bv + s1)
+	}
+
+	return n
+
 }

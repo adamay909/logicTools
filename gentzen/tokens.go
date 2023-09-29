@@ -248,7 +248,12 @@ func nextToken(s string) (t token, r string) {
 		t.tokenType = tTerm
 		if len(s) > 1+pos {
 			if string(sr[pos:pos+1]) == `_` {
-				pos = pos + 2
+				if string(sr[pos+1:pos+2]) == `{` {
+					pos2 := strings.Index(string(sr[pos+2:]), `}`)
+					pos = pos + 2 + pos2 + 1
+				} else {
+					pos = pos + 2
+				}
 			}
 		}
 	default:
@@ -259,7 +264,13 @@ func nextToken(s string) (t token, r string) {
 			}
 			if len(sr) > 1+pos {
 				if string(sr[pos:pos+1]) == `_` {
-					pos = pos + 2
+					if string(sr[pos+1:pos+2]) == `{` {
+						pos2 := strings.Index(string(sr[pos+2:]), `}`)
+						pos = pos + 2 + pos2 + 1
+					} else {
+						pos = pos + 2
+					}
+					//	pos = pos + 2
 				}
 			}
 		}

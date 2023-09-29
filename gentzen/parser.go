@@ -9,27 +9,28 @@ import (
 
 func parseTokens(t tokenStr) (*Node, error) {
 
-	var n Node
+	n := mkNode()
+
 	var err error
 
 	if len(t) == 0 {
 		err = errors.New("too short")
 
-		return &n, err
+		return n, err
 	}
 
 	if !t[0].isConnective() {
 
 		if len(t) > 1 {
 			err = errors.New("malformed: " + t.String())
-			return &n, err
+			return n, err
 		}
 
 		n.SetFormula(t.String())
 		n.SetAtomic()
 		n.predicateLetter = t[0].predicate
 		n.term = t[0].term
-		return &n, err
+		return n, err
 	}
 
 	if len(t) < 2 {
@@ -41,48 +42,48 @@ func parseTokens(t tokenStr) (*Node, error) {
 		if !oML {
 			if t[0].isModalOperator() {
 				err = errors.New("Modal Logic not allowed")
-				return &n, err
+				return n, err
 			}
 		}
 		n.SetConnective(t[0].tokenType.logicConstant())
 		n.variable = t[0].variable
 		s1 := findNextSentence(t[1:])
-		n.subnode1, err = parseTokens(s1)
-		if isFormulaSet(n.subnode1.String()) {
+		ns1, err := parseTokens(s1)
+		if isFormulaSet(ns1.String()) {
 			err = errors.New("cannot have place holders for sets of formulas inside a formula1")
 		}
 		if err != nil {
-			return &n, err
+			return n, err
 		}
-		n.subnode1.parent = &n
+		n.SetChild1(ns1)
 
 	case t[0].isBinary():
 		n.SetConnective(t[0].tokenType.logicConstant())
 		s1 := findNextSentence(t[1:])
-		n.subnode1, err = parseTokens(s1)
-		if isFormulaSet(n.subnode1.String()) {
+		ns1, err := parseTokens(s1)
+		if isFormulaSet(ns1.String()) {
 			err = errors.New("cannot have place holders for sets of formulas inside a formula2")
 		}
-		n.subnode1.parent = &n
 		s2 := t[len(s1)+1:]
 		if len(s2) < 1 {
 			err = errors.New("malformed: " + t.String())
-			return &n, err
+			return n, err
 		}
-		n.subnode2, err = parseTokens(s2)
-		if isFormulaSet(n.subnode2.String()) {
+		ns2, err := parseTokens(s2)
+		if isFormulaSet(ns2.String()) {
 			err = errors.New("cannot have place holders for sets of formulas inside a formula3")
 		}
 		if err != nil {
-			return &n, err
+			return n, err
 		}
-		n.subnode2.parent = &n
+		n.SetChild1(ns1)
+		n.SetChild2(ns2)
 
 	default:
-		return &n, err
+		return n, err
 	}
 
-	return &n, err
+	return n, err
 }
 
 func findNextSentence(s tokenStr) tokenStr {

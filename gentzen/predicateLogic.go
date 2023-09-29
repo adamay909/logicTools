@@ -3,6 +3,7 @@ package gentzen
 import (
 	"errors"
 	"log"
+	"strconv"
 	"strings"
 )
 
@@ -99,6 +100,22 @@ func replaceTerms(n *Node, old, subst string) *Node {
 	return Parse(s)
 }
 
+func (n *Node) instantiate(v, c string) *Node {
+
+	if !n.IsQuantifier() {
+		return n
+	}
+
+	f := strings.ReplaceAll(n.Child1Must().String(), v, c)
+
+	_, err := ParseStrict(f)
+	if err != nil {
+		panic(err)
+	}
+	return Parse(f)
+
+}
+
 func (n *Node) replaceTerm(p int, v string) (old, subst string) {
 
 	if p < 0 {
@@ -162,4 +179,114 @@ func (n *Node) hasIllegalBoundVariables() (err error) {
 		}
 	}
 	return
+}
+
+func (n *Node) hasEmptyQuantifiers() bool {
+
+	if !n.IsQuantifier() {
+		return false
+	}
+
+	v := n.variable
+
+	ns := getSubnodes(n)
+
+	for i := 1; i < len(ns); i++ {
+		if !ns[i].IsAtomic() {
+			continue
+		}
+		for _, t := range ns[i].term {
+			if t == v {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func (n *Node) renameVars() *Node {
+
+	vars := []string{"x", "y", "z", "v", "w", "u"}
+
+	qnest := func(n *Node) int {
+		r := 0
+		for _, e := range n.Ancestors() {
+			if e.IsQuantifier() {
+				r++
+			}
+		}
+		return r
+	}
+
+	for l := 5; l > -1; l-- {
+
+		for _, e := range getSubnodes(n) {
+
+			if !e.IsQuantifier() {
+				continue
+			}
+			if qnest(e) != l {
+				continue
+			}
+
+			for _, f := range getSubnodes(e) {
+				if !f.IsAtomic() {
+					continue
+				}
+				var newterm []string
+				for _, t := range f.term {
+					if t == e.BoundVariable() {
+						newterm = append(newterm, vars[l])
+					} else {
+						newterm = append(newterm, t)
+					}
+				}
+				f.term = nil
+				f.term = append(f.term, newterm...)
+				f.raw = f.predicateLetter + strings.Join(f.term, "")
+			}
+			e.variable = vars[l]
+		}
+	}
+	return n
+}
+
+func (n *Node) NormalizeVars() *Node {
+
+	if err := n.hasIllegalBoundVariables(); err != nil {
+		return n
+	}
+
+	varCounter := 0
+	vars := func() string {
+		varCounter++
+		return "x_{" + strconv.Itoa(varCounter) + "}"
+	}
+
+	for _, e := range getSubnodes(n) {
+
+		if !e.IsQuantifier() {
+			continue
+		}
+		newvar := vars()
+
+		for _, f := range getSubnodes(e) {
+			if !f.IsAtomic() {
+				continue
+			}
+			var newterm []string
+			for _, t := range f.term {
+				if t == e.BoundVariable() {
+					newterm = append(newterm, newvar)
+				} else {
+					newterm = append(newterm, t)
+				}
+			}
+			f.term = nil
+			f.term = append(f.term, newterm...)
+			f.raw = f.predicateLetter + strings.Join(f.term, "")
+		}
+		e.variable = newvar
+	}
+	return n
 }
