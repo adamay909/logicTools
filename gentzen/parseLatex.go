@@ -237,7 +237,8 @@ func isCloseb(s string) bool {
 
 func parseLatex(ts tokenStr) (*Node, error) {
 
-	n := new(Node)
+	var m Node
+	n := &m
 
 	mc, sub1, sub2, err := findMC(ts)
 
@@ -255,27 +256,26 @@ func parseLatex(ts tokenStr) (*Node, error) {
 		return n, err
 	}
 
-	//ns1 := n.mkChild1()
-	//	ns2 := n.mkChild2()
+	var ns1, ns2 *Node
 
 	n.SetConnective(mc.tokenType.logicConstant())
 	if mc.isQuantifier() {
 		n.SetBoundVar(mc.variable)
 	}
-	ns1, err := parseLatex(sub1)
+	ns1, err = parseLatex(sub1)
 	if err != nil {
 		return n, err
 	}
 	n.SetChild1(ns1)
-	//	n.subnode1.parent = n
+	n.subnode1.parent = n
 
 	if len(sub2) > 0 {
-		ns2, err := parseLatex(sub2)
+		ns2, err = parseLatex(sub2)
 		if err != nil {
 			return n, err
 		}
 		n.SetChild2(ns2)
-		//		n.subnode2.parent = n
+		n.subnode2.parent = n
 	}
 
 	n, err = ParseStrict(n.String())

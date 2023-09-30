@@ -250,31 +250,6 @@ func IsTautology(s string) bool {
 	return true
 }
 
-// IsConsistent returns whether s is consistent. Works for predicate logic.
-func IsInconsistent(s string) bool {
-
-	n, err := ParseStrict(s)
-
-	if err != nil {
-		return false
-	}
-
-	t := semanticTableau(n, false)
-
-	t.pruneTableau()
-
-	f := flattenTableaux(t)
-
-	for _, e := range f {
-		if len(e.child) == 0 {
-			if !e.closed {
-				return false
-			}
-		}
-	}
-	return true
-}
-
 // IsWff returns whether s is a wff.
 func IsWff(s string) bool {
 

@@ -4,28 +4,30 @@ import (
 	"math/rand"
 )
 
-func genRand(m, d int, fixed bool) string {
+var (
+	atomicE = []string{
+		"P",
+		"Q",
+		"R",
+		"S",
+		"T",
+		"W",
+		"Y",
+		"Z",
+		"M",
+		"L",
+	}
+)
 
-	var (
-		atomicE = []string{
-			"P",
-			"Q",
-			"R",
-			"S",
-			"T",
-			"W",
-			"Y",
-			"Z",
-			"M",
-			"L",
-		}
-	)
+func genRand(m, d int, fixed bool) string {
 
 	if m > len(atomicE) {
 		m = len(atomicE)
 	}
 
-	s := Parse(chooseAtomic(m, atomicE))
+	s := new(Node)
+	s.raw = chooseAtomic(m)
+	s.SetAtomic()
 
 	for s.ConnectiveCount() < d {
 
@@ -39,18 +41,18 @@ func genRand(m, d int, fixed bool) string {
 				continue
 			}
 			changed = true
-			e.connective = chooseConnective(connectivesSL)
-			c1 := Parse(chooseAtomic(m, atomicE))
-			e.SetChild1(c1)
+			e.connective = chooseConnective()
+			c1 := e.mkchild()
+			c1.raw = chooseAtomic(m)
+			c1.SetAtomic()
 
 			if e.IsBinary() {
-				c2 := Parse(chooseAtomic(m, atomicE))
-				e.SetChild2(c2)
+				c2 := e.mkchild()
+
+				c2.raw = chooseAtomic(m)
+				c2.SetAtomic()
 			}
 			e.raw = e.String()
-			if s.ConnectiveCount() >= d {
-				break
-			}
 		}
 		if !changed {
 			break
@@ -60,185 +62,97 @@ func genRand(m, d int, fixed bool) string {
 	return s.String()
 }
 
-func chooseAtomic(m int, atomicE []string) string {
-
-	if m > len(atomicE) {
-		m = len(atomicE)
-	}
+func chooseAtomic(m int) string {
 
 	return atomicE[rand.Intn(m)]
 
 }
 
-func chooseConnective(candidates [][6]string) logicalConstant {
+func chooseConnective() logicalConstant {
 
-	return logicalConstant(candidates[rand.Intn(len(candidates))][0])
+	return logicalConstant(connectivesSL[rand.Intn(len(connectivesSL))][0])
 
 }
 
-// m number of predicates, d number of connectives
-func genRandPL(m, d int) string {
+/*
+flatten node.
+For each atomic sentence decide whether to replace it with compound.If yes:
+	decide on connective
+	decide on child(ren)
+Repeat until either max depth is reached or no changes were made
+*/
 
-	var quantifiers [][6]string
+func _genRand(m, d int, fixed bool) string {
 
-	quantifiers = append(quantifiers, connectivesPL[:2]...) //need to exclude equality sign
+	if m > len(atomicE) {
+		m = len(atomicE)
+	}
 
-	atomicE := genAtomicE(m)
+	cand := generateCandidates(m, fixed)
 
-	s := Parse(chooseAtomic(len(atomicE), atomicE))
+	var s, sNew, sOld string
 
-	for s.ConnectiveCount() < d {
-
-		changed := false
-
-		for _, e := range getSubnodes(s) {
-			if !e.IsAtomic() {
-				continue
-			}
-			if rand.Intn(4) == 0 {
-				continue
-			}
-
-			changed = true
-			e.SetConnective(chooseConnective(connectivesSL))
-
-			c1 := Parse(chooseAtomic(len(atomicE), atomicE))
-			e.clear()
-			e.SetChild1(c1)
-
-			if e.IsBinary() {
-
-				c2 := Parse(chooseAtomic(len(atomicE), atomicE))
-				e.clear()
-				e.SetChild2(c2)
-			}
-			e.raw = e.String()
+	s = "P"
+	for Parse(s).ConnectiveCount() < d {
+		sNew = ""
+		sOld = s
+		for _, c := range s {
+			sNew = sNew + replace(string(c), cand)
 		}
-		if !changed {
+
+		if s == sNew {
 			break
 		}
+		s = sNew
 	}
-	for s.HasFreeVars() {
+	if Parse(s).ConnectiveCount() > d {
+		s = sOld
+	}
+	return s
 
-		es := getSubnodes(s)
+}
 
-		e := es[rand.Intn(len(es))]
+func generateCandidates(m int, fixed bool) []string {
 
-		if e.HasFreeVarsOnBranch() {
-			if rand.Intn(4) == 0 {
-				e.closure(chooseConnective(quantifiers), chooseAtomic(100, e.FreeVarsOnBranch()))
-				e.raw = e.String()
+	var r []string
+	var perm []int
+
+	if fixed {
+		for i := 0; i < len(atomicE); i++ {
+			perm = append(perm, i)
+		}
+	} else {
+		perm = rand.Perm(len(atomicE))
+	}
+	for _, n1 := range perm[:m] {
+		s1 := atomicE[n1]
+
+		for _, n2 := range perm[:m] {
+			s2 := atomicE[n2]
+			for _, c := range connectivesSL {
+
+				if c[0] == lneg {
+					r = append(r, string(c[0])+s1)
+					continue
+				}
+				r = append(r, string(c[0])+s1+s2)
 			}
 		}
 	}
-	s.renameVars()
-	return s.String()
-}
-
-func (n *Node) FreeVarsOnBranch() []string {
-
-	fv := n.FreeVars()
-
-	for _, e := range n.Ancestors() {
-		if !e.IsQuantifier() {
-			continue
-		}
-
-		if slicesContains(fv, e.BoundVariable()) {
-			fv = slicesRemove(fv, e.BoundVariable())
-		}
-	}
-	return fv
-}
-
-func (n *Node) HasFreeVarsOnBranch() bool {
-	return len(n.FreeVarsOnBranch()) > 0
-}
-
-func (n *Node) closure(quantifier logicalConstant, v string) {
-
-	c1 := Parse(n.String())
-	if _, ok := n.Child1(); ok {
-		c1.SetChild1(n.Child1Must())
-	}
-	if n.IsBinary() {
-		c1.SetChild2(n.Child2Must())
-	}
-
-	n.SetConnective(quantifier)
-
-	n.SetChild1(c1)
-	n.variable = v
-	n.term = nil
-	return
-}
-
-// generates the candidate atomic sentences for PL
-func genAtomicE(m int) (r []string) {
-	var (
-		predicates = []string{
-			"F",
-			"G",
-			"H",
-			"D",
-			"B",
-			"P",
-			"Q",
-		}
-
-		variables = []string{
-			"a",
-			"b",
-			"c",
-			"d",
-			"e",
-			"f",
-		}
-	)
-
-	if m > len(predicates) {
-		m = len(predicates)
-	}
-
-	nv := rand.Intn(len(variables)) + 1
-	for _, p := range predicates[:m] {
-		for _, v := range variables[:nv] {
-			r = append(r, p+v)
-		}
-	}
-
 	return r
 }
 
-func (s *Node) cleanEmptyQuantifiers() {
+func replace(s string, cand []string) string {
 
-	for _, n := range getSubnodes(s) {
-
-		if !n.hasEmptyQuantifiers() {
-			continue
-		}
-
-		c := n.Child1Must()
-
-		if n.parent == nil {
-			n.connective = c.connective
-			n.SetChild1(c.Child1Must())
-			if c.IsBinary() {
-				n.SetChild2(c.Child2Must())
-			}
-			continue
-		}
-
-		if n.parent.IsBinary() {
-			if n.parent.Child2Must() == c {
-				n.parent.SetChild2(c)
-			} else {
-				n.parent.SetChild1(c)
-
-			}
-		} else {
-			n.parent.SetChild1(c)
-		}
+	if isConnective(s) {
+		return s
 	}
-	return
+	d := rand.Intn(2)
+
+	if d == 0 {
+		return s
+	}
+
+	return cand[rand.Intn(len(cand))]
+
 }

@@ -42,7 +42,7 @@ var (
 
 	oHELP = false
 
-	oMENU = true
+	oMENU = false
 
 	oABOUT = false
 
@@ -76,6 +76,7 @@ func main() {
 	setupJS()
 	resetDisplay()
 	hideExtra()
+	hide("menuButton")
 	loadHistory()
 	stopInput()
 
