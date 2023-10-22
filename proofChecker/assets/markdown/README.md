@@ -137,7 +137,7 @@ If you use a theorem in a derivation, you must use its abbreviation in the annot
 
 ### Derived Rules
 
-If derived rules are enabled (default), you may given a theorem listed above of the form s1⊃s2 use the derived rule of inference: From Γ ⊢ s1 , infer Γ ⊢ s2.
+If derived rules are enabled (default), you may, given a theorem listed above of the form s1⊃s2, use the derived rule of inference: From Γ ⊢ s1 , infer Γ ⊢ s2.
 
 This will save you having to go through Conditional Elimination. If you use a derived rule, append R to the end of the name of the corresponding theorem. E.g.:
 
