@@ -76,5 +76,22 @@ func negI(d *derivNode) bool {
 		return false
 	}
 
+	wantDatum1 := datumRm(seq1.datumSlice(), datum(n3.Child1Must().Formula()))
+	wantDatum2 := datumRm(seq2.datumSlice(), datum(n3.Child1Must().Formula()))
+
+	wantDatum := datumUnion(wantDatum1, wantDatum2)
+
+	if strictCheck {
+		if !datumsEqual(wantDatum, seq3.datumSlice()) {
+			logger.Print("check datum of conclusion")
+			return false
+		}
+	} else {
+		if !datumsEquiv(wantDatum, seq3.datumSlice()) {
+			logger.Print("check datum of conclusion")
+			return false
+		}
+	}
+
 	return true
 }

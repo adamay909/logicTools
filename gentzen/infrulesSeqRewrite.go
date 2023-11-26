@@ -14,6 +14,8 @@ func seqRewrite(d *derivNode) bool {
 	res := d.line.seq
 	n := d.line.lines[0]
 
+	Debug("checking datum 1: ", ini.datumSlice(), " against: ", res.datumSlice())
+
 	if isSeqReduce(ini, res) {
 		return true
 	}

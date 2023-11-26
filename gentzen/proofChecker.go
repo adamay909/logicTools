@@ -203,20 +203,27 @@ func printDerivline(s string, m printMode) string {
 }
 
 func printArgline(al argLine, m printMode) string {
+	/*
+		datumstring := convSubscript(al.printDatum(m))
 
-	datumstring := convSubscript(al.printDatum(m))
+		succstring := convSubscript(printNodeInfix(Parse(al.seq.succedent().String()), m))
 
-	succstring := convSubscript(printNodeInfix(Parse(al.seq.succedent().String()), m))
+		annotation := convSubscript(al.printAnnotation(m))
+	*/
+	datumstring := al.printDatum(m)
 
-	annotation := convSubscript(al.printAnnotation(m))
+	succstring := printNodeInfix(Parse(al.seq.succedent().String()), m)
+
+	annotation := al.printAnnotation(m)
 
 	var resp string
 
 	if m == mLatex {
 		resp = `\ai{` + datumstring + `}{` + succstring + `}{` + annotation + `}` + "\n\n"
+		return resp
 	}
 	if m == mPlainText {
-		resp = strings.ReplaceAll(datumstring+`⊢`+succstring+`...`+annotation, " ", "")
+		resp = strings.ReplaceAll(convSubscript(datumstring)+`⊢`+convSubscript(succstring)+`...`+convSubscript(annotation), " ", "")
 	}
 	return resp
 }
@@ -243,9 +250,12 @@ func (al argLine) printDatum(m printMode) string {
 	if len(al.seq.d) != 0 {
 
 		datums := al.seq.datumSlice()
-		for _, d := range datums {
+		for k, d := range datums {
+			Debug("datum ", k, ": ", d)
 			if d[:1] == `\` {
-				datumstring = datumstring + runeOf(d, m) + `, `
+				Debug("Splitting subscript: ", d)
+				e, sub := splitSubscript(string(d))
+				datumstring = datumstring + runeOf(e, m) + `_` + sub + `, `
 			} else {
 				datumstring = datumstring + printNodeInfix(Parse(d), m) + `, `
 			}
@@ -304,10 +314,22 @@ func runeOf[str ~string](s str, m printMode) string {
 	return string(s)
 }
 
+func splitSubscript(s string) (m, sub string) {
+	m = s
+	sub = ""
+	if i := strings.Index(s, "_"); i > 0 {
+		m = s[:i]
+		sub = s[i:]
+	}
+
+	return
+}
+
 func isFormulaSet(s string) bool {
 
+	Debug("checking ", s)
 	for _, e := range greekUCBindings {
-		if e[2] == s {
+		if m, _ := splitSubscript(s); e[2] == m {
 			return true
 		}
 	}

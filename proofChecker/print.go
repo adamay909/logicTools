@@ -113,6 +113,10 @@ func latexOutput() string {
 	output = `%title:%` + dsp.Title + "\n"
 
 	if arglines, ok := getArglines(dsp.Input); ok {
+		for c, k := range arglines {
+			debug(c, ": ", k)
+		}
+
 		output = output + gentzen.PrintDeriv(arglines, dsp.Offset)
 		return safeLtx(output)
 	}

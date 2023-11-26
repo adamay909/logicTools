@@ -244,6 +244,11 @@ func nextToken(s string) (t token, r string) {
 		t.tokenType = tPredicate
 	case isFormulaSet(string(sr[:pos])):
 		t.tokenType = tAtomicSentence
+		if len(s) > 1+pos {
+			if string(sr[pos:pos+1]) == `_` {
+				pos = pos + 2
+			}
+		}
 	case isLowerCase(string(sr[:pos])):
 		t.tokenType = tTerm
 		if len(s) > 1+pos {

@@ -36,7 +36,7 @@ func getArglines(c []inputLine) (s []string, ok bool) {
 			continue
 		}
 		raw := true
-		debug(strings.Join(line, "; "))
+		debug("parsing :", strings.Join(line, "; "))
 
 		datum, succ, annot, err := parseLine(line, raw)
 		if err != nil {
@@ -45,7 +45,6 @@ func getArglines(c []inputLine) (s []string, ok bool) {
 		}
 
 		s = append(s, datum+";"+succ+";"+replaceInfrules(annot))
-
 	}
 	return
 }
@@ -72,30 +71,19 @@ func length(l []inputLine) int {
 
 func subscript(s string) string {
 
-	if !strings.Contains(s, "<sub>") {
+	if !strings.Contains(s, "_") {
 		return ""
 	}
 
-	if !strings.Contains(s, "</sub>") {
-		return ""
-	}
+	i := strings.Index(s, "_")
 
-	i := strings.Index(s, "<sub>") + 5
-
-	j := strings.Index(s, "</sub>")
-
-	return strings.TrimSpace(s[i:j])
+	return strings.TrimSpace(s[i+1:])
 
 }
 
 func removeSubscript(s string) string {
 
-	if !strings.Contains(s, "<sub>") {
-		return ""
-	}
-
-	return strings.TrimSpace(s[:strings.Index(s, "<sub>")])
-
+	return strings.TrimSuffix(s, "_"+subscript(s))
 }
 
 func fixSubscripts(l []string) (o []string, err error) {
@@ -108,8 +96,8 @@ func fixSubscripts(l []string) (o []string, err error) {
 
 	for i := 1; i < len(l); i++ {
 
-		if strings.HasPrefix(l[i], "<sub>") {
-			o[len(o)-1] = o[len(o)-1] + "_" + subscript(l[i])
+		if strings.HasPrefix(l[i], `<sub>`) {
+			o[len(o)-1] = o[len(o)-1] + "_" + strings.TrimSuffix(strings.TrimPrefix(l[i], `<sub>`), `</sub>`)
 			continue
 		}
 		o = append(o, l[i])
@@ -146,6 +134,7 @@ func parseLine(l []string, raw bool) (datum, succ, annot string, err error) {
 	data := strings.Split(datum, ",")
 	datum = ""
 	for _, e := range data {
+		debug("datum check: ", e)
 		f := strings.TrimSpace(e)
 		if len(f) == 0 {
 			continue
@@ -161,7 +150,7 @@ func parseLine(l []string, raw bool) (datum, succ, annot string, err error) {
 			if subs {
 				f = f + "_" + substr
 			}
-			datum = datum + f
+			datum = datum + f + ","
 			continue
 		}
 		formula, err = gentzen.InfixParser(tk(e))
