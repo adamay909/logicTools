@@ -1,16 +1,28 @@
 package main
 
 func (d *console) insertion(m string) {
+
+	sub := false
+
 	if d.modifier != "" {
+		if d.modifier == "_" {
+			sub = true
+			d.modifier = ""
+		}
 		m = d.modifier + m
 		d.modifier = ""
 	}
+
 	switch m {
 	case enter:
 		d.addNewline()
 	default:
-		tk, err := tkOf(m, tkraw, tktex, allBindings)
-		if err == nil {
+	}
+	tk, err := tkOf(m, tkraw, tktex, allBindings)
+	if err == nil {
+		if sub == true {
+			d.addChar(`<sub>` + tk + `</sub>`)
+		} else {
 			d.addChar(tk)
 		}
 	}

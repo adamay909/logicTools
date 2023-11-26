@@ -36,6 +36,8 @@ func getArglines(c []inputLine) (s []string, ok bool) {
 			continue
 		}
 		raw := true
+		debug(strings.Join(line, "; "))
+
 		datum, succ, annot, err := parseLine(line, raw)
 		if err != nil {
 			gentzen.WriteLog(err.Error(), "line "+strconv.Itoa(i+1)+": ")
@@ -67,9 +69,59 @@ func length(l []inputLine) int {
 	}
 	return 0
 }
+
+func subscript(s string) string {
+
+	if !strings.Contains(s, "<sub>") {
+		return ""
+	}
+
+	if !strings.Contains(s, "</sub>") {
+		return ""
+	}
+
+	i := strings.Index(s, "<sub>") + 5
+
+	j := strings.Index(s, "</sub>")
+
+	return strings.TrimSpace(s[i:j])
+
+}
+
+func removeSubscript(s string) string {
+
+	if !strings.Contains(s, "<sub>") {
+		return ""
+	}
+
+	return strings.TrimSpace(s[:strings.Index(s, "<sub>")])
+
+}
+
+func fixSubscripts(l []string) (o []string, err error) {
+
+	if len(l) == 0 {
+		return
+	}
+
+	o = append(o, l[0])
+
+	for i := 1; i < len(l); i++ {
+
+		if strings.HasPrefix(l[i], "<sub>") {
+			o[len(o)-1] = o[len(o)-1] + "_" + subscript(l[i])
+			continue
+		}
+		o = append(o, l[i])
+	}
+	return
+}
+
 func parseLine(l []string, raw bool) (datum, succ, annot string, err error) {
 
-	p1, _, p2, _, p3 := parseNsplit(l, raw)
+	lf, _ := fixSubscripts(l)
+
+	p1, _, p2, _, p3 := parseNsplit(lf, raw)
 
 	datum = spaceyStringOf(p1)
 	succ = spaceyStringOf(p2)
@@ -87,6 +139,9 @@ func parseLine(l []string, raw bool) (datum, succ, annot string, err error) {
 
 	var formula *gentzen.Node
 
+	subs := false
+	substr := ""
+
 	//Deal with datum
 	data := strings.Split(datum, ",")
 	datum = ""
@@ -95,9 +150,18 @@ func parseLine(l []string, raw bool) (datum, succ, annot string, err error) {
 		if len(f) == 0 {
 			continue
 		}
+		if subscript(f) != "" {
+			subs = true
+			substr = subscript(f)
+			f = strings.TrimSpace(removeSubscript(f))
+		}
+
 		if isGreekLetter(f) {
 			f, _ = tkOf(f, tktex, tktxt, greekBindings)
-			datum = datum + f + ","
+			if subs {
+				f = f + "_" + substr
+			}
+			datum = datum + f
 			continue
 		}
 		formula, err = gentzen.InfixParser(tk(e))
@@ -215,6 +279,9 @@ func tk(s string) (t []string) {
 
 	for _, e := range d {
 		if len(e) != 0 {
+			if subscript(e) != "" {
+				e = removeSubscript(e) + "_" + subscript(e)
+			}
 			t = append(t, e)
 		}
 	}

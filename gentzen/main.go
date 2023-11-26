@@ -59,6 +59,7 @@ var (
 	oPL    = false
 	oTHM   = false
 	oCOND  = true
+	oAX    = true
 	oML    = true
 	oDR    = true
 	oDEBUG = false

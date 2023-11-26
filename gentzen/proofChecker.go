@@ -204,11 +204,11 @@ func printDerivline(s string, m printMode) string {
 
 func printArgline(al argLine, m printMode) string {
 
-	datumstring := al.printDatum(m)
+	datumstring := convSubscript(al.printDatum(m))
 
-	succstring := printNodeInfix(Parse(al.seq.succedent().String()), m)
+	succstring := convSubscript(printNodeInfix(Parse(al.seq.succedent().String()), m))
 
-	annotation := al.printAnnotation(m)
+	annotation := convSubscript(al.printAnnotation(m))
 
 	var resp string
 
@@ -219,6 +219,21 @@ func printArgline(al argLine, m printMode) string {
 		resp = strings.ReplaceAll(datumstring+`⊢`+succstring+`...`+annotation, " ", "")
 	}
 	return resp
+}
+
+func convSubscript(s string) (o string) {
+
+	r := []rune(s)
+
+	for k := 0; k < len(r); k++ {
+		if r[k] == '_' {
+			o = o + `<sub>` + string(r[k+1]) + `</sub>`
+			k++
+		} else {
+			o = o + string(r[k])
+		}
+	}
+	return o
 }
 
 func (al argLine) printDatum(m printMode) string {

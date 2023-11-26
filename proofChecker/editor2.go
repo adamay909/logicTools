@@ -108,7 +108,7 @@ func (d *console) empty() bool {
 
 func isModifier(k string) bool {
 
-	return k == `\` || k == `|`
+	return k == `\` || k == `|` || k == `_`
 
 }
 

@@ -15,7 +15,9 @@ func InfixParser(s []string) (n *Node, err error) {
 	var ts tokenStr
 
 	Debug("$$$$$$ Infix Parser")
-	Debug("parsing: ", s)
+	sl := strings.Join(s, ";")
+
+	Debug("parsing: ", sl)
 
 	ts, err = tokenizeLatex(s)
 	if err != nil {
@@ -32,7 +34,7 @@ func InfixParser(s []string) (n *Node, err error) {
 	n, err = parseLatex(ts)
 
 	if err != nil {
-		Debug("Infix Parser", err)
+		Debug("Infix Parser: ", err)
 		return
 	}
 	Debug("found", n.StringPlain())

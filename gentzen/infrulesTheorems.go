@@ -58,9 +58,26 @@ func theoremsInUse() [][]string {
 		{"Duality", "DL", ">-[p<-p"},
 	}
 
+	var axiomsSL = [][]string{
+		{"", "A1", ">p>q^pq"},
+		{"", "A2", ">^pqp"},
+		{"", "A3", ">^pqq"},
+		{"", "A4", ">pVpq"},
+		{"", "A5", ">pVqp"},
+		{"", "A6", ">Vpq>>pr>>qrr"},
+		{"", "A7", ">>pq>>p-q-p"},
+		{"", "A8", ">--pp"},
+		{"", "A9", ">>p>qr>>pq>pr"},
+		{"", "A10", ">p>qp"},
+	}
+
 	var thm [][]string
 
 	thm = append(thm, theorems...)
+
+	if oAX {
+		thm = append(thm, axiomsSL...)
+	}
 
 	if oML {
 		thm = append(thm, modalTheorems...)
