@@ -65,6 +65,7 @@ var connectivesSL, connectivesPL, connectivesML [][6]string
 
 var infRules = [][]string{
 	{`a`, `A`, `A`, `A`},
+	{`m`, `M`, `M`, `M`},
 	{`ki`, `\conjI`, `\conjI`, "\u2227I"},
 	{`ke`, `\conjE`, `\conjE`, "\u2227E"},
 	{`di`, `\disjI`, `\disjI`, "\u2228I"},

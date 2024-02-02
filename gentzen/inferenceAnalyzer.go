@@ -180,6 +180,9 @@ func checkFunc(inf string) func(*derivNode) bool {
 	case a: //assumption
 		return assumption
 
+	case m: //monotonicity
+		return monotonicity
+
 	case ki: //conjunction intro
 		return conjI
 

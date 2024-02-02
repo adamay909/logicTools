@@ -28,6 +28,7 @@ const (
 	ci  = "ci"
 	ce  = "ce"
 	a   = "a"
+	m   = "m"
 	ui  = "ui"
 	ue  = "ue"
 	ei  = "ei"

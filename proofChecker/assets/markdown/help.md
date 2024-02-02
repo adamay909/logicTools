@@ -30,18 +30,14 @@ How to input logical symbols:
 The following letters cannot be used for sentence, predicate, and term letters:
 v, V, U, and X.
 
+
 The editor will format your derivation on the fly. It is not possible to control the formatting.
 
 Inference rules must be specified by abbreviations used in the course material (see README).
 
-Theorems must be specified by abbreviations used in the course material (see README).
+Theorems and Axioms  must be specified by abbreviations used in the course material (see README).
 
-The menu button on the upper left gives some more commands: 
-- "copy to clipboard" copies the content of the current screen as plain text. Formatting is lost;
-- "import/export" im(ex)ports the entire history as a JSON file. Useful if you want to move history between browsers;
-- "copy LaTeX" produces output for typesetting course material. Not useful without custom commands.
-
-
+You can add subscripts by typing _ (underscore) followed by a single character (WARNING: debugging for use of subscripts is incomplete)
 
 <div>
 <button class="button" id="togglereadme" tabindex="0">Click here for README</button>

@@ -49,10 +49,6 @@ There are two rules for identity:
 - **Identity Elimination (=E)** For any constants κ1 and κ2 , infer
 ⊢ (κ1=κ2 ∧ φ(κ1)) ⊃ φ\*(κ2) (φ\*(κ2) is φ(κ1) with one or more inistance of κ1 replaced with  κ2.)
 
- 
-
-
-
 
 
 For annotations, the proof checker requires you to use the abbreviations given in parentheses.

@@ -290,6 +290,7 @@ func replaceInfrules(s string) string {
 		[2]string{`\supsetE`, `ce`},
 		[2]string{`\supsetI`, `ci`},
 		[2]string{`A`, `a`},
+		[2]string{`M`, `m`},
 		[2]string{`\forallE`, `ue`},
 		[2]string{`\forallI`, `ui`},
 		[2]string{`\existsE`, `ee`},
