@@ -200,6 +200,13 @@ func (n *Node) IsDisjunction() bool {
 	return n.MainConnective() == disj
 }
 
+func (n *Node) IsDoubleNegation() bool {
+	if !n.IsNegation() {
+		return false
+	}
+	return n.Child1Must().IsNegation()
+}
+
 func (n *Node) IsModal() bool {
 	return n.MainConnective() == nec || n.MainConnective() == pos
 }

@@ -246,7 +246,7 @@ func setupConnectives() {
 
 	connectivesML = [][6]string{
 		{string(pos), `\lpos `, `\Diamond `, "\u25c7", "\u25c7", " possibly "},
-		{string(nec), `\lnec `, `\Box `, "\u25a1", "\u25a1", " necessarily "},
+		{string(nec), `\lnec `, `\Box `, "\u25fb", "\u25fb", " necessarily "},
 	}
 
 	if oCOND {

@@ -96,7 +96,7 @@ var (
 	}
 
 	mlBindings = [][3]string{
-		[3]string{`[`, `\lnec`, "\u25a1"},
+		[3]string{`[`, `\lnec`, "\u25fb"},
 		[3]string{`<`, `\lpos`, "\u25c7"},
 	}
 
