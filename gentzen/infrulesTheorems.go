@@ -56,6 +56,10 @@ func theoremsInUse() [][]string {
 		{"Duality", "DL", "><-p-[p"},
 		{"Duality", "DL", ">-<p[-p"},
 		{"Duality", "DL", ">-[p<-p"},
+		{"M1", "M1", ">[p-<-p"},
+		{"M3", "M3", "><p-[-p"},
+		{"M4", "M4", ">-[-p<p"},
+		{"M2", "M2", ">-<-p[p"},
 	}
 
 	var axiomsSL = [][]string{

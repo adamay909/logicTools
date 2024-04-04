@@ -39,6 +39,8 @@ func necE(d *derivNode) bool {
 
 	return true
 }
+
+/*
 func necI(d *derivNode) bool {
 
 	Debug("Inference checker checking for li")
@@ -78,7 +80,41 @@ func necI(d *derivNode) bool {
 	return true
 
 }
+*/
 
+func necI(d *derivNode) bool {
+
+	if !oML {
+		logger.Print("Modal Logic not allowed")
+		return false
+	}
+
+	if len(d.supportingLines) != 1 {
+		logger.Print("T Necessity Introduction depends on one line")
+		return false
+	}
+
+	seq1 := d.supportingLines[0].line.seq
+	seq2 := d.line.seq
+
+	if Parse(seq2.succedent().String()).MainConnective() != nec {
+		logger.Print("conclusion must be necessary truth")
+		return false
+	}
+	if !isModalInstanceOf(seq1.succedent().String(), seq2.succedent().String()) {
+		logger.Print("conclusion not a necessitation of premise")
+		return false
+	}
+
+	if len(seq1.datumSlice()) != 0 {
+
+		logger.Print("can only necessitate a theorem")
+		return false
+	}
+
+	return true
+
+}
 func necI_T(d *derivNode) bool {
 
 	if !oML {
