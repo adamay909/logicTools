@@ -5,48 +5,58 @@ The variables defined here should be treated as constants except by functins def
 file.
 *************************************/
 
-type logicalConstant string
+// LogicalConstant represents the logical constants.
+type LogicalConstant int
 
 var (
-	lneg  = "-"
-	lconj = "^"
-	ldisj = "V"
-	lcond = ">"
-	luni  = "U"
-	lex   = "X"
-	lnec  = "["
-	lpos  = "<"
-)
-var (
-	neg   = logicalConstant(lneg)
-	conj  = logicalConstant(lconj)
-	disj  = logicalConstant(ldisj)
-	cond  = logicalConstant(lcond)
-	uni   = logicalConstant(luni)
-	ex    = logicalConstant(lex)
-	ident = logicalConstant("=")
-	nec   = logicalConstant(lnec)
-	pos   = logicalConstant(lpos)
-	none  = logicalConstant(`*`)
+	lneg   = "-"
+	lconj  = "^"
+	ldisj  = "V"
+	lcond  = ">"
+	luni   = "U"
+	lex    = "X"
+	lnec   = "["
+	lpos   = "<"
+	lident = "="
 )
 
+//go:generate stringer -type LogicalConstant
 const (
-	mPolish printMode = iota
-	mLatex
-	mPlainLatex
-	mPlainText
-	mSimple
-	mEnglish
+	None  LogicalConstant = iota //no connective
+	Neg                          //negation
+	Conj                         //conjunction
+	Disj                         //disjunction
+	Cond                         //conditional
+	Uni                          //universal quantifier
+	Ex                           //existential quantifier
+	Ident                        //identity
+	Nec                          //necessity
+	Pos                          //possibility
+)
+
+//go:generate stringer -type=PrintMode
+const (
+	O_Polish       PrintMode = iota //Polish notation
+	O_Latex                         //LaTeX code
+	O_PlainLatex                    //ditto
+	O_PlainText                     //plain text
+	O_Simple                        //unused
+	O_English                       //plain English
+	O_PlainASCII                    //plain text restricted to ASCII
+	O_ProofChecker                  //for proof checker
 )
 
 var brackets = [][2]string{
 	{"", ""},
-	{"(", ")"},
-	{"[", "]"},
-	{`\{`, `\}`},
+	{`\big(`, `\big)`},
+	{`\big[`, `\big]`},
+	{`\big\{`, `\big\}`},
 	{`\Big(`, `\Big)`},
 	{`\Big[`, `\Big]`},
 	{`\Big\{`, `\Big\}`},
+	{`\bigg(`, `\bigg)`},
+	{`\bigg[`, `\bigg]`},
+	{`\bigg\{`, `\bigg\}`},
 	{`\Bigg(`, `\Bigg)`},
 	{`\Bigg[`, `\Bigg]`},
 	{`\Bigg\{`, `\Bigg\}`},
@@ -54,6 +64,7 @@ var brackets = [][2]string{
 }
 
 var textBrackets = [][2]string{
+	{"", ""},
 	{`$\langle$`, `$\rangle$`},
 	{`$\big\langle$`, `$\big\rangle$`},
 	{`$\Big\langle$`, `$\Big\rangle$`},
@@ -61,7 +72,29 @@ var textBrackets = [][2]string{
 	{`$\Bigg\langle$`, `$\Bigg\rangle$`},
 }
 
-var connectivesSL, connectivesPL, connectivesML [][6]string
+var proofCheckerBrackets = [][2]string{
+	{"", ""},
+	{`<span class="big">(</span>`, `<span class="big">)</span>`},
+	{`<span class="big">[</span>`, `<span class="big">]</span>`},
+	{`<span class="big">{</span>`, `<span class="big">}</span>`},
+	{`<span class="bigg">(</span>`, `<span class="bigg">)</span>`},
+	{`<span class="bigg">[</span>`, `<span class="bigg">]</span>`},
+	{`<span class="bigg">{</span>`, `<span class="bigg">}</span>`},
+	{`<span class="biggg">(</span>`, `<span class="biggg">)</span>`},
+	{`<span class="biggg">[</span>`, `<span class="biggg">]</span>`},
+	{`<span class="biggg">{</span>`, `<span class="biggg">}</span>`},
+}
+
+var simpleBrackets = [][2]string{
+	{"", ""},
+	{"(", ")"},
+	{"[", "]"},
+	{`{`, `}`},
+}
+
+var plainBrackets = simpleBrackets[:2]
+
+var connectivesSL, connectivesPL, connectivesML [][7]string
 
 var infRules = [][]string{
 	{`a`, `A`, `A`, `A`},
@@ -91,6 +124,7 @@ var infRules = [][]string{
 	{sc, "SC", "SC", "SC"},
 	{sl, "logic", "logic", "logic"},
 	{"rewrite", "", "", ""},
+	{`\lposDR`, `\lposDR`, `\lposDR`, "\u25c7DR"},
 }
 
 var greekUCBindings = [][3]string{
@@ -106,8 +140,8 @@ var greekUCBindings = [][3]string{
 	[3]string{`/F`, `\Phi`, "\u03a6"},
 	[3]string{`/Q`, `\Psi`, "\u03a8"},
 	[3]string{`/W`, `\Omega`, "\u03a9"},
-	[3]string{`/W`, `\Omega`, "\u03a9"},
-	[3]string{`/W`, `\Omega`, "\u03a9"},
+	//	[3]string{`/W`, `\Omega`, "\u03a9"},
+	//	[3]string{`/W`, `\Omega`, "\u03a9"},
 	[3]string{`\0`, `\emptyset`, "\u2300"},
 }
 
@@ -132,7 +166,7 @@ var greekLCBindings = [][3]string{
 	[3]string{`/s`, `\sigma`, "\u03c3"},
 	[3]string{`/y`, `\tau`, "\u03c4"},
 	[3]string{`/u`, `\upsilon`, "\u03c5"},
-	[3]string{`/f`, `\varphi`, "\u03c6"},
+	[3]string{`/f`, `\phi`, "\u03c6"},
 	[3]string{`/c`, `\chi`, "\u03c7"},
 	[3]string{`/q`, `\psi`, "\u03c8"},
 	[3]string{`/w`, `\omega`, "\u03c9"},
@@ -180,7 +214,7 @@ var greekLowerCaseLetters = []string{
 	`\omega`,
 }
 
-var connectives [][6]string
+var connectives [][7]string
 
 // SetStandardPolish sets whether to use more standard notations for the
 // logical constants.
@@ -205,6 +239,7 @@ func setupConnectives() {
 		lex = "X"
 		lnec = "[" //don't use L and M
 		lpos = "<"
+		lident = "="
 	} else {
 
 		lneg = "-"
@@ -215,42 +250,45 @@ func setupConnectives() {
 		lex = "X"
 		lnec = "["
 		lpos = "<"
+		lident = "="
 	}
-
-	neg = logicalConstant(lneg)
-	conj = logicalConstant(lconj)
-	disj = logicalConstant(ldisj)
-	cond = logicalConstant(lcond)
-	uni = logicalConstant(luni)
-	ex = logicalConstant(lex)
-	nec = logicalConstant(lnec)
-	pos = logicalConstant(lpos)
-	ident = logicalConstant("=")
-	none = logicalConstant(`*`)
+	/*
+		Neg = LogicalConstant(lneg)
+		Conj = LogicalConstant(lconj)
+		Disj = LogicalConstant(ldisj)
+		Cond = LogicalConstant(lcond)
+		Uni = LogicalConstant(luni)
+		Ex = LogicalConstant(lex)
+		Nec = LogicalConstant(lnec)
+		Pos = LogicalConstant(lpos)
+		Ident = LogicalConstant("=")
+		None = LogicalConstant(`*`)
+	*/
 
 	connectivesSL = nil
 	connectivesPL = nil
 	connectivesML = nil
 
-	connectivesSL = [][6]string{
-		{string(neg), `\lnot `, `\neg `, "\u00ac", "\u00ac", " it is not the case that "},
-		{string(conj), `\land `, `\wedge `, "\u2227", "\u2227", " and "},
-		{string(disj), `\lor `, `\vee `, "\u2228", "\u2228", " or "},
+	connectivesSL = [][7]string{
+		{lneg, `\lnot `, `\neg `, "\u00ac", "\u00ac", " it is not the case that ", "-"},
+		{lconj, `\land `, `\wedge `, "\u2227", "\u2227", " and ", "^"},
+		{ldisj, `\lor `, `\vee `, "\u2228", "\u2228", " or ", "v"},
 	}
 
-	connectivesPL = [][6]string{
-		{string(uni), `\lforall `, `\forall `, "\u2200", "\u2200", " for all "},
-		{string(ex), `\lthereis `, `\exists `, "\u2203", "\u2203", " there is a "},
-		{string(ident), `\mathbin{=}`, `\mathbin{=}`, `=`, `=`, " equals "},
+	connectivesPL = [][7]string{
+		{luni, `\lforall `, `\forall `, "\u2200", "\u2200", " for all ", "U"},
+		{lex, `\lthereis `, `\exists `, "\u2203", "\u2203", " there is a ", "X"},
+		{lident, `\mathbin{=}`, `\mathbin{=}`, `=`, `=`, " equals ", "="},
 	}
 
-	connectivesML = [][6]string{
-		{string(pos), `\lpos `, `\Diamond `, "\u25c7", "\u25c7", " possibly "},
-		{string(nec), `\lnec `, `\Box `, "\u25fb", "\u25fb", " necessarily "},
+	connectivesML = [][7]string{
+		{lpos, `\lpos `, `\Diamond `, "\u25c7", "\u25c7", " possibly ",
+			"<"},
+		{lnec, `\lnec `, `\Box `, "\u25fb", "\u25fb", " necessarily ", "["},
 	}
 
 	if oCOND {
-		connectivesSL = append(connectivesSL, [6]string{string(cond), `\limplies `, `\supset `, "\u2283", "\u2283", " if , then "})
+		connectivesSL = append(connectivesSL, [7]string{lcond, `\limplies `, `\supset `, "\u2283", "\u2283", " if , then ", ">"})
 	}
 
 	connectives = append(connectivesSL, connectivesPL...)
@@ -275,6 +313,32 @@ func greekCharOf(s string) string {
 
 var prettifyBrackets = true
 
+// SetPrettyBrackets sets whether to use variations in brackets styles (form and possibly size) for improved readability.
 func SetPrettyBrackets(v bool) {
 	prettifyBrackets = v
+}
+
+func codeOf(l LogicalConstant) string {
+
+	switch l {
+	case Neg:
+		return lneg
+	case Conj:
+		return lconj
+	case Disj:
+		return ldisj
+	case Cond:
+		return lcond
+	case Uni:
+		return luni
+	case Ex:
+		return lex
+	case Nec:
+		return lnec
+	case Pos:
+		return lpos
+	default:
+		return ""
+	}
+
 }

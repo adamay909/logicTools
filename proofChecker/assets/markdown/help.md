@@ -24,8 +24,6 @@ How to input logical symbols:
 - &#x2200; : &emsp; U (upper case U as in Universal; only if using predicate logic)
 - &#x2203; : &emsp; X (upper case X as in eXists; only if using predicate logic)
 - ≠ : &emsp; \ followed by =
-- &#x25a1; : &emsp; [ (left square bracket; if you want to do modal logic)
-- &#x25c7; : &emsp; < (smaller-than symbol; if you want to do modal logic) 
 
 The following letters cannot be used for sentence, predicate, and term letters:
 v, V, U, and X.

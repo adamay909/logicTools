@@ -78,6 +78,8 @@ func flattenDerivTree(n *derivNode) []*derivNode {
 	return gs(n, list)
 }
 
+// PrintDerivTree returns the LaTeX code for printing the
+// derivation in tree form.
 func PrintDerivTree(lines []string, offset int) string {
 
 	al, ok := getDerivation(lines, offset)
@@ -116,31 +118,6 @@ DATA\end{forest}
 
 `
 	return strings.ReplaceAll(templ, `DATA`, lt(dt))
-
-}
-
-func PrintDerivation(lines []string, offset int) string {
-
-	return normalDerivation(lines, offset)
-
-}
-
-func normalDerivation(lines []string, offset int) string {
-
-	al, ok := getDerivation(lines, offset)
-	if !ok {
-		return strings.Join(lines, "\n")
-	}
-
-	dt := getDerivTree(al, len(al)-1)
-
-	dl := slicesInvert(flattenDerivTree(dt))
-
-	ret := ""
-	for _, e := range dl {
-		ret = ret + e.line.seq.StringLatex()
-	}
-	return ret
 
 }
 
@@ -224,37 +201,37 @@ func checkFunc(inf string) func(*derivNode) bool {
 
 	case ie: //identity introduction
 		return idE
+		/*
+			case li: //necessity introduction
+				return necI
 
-	case li: //necessity introduction
-		return necI
+			case tli: //necessity introduction
+				return necI_T
 
-	case tli: //necessity introduction
-		return necI_T
+			case pli: //necessity introduction
+				return necI_S4
 
-	case pli: //necessity introduction
-		return necI_S4
+			case mli: //necessity introduction
+				return necI_S5
 
-	case mli: //necessity introduction
-		return necI_S5
+			case le: //necessity elim
+				return necE
 
-	case le: //necessity elim
-		return necE
+			case mi: //possibility intro
+				return posI
 
-	case mi: //possibility intro
-		return posI
+			case me: //possibility elim
+				return posE
 
-	case me: //possibility elim
-		return posE
+			case mme: //possibility elim
+				return posE_S5
 
-	case mme: //possibility elim
-		return posE_S5
+			case sc: //possibility elim
+				return scopeReplacement
 
-	case sc: //possibility elim
-		return scopeReplacement
-
-	case sl: //possibility elim
-		return sententialLogic
-
+			case sl: //possibility elim
+				return sententialLogic
+		*/
 	case "premise": //premise
 		return premise
 
@@ -278,7 +255,7 @@ func theoremDeriv(d *derivNode) bool {
 
 	Debug("Theorems:============")
 	for _, e := range thms {
-		Debug(Parse(e[2]).display())
+		Debug(Parse(e[2], !allowGreekUpper).display())
 	}
 	Debug("=================")
 
@@ -305,7 +282,7 @@ func theoremDeriv(d *derivNode) bool {
 		return (derivR(d))
 	}
 
-	logger.Print(inf, "unknown inference rule or theorem")
+	logger.Print(inf, " unknown inference rule or theorem")
 
 	return false
 }

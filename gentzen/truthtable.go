@@ -1,168 +1,369 @@
 package gentzen
 
 import (
-	"log"
-	"math"
-	"sort"
+	"slices"
+	"strconv"
+	"strings"
 )
 
-//ColSpec is for specifying features of columns of
-//a truth table
-type ColSpec struct {
-	formula string
-	mc      string
-	c1, c2  int
+// TruthTable holds information about a truth table.
+type TruthTable struct {
+	Formula        string
+	ColumnTitles   []string
+	Rows           [][]bool
+	NumAtomic      int   //number of atomic sentences
+	Narrow         bool  //true if the truth table uses the narrow format
+	MainConnective int   //index within infix tokenstring of formula (used for narrow fomat
+	Boundary       []int //index of boundaries between tokens to determine column titles for narrow format
 }
 
-//Table holds the column specifications and truth
-//values of each cell
-type Table struct {
-	tableSpec []ColSpec
-	vals      [][]bool
-}
+func isTautologyTT(s string) bool {
 
-//TTrow holds string value for each row of a truth table.
-type TTrow []string
+	tt, err := GenerateTruthTable(s)
 
-//TextTable holds text strings for each cell of a table
-type TextTable struct {
-	vals   []TTrow
-	atomic int
-}
-
-//Vals returns the text values of each cell of t.
-func (t *TextTable) Vals() []TTrow {
-	return t.vals
-}
-
-//ColSpecs returns the colspecs of t
-func (t *Table) ColSpecs() []ColSpec {
-
-	return t.tableSpec
-
-}
-
-//Vals returns truth values
-func (t *Table) Vals() [][]bool {
-
-	return t.vals
-
-}
-
-//SetColSpecs sets colspecs of t
-func (t *Table) SetColSpecs(s []ColSpec) {
-	t.tableSpec = s
-	return
-}
-
-//SetVals sets t values
-func (t *Table) SetVals(v [][]bool) {
-	t.vals = v
-	return
-}
-
-//Formula returns the formula
-func (c *ColSpec) Formula() string {
-	return c.formula
-}
-
-//SetFormula sets formula
-func (c *ColSpec) SetFormula(s string) {
-	c.formula = s
-}
-
-//MainConnective returns the main connective
-func (c *ColSpec) MainConnective() string {
-	return c.mc
-}
-
-//SetMainConnective sets connective
-func (c *ColSpec) SetMainConnective(s string) {
-	c.mc = s
-}
-
-//RefCols returns the columns referred to
-func (c *ColSpec) RefCols() (int, int) {
-	return c.c1, c.c2
-}
-
-//SetRefCols sets refcols
-func (c *ColSpec) SetRefCols(i, j int) {
-	c.c1 = i
-	c.c2 = j
-	return
-}
-
-//MkTable creates Table for s
-func MkTable(s string) (table Table) {
-
-	table.tableSpec = genTableSpec(getColumns(s))
-	table.vals = genTable(table.tableSpec)
-
-	return
-
-}
-
-//MkTextTable creates a table of strings out of t
-func MkTextTable(table Table) TextTable {
-
-	var t TextTable
-
-	var r TTrow
-
-	t.atomic = getNumberAtomicSentences(table.ColSpecs())
-
-	for _, f := range table.ColSpecs() {
-		r = append(r, Parse(f.Formula()).String())
+	if err != nil {
+		return false
 	}
 
-	t.vals = append(t.vals, r)
+	last := len(tt.ColumnTitles) - 1
 
-	cs := len(r)
+	for _, row := range tt.Rows {
 
-	rs := len(table.Vals()[0])
-
-	for i := 0; i < rs; i++ {
-		r = nil
-		for j := 0; j < cs; j++ {
-			r = append(r, textOf(table.Vals()[j][i]))
+		if row[last] == false {
+			return false
 		}
-		t.vals = append(t.vals, r)
 	}
 
-	return t
+	return true
+}
+
+func isTautologyTTfast(s string) bool {
+
+	_, err := ParseStrict(s, !allowGreekUpper)
+
+	if err != nil {
+		panic(err)
+	}
+
+	cols := getColumnTitles(s)
+
+	numAtomic := len(getAtomicColumns(cols))
+
+	last := len(cols) - 1
+
+	for rownum := 0; rownum < 1<<numAtomic; rownum++ {
+
+		if rowValues(rownum, cols)[last] == false {
+			return false
+		}
+
+	}
+
+	return true
+}
+
+/*
+GenerateTruthTable returns the TruthTable of s where the table
+takes the wide format. For narrow format truth tables, use
+[GenerateTruthTableNarrow]. Here is a wide truth table for [(p⊃q)∧¬p]⊃¬q presented in O_Polish mode:
+
+	   	   p  q  |  Cpq  Np  KCpqNp  Nq  CKCpqNpNq
+		  -------+---------------------------------
+	  	   T  T  |   T   F     F     F       T
+		   F  T  |   T   T     T     F       F
+		   T  F  |   F   F     F     T       T
+		   F  F  |   T   T     T     T       T
+*/
+func GenerateTruthTable(s string) (tt TruthTable, err error) {
+
+	_, err = ParseStrict(s, !allowGreekUpper)
+
+	if err != nil {
+		return
+	}
+
+	tt.ColumnTitles = getColumnTitles(s)
+
+	tt.NumAtomic = len(getAtomicColumns(tt.ColumnTitles))
+
+	for rownum := 0; rownum < 1<<tt.NumAtomic; rownum++ {
+
+		tt.Rows = append(tt.Rows, rowValues(rownum, tt.ColumnTitles))
+
+	}
+
+	return
+}
+
+func valuation(rownumber, numAtomic int) (val []bool, err error) {
+
+	var v int
+	for i := 0; i < numAtomic; i++ {
+
+		v = rownumber
+
+		v = v >> i
+
+		val = append(val, v%2 == 0)
+
+	}
+
+	return
+}
+
+func getColumnTitles(s string) []string {
+
+	n, err := ParseStrict(s, !allowGreekUpper)
+
+	if err != nil {
+		panic(s + "is not well-formed")
+	}
+
+	nslice := linearizeBT(n)
+
+	var atomicCol []string
+
+	var regCol []string
+
+	for _, n = range nslice {
+
+		nstr := n.String()
+
+		if n.IsAtomic() {
+
+			if !slices.Contains(atomicCol, nstr) {
+				atomicCol = append(atomicCol, nstr)
+			}
+		} else {
+			if !slices.Contains(regCol, nstr) {
+				regCol = append(regCol, nstr)
+			}
+		}
+	}
+
+	slices.SortFunc(atomicCol, sortAtomicSentences)
+
+	return slices.Concat(atomicCol, regCol)
+}
+
+func getAtomicColumns(column []string) []string {
+
+	var resp []string
+
+	for _, c := range column {
+
+		n, err := ParseStrict(c, !allowGreekUpper)
+
+		if err != nil {
+			panic(c + "is not well-formed")
+		}
+
+		if n.IsAtomic() {
+
+			resp = append(resp, c)
+
+		}
+
+	}
+
+	return resp
 
 }
 
-//PrintLatexTable prints table as Latex table. rowSep forces
-//printing visible row separators
-func PrintLatexTable(table TextTable, rowSep bool) string {
+func rowValues(rownumber int, columns []string) []bool {
 
-	out := `%generated by gentzen` + "\n"
+	colval := make(map[string]bool)
+
+	var resp []bool
+
+	ac := getAtomicColumns(columns)
+
+	val, _ := valuation(rownumber, len(ac))
+
+	for i, a := range ac {
+
+		colval[a] = val[i]
+
+		resp = append(resp, colval[a])
+	}
+
+	var v1, v2, ok bool
+
+	for i := len(ac); i < len(columns); i++ {
+
+		n, err := ParseStrict(columns[i], !allowGreekUpper)
+
+		if err != nil {
+
+			panic(columns[i] + " is not well formed")
+
+		}
+
+		v1, ok = colval[n.children[0].String()]
+		if !ok {
+			panic("NEG. something wrong " + n.children[0].String())
+		}
+
+		if n.IsBinary() {
+
+			v2, ok = colval[n.children[1].String()]
+
+			if !ok {
+				panic("BINARY. something wrong " + n.children[1].String())
+			}
+
+		}
+
+		switch n.MainConnective() {
+
+		case Neg:
+
+			colval[n.String()] = !v1
+
+		case Conj:
+
+			colval[n.String()] = v1 && v2
+
+		case Disj:
+
+			colval[n.String()] = v1 || v2
+
+		case Cond:
+
+			colval[n.String()] = !v1 || v2
+
+		}
+
+		resp = append(resp, colval[n.String()])
+
+	}
+
+	return resp
+
+}
+
+// PrintTruthTable prints the truth table.
+func (tt *TruthTable) PrintTruthTable(mode PrintMode, rowsep bool) string {
+
+	if tt.Narrow {
+		return printTruthTableNarrow(tt, mode, rowsep)
+	}
+
+	if mode == O_Latex {
+		return printTruthTableLatex(tt, rowsep)
+	}
+
+	w := new(strings.Builder)
+
+	numCols := len(tt.ColumnTitles)
+	colWidths := make([]int, numCols)
+
+	//title line
+	for i, f := range tt.ColumnTitles {
+
+		n, _ := ParseStrict(f, !allowGreekUpper)
+
+		title := n.StringF(mode)
+
+		colWidths[i] = len([]rune(title))
+
+		w.WriteString(center(title, colWidths[i]+2))
+
+		if i == tt.NumAtomic-1 {
+			w.WriteString(` | `)
+		}
+
+	}
+
+	w.WriteString("\n")
+
+	//separator
+	for i, wdth := range colWidths {
+		w.WriteString(strings.Repeat("-", wdth+2))
+
+		if i == tt.NumAtomic-1 {
+			w.WriteString(`-+-`)
+		}
+	}
+
+	w.WriteString("\n")
+
+	//the actual table
+
+	for rownum, row := range tt.Rows {
+		for i, val := range row {
+
+			text := "T"
+
+			if val == false {
+				text = "F"
+			}
+
+			w.WriteString(center(text, colWidths[i]+2))
+
+			if i == tt.NumAtomic-1 {
+				w.WriteString(` | `)
+			}
+
+		}
+		w.WriteString("\n")
+
+		if rowsep && rownum < len(tt.Rows)-1 {
+			for i, wdth := range colWidths {
+				w.WriteString(strings.Repeat("-", wdth+2))
+
+				if i == tt.NumAtomic-1 {
+					w.WriteString(`-+-`)
+				}
+			}
+			w.WriteString("\n")
+		}
+	}
+	return w.String()
+}
+
+// center centers text within a given width
+func center(text string, width int) string {
+	if len([]rune(text)) >= width {
+		return text
+	}
+	padding := width - len([]rune(text))
+	leftPad := padding / 2
+	rightPad := padding - leftPad
+	return strings.Repeat(" ", leftPad) + text + strings.Repeat(" ", rightPad)
+}
+
+// PrintTruthTableLatex returns LaTeX code for printing tt in wide format.
+func printTruthTableLatex(tt *TruthTable, rowsep bool) string {
+
+	out := `%truth table of:` + "\n"
+
+	out = out + "% " + tt.ColumnTitles[len(tt.ColumnTitles)-1] + "\n"
+
+	out = out + `%generated by gentzen` + "\n"
 
 	out = out + `\begin{tabular}{`
 
-	for i := 0; i < len(table.vals[0]); i++ {
+	for i := 0; i < len(tt.ColumnTitles); i++ {
 		out = out + `c`
-		if i < table.atomic-1 {
+		if i < tt.NumAtomic-1 {
 			continue
 		}
 
-		if i > table.atomic-2 && i < len(table.vals[0])-1 {
+		if i > tt.NumAtomic-2 && i < len(tt.ColumnTitles)-1 {
 			out = out + `|`
 		}
 
-		if i == len(table.vals[0])-2 {
+		if i == len(tt.ColumnTitles)-2 {
 			out = out + `|`
 		}
 	}
 
 	out = out + "}" + "\n"
 
-	r := table.vals[0]
-	for i, txt := range r {
-		out = out + `\p{` + Parse(txt).StringLatex() + `}`
-		if i != len(r)-1 {
+	for i, f := range tt.ColumnTitles {
+		out = out + `\p{` + Parse(f, !allowGreekUpper).StringF(O_Latex) + `}`
+		if i != len(tt.ColumnTitles)-1 {
 			out = out + ` & `
 		}
 	}
@@ -170,11 +371,13 @@ func PrintLatexTable(table TextTable, rowSep bool) string {
 	out = out + `\\` + "\n"
 	out = out + `\hline` + "\n"
 
-	for i := 1; i < len(table.vals); i++ {
+	for _, r := range tt.Rows {
 
-		r := table.vals[i]
-
-		for j, txt := range r {
+		for j, val := range r {
+			txt := "T"
+			if val == false {
+				txt = "F"
+			}
 			out = out + `\emph{` + txt + `}`
 			if j != len(r)-1 {
 				out = out + ` & `
@@ -182,7 +385,7 @@ func PrintLatexTable(table TextTable, rowSep bool) string {
 		}
 
 		out = out + `\\` + "\n"
-		if rowSep {
+		if rowsep {
 			out = out + `\hdashline` + "\n"
 		}
 	}
@@ -192,342 +395,120 @@ func PrintLatexTable(table TextTable, rowSep bool) string {
 
 }
 
-func textOf(v bool) string {
-	if v {
-		return "T"
-	}
-	return "F"
-}
+func sortAtomicSentences(s1, s2 string) int {
 
-func tvalue(v1, v2 bool, mainConnective string) bool {
-
-	switch mainConnective {
-
-	case neg.String():
-		return !v1
-
-	case conj.String():
-		return v1 && v2
-
-	case disj.String():
-		return v1 || v2
-
-	case cond.String():
-		return !v1 || v2
-
-	default:
-		log.Fatal("invalid main connective")
+	if s1 == s2 {
+		return 0
 	}
 
-	return false
-}
+	idx1 := strings.Index(s1, "_")
 
-//valuations creates table of valuations for n atomic sentences
-func valuations(n int) (table [][]bool) {
+	idx2 := strings.Index(s2, "_")
 
-	rows := int(math.Pow(2, float64(n)))
-	for i := 0; i < n; i++ {
-		var col []bool
+	if idx1 == -1 || idx2 == -1 {
 
-		repeats := int(math.Pow(2, float64(i)))
-		v := false
-		for j := 0; j < rows; j = j + repeats {
-
-			for k := 0; k < repeats; k++ {
-				col = append(col, !v)
-
-			}
-			v = !v
+		if s1 < s2 {
+			return -1
 		}
-		table = append(table, col)
-	}
-	return table
-}
+		return 1
 
-//type tableSpec []colSpec
-
-func getNumberAtomicSentences(cols []ColSpec) (n int) {
-
-	n = 0
-
-	for _, col := range cols {
-		if col.mc != "" {
-			break
-		}
-		n++
-	}
-	return n
-}
-
-func genTable(cols []ColSpec) (vals [][]bool) {
-
-	nA := getNumberAtomicSentences(cols)
-	vals = valuations(nA)
-
-	for _, col := range cols[nA:] {
-		var ncol []bool
-		for i := 0; i < len(vals[0]); i++ {
-			ncol = append(ncol, tvalue(vals[col.c1-1][i], vals[col.c2-1][i], col.mc))
-		}
-		vals = append(vals, ncol)
 	}
 
-	return vals
-
-}
-
-//printEmptyTable outputs LaTeX fragment for truth table
-//specified by cols
-func printEmptyTable(table Table) (out string) {
-
-	cols := table.tableSpec
-	vals := genTable(cols)
-
-	out = out + `\begin{tabular}{`
-
-	for i := 0; i < len(cols); i++ {
-		out = out + `c`
-		if i < getNumberAtomicSentences(cols)-1 {
-			continue
-		}
-
-		if i > getNumberAtomicSentences(cols)-2 && i < len(cols)-1 {
-			out = out + `|`
-		}
-
-		if i == len(cols)-2 {
-			out = out + `|`
-		}
+	if s1[:idx1] < s2[:idx2] {
+		return -1
 	}
 
-	out = out + "}" + "\n"
-
-	for i := range cols {
-
-		out = out + `\p{` + Parse(cols[i].formula).StringLatex() + `}`
-		if i != len(cols)-1 {
-			out = out + ` & `
-		}
-
-	}
-	out = out + `\\` + "\n"
-	out = out + `\hline` + "\n"
-
-	for row := 0; row < len(vals[0]); row++ { //rows
-		col := 0
-		for ; col < getNumberAtomicSentences(cols); col++ { //columns for atomic
-
-			if vals[col][row] == true {
-				out = out + `\emph{T}`
-			} else {
-				out = out + `\emph{F}`
-			}
-			if col != len(vals)-1 {
-				out = out + ` & `
-			}
-		}
-
-		for ; col < len(cols); col++ { //columns for atomic
-
-			out = out + "\t"
-			if col != len(cols)-1 {
-				out = out + ` & `
-			}
-		}
-		out = out + "\t" + `\\` + "\n" + `\hdashline` + "\n"
-	}
-	out = out + `\end{tabular}` + "\n\n"
-
-	return out
-
-}
-
-//printTable outputs LaTeX fragment for truth table
-//specified by cols
-func printTable(table Table) (out string) {
-
-	cols := table.tableSpec
-	vals := genTable(cols)
-
-	out = out + `\begin{tabular}{`
-
-	for i := 0; i < len(cols); i++ {
-		out = out + `c`
-		if i < getNumberAtomicSentences(cols)-1 {
-			continue
-		}
-
-		if i > getNumberAtomicSentences(cols)-2 && i < len(cols)-1 {
-			out = out + `|`
-		}
-
-		if i == len(cols)-2 {
-			out = out + `|`
-		}
+	if s1[:idx1] > s2[:idx2] {
+		return 1
 	}
 
-	out = out + "}" + "\n"
-
-	for i := range cols {
-
-		out = out + `\p{` + Parse(cols[i].formula).StringLatex() + `}`
-		if i != len(cols)-1 {
-			out = out + ` & `
-		}
-
-	}
-	out = out + `\\` + "\n"
-	out = out + `\hline` + "\n"
-
-	for row := 0; row < len(vals[0]); row++ { //rows
-
-		for col := 0; col < len(vals); col++ { //columns
-
-			if vals[col][row] == true {
-				out = out + `\emph{T}`
-			} else {
-				out = out + `\emph{F}`
-			}
-			if col != len(vals)-1 {
-				out = out + ` & `
-			}
-		}
-		out = out + `\\` + "\n"
-	}
-	out = out + `\end{tabular}` + "\n\n"
-
-	return out
-
-}
-
-func isConnective(s string) bool {
-
-	switch logicalConstant(s) {
-	case neg:
-		return true
-	case conj:
-		return true
-	case disj:
-		return true
-	case cond:
-		return true
-	case uni:
-		return true
-	case ex:
-		return true
-	default:
-		return false
-	}
-	return false
-}
-
-func listSentences(nodes []*Node) []string {
-
-	var l []string
-
-	for _, n := range nodes {
-		l = append(l, n.String())
-	}
-
-	return l
-}
-
-func _removeDuplicates(old []string) []string {
-
-	var l []string
-
-	if len(old) == 0 {
-		return old
-	}
-
-	l = append(l, old[0])
-
-	for i := 1; i < len(old); i++ {
-		if slicesContains(l, old[i]) {
-			continue
-		}
-		l = append(l, old[i])
-	}
-
-	return l
-}
-
-func reorderSentences(l []string) []string {
-
-	var ret []string
-
-	sort.SliceStable(l, func(i, j int) bool { return Parse(l[i]).Class() < Parse(l[j]).Class() })
-
-	max := Parse(l[len(l)-1]).Class()
-
-	for class := 1; class <= max; class++ {
-		var at []string
-		for _, e := range l {
-			if Parse(e).Class() == class {
-				at = append(at, e)
-			}
-		}
-		sort.Strings(at)
-		ret = append(ret, at...)
-	}
-
-	return ret
-}
-
-func genTableSpec(s []string) []ColSpec {
-
-	var ts []ColSpec
-
-	for i := range s {
-		var col ColSpec
-		n := Parse(s[i])
-		if n.IsAtomic() {
-			col.formula = n.String()
-			col.mc = ""
-			col.c1 = i
-			col.c2 = i
-			ts = append(ts, col)
-			continue
-		}
-
-		col.formula = n.String()
-		s1 := n.subnode1.String()
-		for j := range ts {
-			if ts[j].formula == s1 {
-				col.c1 = j + 1
-				col.c2 = j + 1
-			}
-		}
-		if n.MainConnective() != neg {
-			s2 := n.subnode2.String()
-			for j := range ts {
-				if ts[j].formula == s2 {
-					col.c2 = j + 1
-				}
-			}
-		}
-		col.mc = n.MainConnective().String()
-		ts = append(ts, col)
-	}
-
-	return ts
-}
-
-func getColumns(s string) []string {
-
-	n, err := ParseStrict(s)
+	sub1, err := strconv.Atoi(s1[idx1+1:])
 
 	if err != nil {
-		log.Fatal("malformed: ", s)
+		if s1 < s2 {
+			return -1
+		}
+		return 1
+
 	}
 
-	nodes := getSubnodes(n)
+	sub2, err := strconv.Atoi(s2[idx2+1:])
 
-	l := listSentences(nodes)
+	if err != nil {
+		if s1 < s2 {
+			return -1
+		}
+		return 1
 
-	l = slicesCleanDuplicates(l)
+	}
 
-	l = reorderSentences(l)
-	//
-	return l
+	if sub1 < sub2 {
+		return -1
+	}
+
+	if sub1 > sub2 {
+		return 1
+	}
+
+	return 0
+}
+
+func isTautologySub(s string) bool {
+
+	var atomic []string
+
+	tks, err := tokenize(s, !allowGreekUpper, !allowSpecial)
+
+	if err != nil {
+		panic(err)
+	}
+
+	for _, t := range tks {
+
+		if t.tokenType != tAtomicSentence {
+			continue
+		}
+
+		if !slices.Contains(atomic, t.str) {
+			atomic = append(atomic, t.str)
+		}
+	}
+
+	s = strings.ReplaceAll(s, "C", "AN")
+	for r := 0; r < 1<<len(atomic); r++ {
+
+		s0 := s
+
+		val, _ := valuation(r, len(atomic))
+		for i := range atomic {
+			if val[i] == true {
+				s0 = strings.ReplaceAll(s0, atomic[i], "T")
+			} else {
+				s0 = strings.ReplaceAll(s0, atomic[i], "F")
+			}
+		}
+
+		for len(s0) > 1 {
+
+			s0 = strings.ReplaceAll(s0, "NT", "F")
+			s0 = strings.ReplaceAll(s0, "NF", "T")
+
+			s0 = strings.ReplaceAll(s0, "KTT", "T")
+			s0 = strings.ReplaceAll(s0, "KTF", "F")
+			s0 = strings.ReplaceAll(s0, "KFT", "F")
+			s0 = strings.ReplaceAll(s0, "KFF", "F")
+
+			s0 = strings.ReplaceAll(s0, "ATT", "T")
+			s0 = strings.ReplaceAll(s0, "ATF", "T")
+			s0 = strings.ReplaceAll(s0, "AFT", "T")
+			s0 = strings.ReplaceAll(s0, "AFF", "F")
+
+		}
+
+		if s0 == "F" {
+			return false
+		}
+	}
+
+	return true
 }

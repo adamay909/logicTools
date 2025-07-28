@@ -43,23 +43,26 @@ func theoremsInUse() [][]string {
 	}
 
 	var modalTheorems = [][]string{
-		{"Distribution", "K", ">[>pq>[p[q"},
-		{"S4", "S4", ">[p[[p"},
-		{"S4", "S4", "><<p<p"},
-		{"S5", "S5", "><p[<p"},
-		{"S5", "S5", "><[p[p"},
-		{"Duality", "DL", ">[p-<-p"},
-		{"Duality", "DL", "><p-[-p"},
-		{"Duality", "DL", ">-[-p<p"},
-		{"Duality", "DL", ">-<-p[p"},
-		{"Duality", "DL", ">[-p-<p"},
-		{"Duality", "DL", "><-p-[p"},
-		{"Duality", "DL", ">-<p[-p"},
-		{"Duality", "DL", ">-[p<-p"},
-		{"M1", "M1", ">[p-<-p"},
-		{"M3", "M3", "><p-[-p"},
-		{"M4", "M4", ">-[-p<p"},
-		{"M2", "M2", ">-<-p[p"},
+		/*		{"Distribution", "K", ">[>pq>[p[q"},
+				{"S4", "S4", ">[p[[p"},
+				{"S4", "S4", "><<p<p"},
+				{"S5", "S5", "><p[<p"},
+				{"S5", "S5", "><[p[p"},
+				{"Duality", "DL", ">[p-<-p"},
+				{"Duality", "DL", "><p-[-p"},
+				{"Duality", "DL", ">-[-p<p"},
+				{"Duality", "DL", ">-<-p[p"},
+				{"Duality", "DL", ">[-p-<p"},
+				{"Duality", "DL", "><-p-[p"},
+				{"Duality", "DL", ">-<p[-p"},
+				{"Duality", "DL", ">-[p<-p"},
+				{"M1", "M1", ">[p-<-p"},
+				{"M3", "M3", "><p-[-p"},
+				{"M4", "M4", ">-[-p<p"},
+				{"M2", "M2", ">-<-p[p"},
+				{"M5", "M5", ">[pp"},
+				{"\u25c7 Distribution", `\lposD`, ">[>pq><p<q"},
+		*/
 	}
 
 	var axiomsSL = [][]string{
@@ -126,7 +129,7 @@ func matchingTheorems(inf string) []string {
 func foundMatch(c string, tf []string) bool {
 
 	for _, thc := range tf {
-		Debug("<--Theorem check: ", c, " against: ", Parse(thc).StringPlain())
+		Debug("<--Theorem check: ", c, " against: ", Parse(thc, !allowGreekUpper).StringF(O_PlainText))
 		if sameStructure(thc, c) {
 			Debug("ok")
 			Debug("--done theorem check-->")

@@ -2,6 +2,7 @@ package main
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/adamay909/logicTools/gentzen"
 )
@@ -18,7 +19,7 @@ func plainTextDeriv(withTitle bool) string {
 	}
 
 	if arglines, ok := getArglines(dsp.Input); ok {
-		output = output + gentzen.PrintDerivText(arglines, dsp.Offset)
+		output = output + gentzen.PrintDerivation(arglines, dsp.Offset, gentzen.O_ProofChecker)
 		return output
 	}
 
@@ -89,11 +90,29 @@ func plainLatex(s string) string {
 }
 
 func plainText(s string) string {
+
 	for _, e := range greekBindings {
 		if s == e[tktex] {
-			return e[tktxt]
+			return strings.ReplaceAll(e[tkraw], `\`, `/`)
 		}
 	}
+
+	for _, e := range connBindings {
+		if s == e[tktex] {
+			return e[tkraw]
+		}
+	}
+
+	for _, e := range plBindings[:3] {
+		if s == e[tktex] {
+			return e[tkraw]
+		}
+	}
+
+	if s == "≠" {
+		return `/=`
+	}
+
 	if s == `\vdash` {
 		s = `⊢`
 	}
@@ -117,7 +136,7 @@ func latexOutput() string {
 			debug(c, ": ", k)
 		}
 
-		output = output + gentzen.PrintDeriv(arglines, dsp.Offset)
+		output = output + gentzen.PrintDerivation(arglines, dsp.Offset, gentzen.O_Latex)
 		return safeLtx(output)
 	}
 
@@ -149,12 +168,14 @@ func findFormula(l []string) (string, int) {
 	var formula *gentzen.Node
 	var err error
 
+	var allowGreekUpper = true
+
 	for i = len(ret); i > 1; i-- {
 		txt := spaceyStringOf(ret[:i])
-		formula, err = gentzen.InfixParser(tk(txt))
+		formula, err = gentzen.ParseInfix(txt, allowGreekUpper)
 		if err == nil {
-			debug("findFormula: returning ", formula.StringLatex())
-			return formula.StringLatex(), len(ret[:i])
+			debug("findFormula: returning ", formula.StringF(gentzen.O_Latex))
+			return formula.StringF(gentzen.O_Latex), len(ret[:i])
 		}
 	}
 
@@ -246,7 +267,7 @@ func printTree() {
 	gentzen.ClearLog()
 	arglines, ok := getArglines(dsp.Input)
 	if !ok {
-		printMessage(gentzen.ShowLog())
+		printMessage(gentzen.ShowLog(), clean)
 		debug("error parsing derivation lines")
 		return
 	}

@@ -1,610 +1,602 @@
 package gentzen
 
 import (
+	"slices"
+	"strconv"
 	"strings"
 )
 
-func SeqReductionString(s string) string {
-
-	if !isReducibleSeq(s) {
-		return s
-	}
-
-	parts := strings.Split(s, ";")
-	seq := mkSequent(parts[0], parts[1])
-
-	rseries := sequentReductionSeries(seq)
-
-	out := s + "\n"
-
-	for _, row := range rseries {
-
-		for _, e := range row {
-
-			out = out + e.String() + ", "
-
-		}
-		out = strings.TrimRight(out, ", ") + "\n"
-	}
-
-	return out
+type psequent struct {
+	datum []tokenStr
+	succ  tokenStr
 }
 
-func SeqReductionLatexString(s string) string {
-
-	if !isReducibleSeq(s) {
-		return s
-	}
-
-	parts := strings.Split(s, ";")
-	seq := mkSequent(parts[0], parts[1])
-
-	rseries := sequentReductionSeries(seq)
-
-	out := seq.StringLatex() + "\n\n"
-
-	for _, row := range rseries {
-
-		for _, e := range row {
-
-			out = out + e.StringLatex() + ";~~ "
-
-		}
-		out = strings.TrimRight(out, ";~~ ") + "\n\n"
-	}
-
-	return out
+type reductionNode struct {
+	seq      psequent
+	child    *reductionNode
+	parent   *reductionNode
+	depend   []*reductionNode
+	terminal bool
+	number   int
 }
 
-func IsProvableSequent(s string) bool {
+/*
+PrintProofOutline returns a string representing a derivation
+of ⊢ s. If the derivation is not a valid proof, you will see
+"Premise" (as opposed to "Assumption") in the annotation of at least one line.
+*/
+func PrintProofOutline(s string, mode PrintMode) string {
 
-	if !isReducibleSeq(s) {
-		return false
-	}
+	n := genProofTree(s)
 
-	parts := strings.Split(s, ";")
-	seq := mkSequent(parts[0], parts[1])
+	return n.printDeriv(mode)
 
-	rseries := sequentReductionSeries(seq)
+}
 
-	rset := rseries[len(rseries)-1]
+func genProofTree(s string) *reductionNode {
 
-	for _, seq := range rset {
+	var seq sequent
 
-		if len(seq.datumSlice()) != 1 {
+	seq.d = datum("")
+	seq.s = plshFormula(s)
+
+	n := generateProofTree(seq)
+
+	return n.top()
+}
+
+func isTautologySequentReduction(s string) bool {
+
+	var seq sequent
+
+	seq.d = datum("")
+	seq.s = plshFormula(s)
+
+	n := generateProofTree(seq)
+
+	for e := n.bottom(); e != nil; e = e.parent {
+
+		if !e.terminal {
+			continue
+		}
+
+		if !e.isAssumption() {
 			return false
 		}
 
-		if Parse(string(seq.datumSlice()[0])).String() != Parse(seq.succedent()).String() {
-
-			return false
-
-		}
 	}
 	return true
 }
 
-func sequentReductionSeries(s sequent) [][]sequent {
+func generateProofTree(s sequent) *reductionNode {
 
-	var out [][]sequent
+	var err error
 
-	var rset []sequent
+	var sq psequent
 
-	rset = append(rset, s)
-	changed := true
-	for changed {
+	datums := s.datumSlice()
 
-		rset, changed = sequentReduction(rset)
-		if changed {
-			out = append(out, rset)
+	tks := make(tokenStr, 0, 10000)
+
+	for _, d := range datums {
+		tks, err = tokenize(string(d), allowGreekUpper, !allowSpecial)
+
+		if err != nil {
+			panic(s.String() + " is not a well formed sequent")
+		}
+
+		sq.datum = append(sq.datum, tks)
+
+		clear(tks)
+	}
+
+	tks, err = tokenize(string(s.s), !allowGreekUpper, !allowSpecial)
+
+	if err != nil {
+		panic(s.String() + " is not a well formed sequent")
+	}
+
+	sq.succ = tks
+
+	n := new(reductionNode)
+
+	n.seq = sq
+
+	tks = nil
+
+	for e := n; ; e = e.child {
+
+		e.growProofTree()
+		if e.child == nil {
+			break
 		}
 	}
 
-	return out
+	return n.top()
 }
 
-func sequentReduction(seqSet []sequent) (rset []sequent, change bool) {
+func (n *reductionNode) top() *reductionNode {
 
-	redRule := []func(sequent) ([]sequent, bool){
-		redr1,  //chech if base sequent
-		redr2,  //back formula among front formulas
-		redr3,  //contradicting front formulas
-		redr10, //all basic sentences
-		redr11, //back formula Cond
-		redr12, //back formula Disj
-		redr7,  //back formula DN
-		redr15, //back formula negated Cond
-		redr16, //back formula negated Disj
-		redr4,  //front formula has DN
-		redr5,  //front formulas has Conj
-		redr17, //front formula negated Cond
-		redr18, //front formula negated Disj
-		redr8,  //back formula Conj
-		redr9,  //back formula Neg
-		redr13, //front formula Cond
-		redr14, //front formula Disj
-		redr6,  //front formulas has negated Conj
+	for e := n; e != nil; e = e.parent {
+		if e.parent == nil {
+			return e
+		}
 	}
-	var applied bool
-	var acount int
 
-	for _, s := range seqSet {
+	return nil
+}
 
-		var rs []sequent
+func (n *reductionNode) bottom() *reductionNode {
 
-		for rn, rule := range redRule {
-			rs, applied = rule(s)
+	for e := n; e != nil; e = e.child {
+		if e.child == nil {
+			return e
+		}
+	}
 
-			if applied {
-				rset = append(rset, rs...)
-				acount++
-				if rn == 0 || rn == 3 {
-					acount--
-				}
+	return nil
+}
+
+func (n *reductionNode) linearize() []*reductionNode {
+
+	var resp []*reductionNode
+
+	for e := n; e != nil; e = e.child {
+
+		resp = append(resp, e)
+
+	}
+	return resp
+
+}
+
+func (n *reductionNode) isBasic() bool {
+
+	sq := n.seq
+
+	if len(sq.datum) > 1 {
+		return false
+	}
+
+	if !n.seq.succ.isBasic() {
+		return false
+	}
+
+	if len(sq.datum) == 0 || sq.datum[0].isBasic() {
+		return true
+	}
+
+	return false
+}
+
+func (n *reductionNode) growProofTree() {
+
+	if n.isBasic() {
+		n.terminal = true
+	}
+
+	if n.terminal {
+		return
+	}
+
+	var cseq1, cseq2 psequent
+
+	// remove redundant datum items
+	target := n.seq.succ.String()
+
+	for _, d := range n.seq.datum {
+
+		if d.String() == target {
+
+			cseq1.addDatum(d)
+
+			cseq1.succ = n.seq.succ
+
+			n.addChild(cseq1)
+
+			return
+
+		}
+	}
+
+	//ECQ on datum side
+
+	for _, d := range n.seq.datum {
+
+		if !d.isAtomic() {
+			continue
+		}
+
+		for _, e := range n.seq.datum {
+
+			if equaltkstr(d.negate(), e) {
+
+				cseq1.addDatum(d)
+
+				cseq1.succ = d
+
+				cseq2.addDatum(d.negate())
+
+				cseq2.succ = d.negate()
+
+				n.addChild(cseq1)
+
+				n.addChild(cseq2)
+
+				return
+			}
+		}
+	}
+
+	//handle datum side
+
+	for i, d := range n.seq.datum {
+
+		switch {
+
+		case d.isConj():
+
+			subs := d.subFormulas()
+
+			cseq1.setDatum(removeElement(n.seq.datum, i))
+
+			cseq1.addDatum(subs...)
+
+			cseq1.succ = n.seq.succ
+
+			n.addChild(cseq1)
+
+			return
+
+		case d.isDisj():
+
+			subs := d.subFormulas()
+
+			cseq1.setDatum(removeElement(n.seq.datum, i))
+
+			cseq1.addDatum(subs[0])
+
+			cseq2.setDatum(removeElement(n.seq.datum, i))
+
+			cseq2.addDatum(subs[1])
+
+			cseq1.succ = n.seq.succ
+
+			cseq2.succ = n.seq.succ
+
+			n.addChild(cseq1)
+			n.addChild(cseq2)
+
+			return
+
+		case d.isCond():
+
+			subs := d.subFormulas()
+
+			cseq1.setDatum(removeElement(n.seq.datum, i))
+
+			cseq1.addDatum(subs[0].negate().disjoin(subs[1]))
+
+			cseq1.succ = n.seq.succ
+
+			n.addChild(cseq1)
+
+			return
+
+		case d.isNeg() && d[1:].isNeg():
+
+			cseq1.setDatum(removeElement(n.seq.datum, i))
+
+			cseq1.addDatum(d[2:])
+
+			cseq1.succ = n.seq.succ
+
+			n.addChild(cseq1)
+
+			return
+
+		case d.isNeg() && d[1:].isConj():
+
+			subs := d[1:].subFormulas()
+
+			cseq1.setDatum(removeElement(n.seq.datum, i))
+
+			cseq1.addDatum(subs[0].negate().disjoin(subs[1].negate()))
+
+			cseq1.succ = n.seq.succ
+
+			n.addChild(cseq1)
+
+			return
+
+		case d.isNeg() && d[1:].isDisj():
+
+			subs := d[1:].subFormulas()
+
+			cseq1.setDatum(removeElement(n.seq.datum, i))
+
+			cseq1.addDatum(subs[0].negate().conjoin(subs[1].negate()))
+
+			cseq1.succ = n.seq.succ
+
+			n.addChild(cseq1)
+
+			return
+
+		case d[0].tokenType == tNeg && d[1:].isCond():
+
+			subs := d[1:].subFormulas()
+
+			cseq1.setDatum(removeElement(n.seq.datum, i))
+
+			cseq1.addDatum(subs[0].conjoin(subs[1].negate()))
+
+			cseq1.succ = n.seq.succ
+
+			n.addChild(cseq1)
+
+			return
+
+		}
+	}
+
+	//handle succedent side
+	switch {
+
+	case n.seq.succ.isConj():
+
+		subs := n.seq.succ.subFormulas()
+
+		cseq1.addDatum(n.seq.datum...)
+
+		cseq1.succ = subs[0]
+
+		cseq2.addDatum(n.seq.datum...)
+
+		cseq2.succ = subs[1]
+
+		n.addChild(cseq1)
+
+		n.addChild(cseq2)
+
+		return
+
+	case n.seq.succ.isCond():
+
+		subs := n.seq.succ.subFormulas()
+
+		cseq1.setDatum(n.seq.datum)
+
+		cseq1.succ = subs[0].negate().disjoin(subs[1])
+
+		n.addChild(cseq1)
+
+		return
+
+	case n.seq.succ.isDisj():
+
+		subs := n.seq.succ.subFormulas()
+
+		cseq1.setDatum(n.seq.datum)
+
+		cseq1.succ = subs[0].negate().conjoin(subs[1].negate()).negate()
+
+		n.addChild(cseq1)
+
+		return
+
+	case n.seq.succ.isNeg():
+
+		if n.seq.succ[1:].isAtomic() {
+			break
+		}
+
+		cseq1.setDatum(n.seq.datum)
+		cseq2.setDatum(n.seq.datum)
+
+		cseq1.addDatum(n.seq.succ[1:])
+		cseq2.addDatum(n.seq.succ[1:])
+
+		for _, e := range n.seq.succ {
+
+			if e.tokenType == tAtomicSentence {
+				cseq1.succ = []token{e}
+				cseq2.succ = cseq1.succ.negate()
 				break
 			}
 		}
+
+		n.addChild(cseq1)
+		n.addChild(cseq2)
+
+		return
+
 	}
-
-	change = acount > 0
-	nrset := slicesCleanDuplicates(rset)
-	rset = nil
-	rset = append(rset, nrset...)
-
-	return
+	n.terminal = true
 
 }
 
-// remove duplications in datum
-func datumClean(s sequent) (o sequent) {
+func (n *reductionNode) addChild(c psequent) {
 
-	old := s.datumSlice()
-	newd := slicesCleanDuplicates(old)
+	gp := n.bottom()
 
-	if len(old) == len(newd) {
-		o = s
-		return
-	}
+	nc := newreductionnode(c)
+	gp.child = nc
+	nc.parent = gp
+	nc.cleanDatum()
 
-	o = mkSequent(datumSlice(newd), s.succedent())
-	return
+	n.depend = append(n.depend, nc)
+
 }
 
-// if base sequent
-func redr1(s sequent) (o []sequent, applied bool) {
+func newreductionnode(pseq psequent) *reductionNode {
 
-	applied = false
-	if len(s.datumSlice()) != 1 {
-		o = append(o, datumClean(s))
-		return
-	}
+	n := new(reductionNode)
 
-	if Parse(string(s.datumSlice()[0])).String() != s.succedent().String() {
-		o = append(o, datumClean(s))
-		return
-	}
+	n.seq = pseq
 
-	o = append(o, datumClean(s))
-
-	applied = true
-
-	return
+	return n
 }
 
-// If back formula in front formulas
-func redr2(s sequent) (o []sequent, applied bool) {
+func (n *reductionNode) String() string {
 
-	suc := s.succedent()
+	w := new(strings.Builder)
 
-	if !slicesContains(s.datumSlice(), datum(suc.String())) {
-		applied = false
-		o = append(o, datumClean(s))
-		return
+	ds := make([]string, 0, len(n.seq.datum))
+
+	for _, d := range n.seq.datum {
+
+		ds = append(ds, d.String())
 	}
 
-	o = append(o, datumClean(mkSequent(suc.String(), suc.String())))
-	applied = true
+	w.WriteString(strings.Join(ds, ","))
 
-	return
+	w.WriteString(" ; ")
+
+	w.WriteString(n.seq.succ.String())
+
+	return w.String()
+
 }
 
-// If all basic sentences
-func redr10(s sequent) (o []sequent, applied bool) {
+func (n *reductionNode) printDeriv(mode PrintMode) string {
 
-	applied = false
+	w := new(strings.Builder)
 
-	for _, d := range s.datumSlice() {
-		if !Parse(d.String()).IsBasic() {
-			o = append(o, datumClean(s))
-			return
+	var derivlines []string
+
+	lines := n.linearize()
+
+	slices.Reverse(lines)
+
+	for i, l := range lines {
+
+		l.number = i + 1
+
+	}
+
+	for _, l := range lines {
+
+		w.WriteString(l.String())
+
+		w.WriteString(";")
+
+		lannot := make([]int, 0, len(l.depend))
+
+		for _, e := range l.depend {
+
+			lannot = append(lannot, e.number)
+
 		}
-	}
 
-	if !Parse(s.succedent()).IsBasic() {
-		o = append(o, datumClean(s))
-		return
-	}
+		slices.Sort(lannot)
 
-	applied = true
-	o = append(o, datumClean(s))
-	return
-}
-
-// If front formulas contains contradicting sentences
-func redr3(s sequent) (o []sequent, applied bool) {
-
-	applied = false
-
-	for _, i := range s.datumSlice() {
-
-		ns := Negate(Parse(i.String()))
-
-		for _, j := range s.datumSlice() {
-
-			if ns.String() == j.String() {
-				o = nil
-				o = append(o, datumClean(mkSequent(i.String(), i.String())))
-				o = append(o, datumClean(mkSequent(ns.String(), ns.String())))
-				applied = true
-				return
+		for k, e := range lannot {
+			w.WriteString(strconv.Itoa(e))
+			if k < len(lannot)-1 {
+				w.WriteString(",")
 			}
 		}
-	}
-	o = append(o, datumClean(s))
-	return
-}
 
-// If front formulas contains a double negation
-func redr4(s sequent) (o []sequent, applied bool) {
+		if len(l.depend) == 0 {
 
-	applied = false
-
-	var dslice datumSlice
-
-	dslice = append(dslice, s.datumSlice()...)
-	nd := ""
-
-	for _, d := range dslice {
-
-		if !Parse(d.String()).IsDoubleNegation() {
-			nd = nd + string(d) + ","
-			continue
-		}
-		applied = true
-		nd = nd + Parse(d.String()).Child1Must().Child1Must().String() + ","
-
-	}
-
-	nd = strings.TrimRight(nd, ",")
-	o = append(o, datumClean(mkSequent(nd, s.succedent())))
-
-	return
-}
-
-// If front formulas contains a conjunction
-func redr5(s sequent) (o []sequent, applied bool) {
-
-	var newdatumSlice, repls datumSlice
-	applied = false
-
-	for k, i := range s.datumSlice() {
-		n := Parse(i.String())
-		if n.IsConjunction() {
-			d1 := n.Child1Must()
-			d2 := n.Child2Must()
-			repls = append(repls, datum(d1.String()))
-			repls = append(repls, datum(d2.String()))
-			newdatumSlice = slicesReplace(s.datumSlice(), k, repls)
-			seq1 := mkSequent(newdatumSlice, s.succedent())
-			o = append(o, datumClean(seq1))
-			applied = true
-			return
-		}
-	}
-	o = append(o, datumClean(s))
-	return
-}
-
-//If front formulas contain a negated conjunction
-
-func redr6(s sequent) (o []sequent, applied bool) {
-
-	applied = false
-
-	var newds1, newds2 datumSlice
-
-	for k, i := range s.datumSlice() {
-
-		n := Parse(i.String())
-		if n.IsNegation() {
-			if n.Child1Must().IsConjunction() {
-				d1 := Negate(n.Child1Must().Child1Must())
-				d2 := Negate(n.Child1Must().Child2Must())
-
-				newds1 = slicesReplace(s.datumSlice(), k, []datum{datum(d1.String())})
-				newds2 = slicesReplace(s.datumSlice(), k, []datum{datum(d2.String())})
-				seq1 := mkSequent(newds1, s.succedent())
-				seq2 := mkSequent(newds2, s.succedent())
-				o = append(o, datumClean(seq1), datumClean(seq2))
-				applied = true
-				return
+			if l.isAssumption() {
+				w.WriteString("Assumption")
+			} else {
+				w.WriteString("Premise")
 			}
 		}
-	}
-	o = append(o, s)
-	return
-}
 
-//If back formula is double negation
+		derivlines = append(derivlines, w.String())
 
-func redr7(s sequent) (o []sequent, applied bool) {
+		w.Reset()
 
-	applied = false
-
-	if Parse(s.succedent()).IsDoubleNegation() {
-
-		o = append(o, datumClean(mkSequent(s.datum(), Parse(s.succedent()).Child1Must().Child1Must())))
-		applied = true
-		return
 	}
 
-	o = append(o, datumClean(s))
-	return
+	return PrintDerivation(derivlines, 1, mode)
 }
 
-//If back formula is a conjunction
+func (n *reductionNode) isAssumption() bool {
 
-func redr8(s sequent) (o []sequent, applied bool) {
-
-	applied = false
-
-	if Parse(s.succedent()).IsConjunction() {
-		seq1 := mkSequent(s.datum(), Parse(s.succedent()).Child1Must())
-		seq2 := mkSequent(s.datum(), Parse(s.succedent()).Child2Must())
-		o = append(o, datumClean(seq1), datumClean(seq2))
-		applied = true
-		return
-	}
-
-	o = append(o, datumClean(s))
-	return
-}
-
-// If back formula is negation
-func redr9(s sequent) (o []sequent, applied bool) {
-
-	applied = false
-
-	if Parse(s.succedent()).IsNegation() {
-
-		s2 := Parse(s.succedent()).AtomicSentences()[0]
-		nd1 := append(s.datumSlice(), datum(Parse(s.succedent()).Child1Must().String()))
-		seq1 := mkSequent(nd1, Parse(s2))
-		seq2 := mkSequent(nd1, Negate(Parse(s2)))
-
-		o = append(o, datumClean(seq1), datumClean(seq2))
-		applied = true
-		return
-	}
-
-	o = append(o, datumClean(s))
-	return
-}
-
-// If back formula is conditional
-func redr11(s sequent) (o []sequent, applied bool) {
-
-	applied = false
-
-	if Parse(s.succedent()).IsConditional() {
-
-		d1 := Parse(s.succedent()).Child1Must()
-		d2 := Parse(s.succedent()).Child2Must()
-
-		ns := Negate(Conjoin(d1, Negate(d2)))
-
-		o = append(o, datumClean(mkSequent(s.datumSlice(), ns)))
-		applied = true
-		return
-	}
-
-	o = append(o, datumClean(s))
-	return
-}
-
-// If back formula is disjunction
-func redr12(s sequent) (o []sequent, applied bool) {
-
-	applied = false
-
-	if Parse(s.succedent()).IsDisjunction() {
-
-		d1 := Parse(s.succedent()).Child1Must()
-		d2 := Parse(s.succedent()).Child2Must()
-
-		ns := Negate(Conjoin(Negate(d1), Negate(d2)))
-
-		o = append(o, datumClean(mkSequent(s.datumSlice(), ns)))
-		applied = true
-		return
-	}
-
-	o = append(o, datumClean(s))
-	return
-}
-
-// If front formulas contains a conditional
-func redr13(s sequent) (o []sequent, applied bool) {
-
-	applied = false
-	var newds1, newds2 datumSlice
-
-	for k, i := range s.datumSlice() {
-
-		n := Parse(i.String())
-		if n.IsConditional() {
-			d1 := Negate(n.Child1Must())
-			d2 := n.Child2Must()
-
-			newds1 = slicesReplace(s.datumSlice(), k, []datum{datum(d1.String())})
-			newds2 = slicesReplace(s.datumSlice(), k, []datum{datum(d2.String())})
-			seq1 := mkSequent(newds1, s.succedent())
-			seq2 := mkSequent(newds2, s.succedent())
-			o = append(o, datumClean(seq1), datumClean(seq2))
-			applied = true
-			return
-		}
-	}
-	o = append(o, s)
-	return
-}
-
-// If front formulas contains a disjunction
-func redr14(s sequent) (o []sequent, applied bool) {
-
-	applied = false
-	var newds1, newds2 datumSlice
-
-	for k, i := range s.datumSlice() {
-
-		n := Parse(i.String())
-		if n.IsDisjunction() {
-			d1 := n.Child1Must()
-			d2 := n.Child2Must()
-
-			newds1 = slicesReplace(s.datumSlice(), k, []datum{datum(d1.String())})
-			newds2 = slicesReplace(s.datumSlice(), k, []datum{datum(d2.String())})
-			seq1 := mkSequent(newds1, s.succedent())
-			seq2 := mkSequent(newds2, s.succedent())
-			o = append(o, datumClean(seq1), datumClean(seq2))
-			applied = true
-			return
-		}
-	}
-	o = append(o, s)
-	return
-}
-
-// If back formula is a negated conditional
-func redr15(s sequent) (o []sequent, applied bool) {
-
-	applied = false
-
-	if Parse(s.succedent()).IsNegation() {
-
-		if Parse(s.succedent()).Child1Must().IsConditional() {
-			applied = true
-			d1 := Parse(s.succedent()).Child1Must().Child1Must()
-			d2 := Parse(s.succedent()).Child1Must().Child2Must()
-
-			ns := Conjoin(d1, Negate(d2))
-
-			o = append(o, datumClean(mkSequent(s.datumSlice(), ns)))
-			return
-		}
-	}
-	o = append(o, datumClean(s))
-	return
-}
-
-// If back formula is a negated disjunction
-func redr16(s sequent) (o []sequent, applied bool) {
-
-	applied = false
-
-	if Parse(s.succedent()).IsNegation() {
-
-		if Parse(s.succedent()).Child1Must().IsDisjunction() {
-			applied = true
-			d1 := Parse(s.succedent()).Child1Must().Child1Must()
-			d2 := Parse(s.succedent()).Child1Must().Child2Must()
-
-			ns := Conjoin(Negate(d1), Negate(d2))
-
-			o = append(o, datumClean(mkSequent(s.datumSlice(), ns)))
-			return
-		}
-	}
-	o = append(o, datumClean(s))
-	return
-}
-
-// If front formula has a negated conditional
-func redr17(s sequent) (o []sequent, applied bool) {
-
-	var newdatumSlice, repls datumSlice
-	applied = false
-
-	for k, i := range s.datumSlice() {
-		n := Parse(i.String())
-		if n.IsNegation() {
-			if n.Child1Must().IsConditional() {
-				d1 := n.Child1Must().Child1Must()
-				d2 := Negate(n.Child1Must().Child2Must())
-				repls = append(repls, datum(d1.String()))
-				repls = append(repls, datum(d2.String()))
-				newdatumSlice = slicesReplace(s.datumSlice(), k, repls)
-				seq1 := mkSequent(newdatumSlice, s.succedent())
-				o = append(o, datumClean(seq1))
-				applied = true
-				return
-			}
-		}
-	}
-	o = append(o, datumClean(s))
-	return
-}
-
-// If front formula has a negated disjunction
-func redr18(s sequent) (o []sequent, applied bool) {
-
-	var newdatumSlice, repls datumSlice
-	applied = false
-
-	for k, i := range s.datumSlice() {
-		n := Parse(i.String())
-		if n.IsNegation() {
-			if n.Child1Must().IsDisjunction() {
-				d1 := Negate(n.Child1Must().Child1Must())
-				d2 := Negate(n.Child1Must().Child2Must())
-				repls = append(repls, datum(d1.String()))
-				repls = append(repls, datum(d2.String()))
-				newdatumSlice = slicesReplace(s.datumSlice(), k, repls)
-				seq1 := mkSequent(newdatumSlice, s.succedent())
-				o = append(o, datumClean(seq1))
-				applied = true
-				return
-			}
-		}
-	}
-	o = append(o, datumClean(s))
-	return
-}
-
-func isReducibleSeq(s string) bool {
-
-	parts := strings.Split(s, ";")
-
-	if len(parts) != 2 {
+	if len(n.seq.datum) != 1 {
 		return false
 	}
 
-	for _, e := range strings.Split(parts[0], ",") {
-		if e == "" {
-			continue
-		}
-		for _, c := range greekUCBindings {
-			if e == c[0] {
-				return false
-			}
-		}
-		if _, err := ParseStrict(e); err != nil {
+	return n.seq.datum[0].String() == n.seq.succ.String()
+}
+
+func (n *reductionNode) cleanDatum() {
+
+	n.seq.cleanDatum()
+
+}
+
+func (p *psequent) cleanDatum() {
+
+	slices.SortFunc(p.datum, ordertkstr)
+
+	nd := slices.CompactFunc(p.datum, equaltkstr)
+
+	p.datum = nd
+}
+
+func (p *psequent) setDatum(d []tokenStr) {
+
+	p.datum = nil
+
+	p.datum = append(p.datum, d...)
+
+}
+
+func (p *psequent) addDatum(d ...tokenStr) {
+
+	p.datum = append(p.datum, d...)
+
+	p.cleanDatum()
+
+}
+
+func removeElement[S ~[]E, E any](s S, i int) (resp S) {
+
+	if i == 0 {
+
+		resp = append(resp, s[1:]...)
+
+		return
+
+	}
+
+	resp = append(resp, s[:i]...)
+
+	if i < len(s)-1 {
+
+		resp = append(resp, s[i+1:]...)
+
+	}
+
+	return resp
+
+}
+
+func (p *psequent) removeDatum(d tokenStr) {
+
+	f := func(e tokenStr) bool {
+		return equaltkstr(e, d)
+	}
+	p.datum = slices.DeleteFunc(p.datum, f)
+
+	p.cleanDatum()
+
+}
+
+func (n *reductionNode) isTerminal() bool {
+
+	for _, d := range n.seq.datum {
+		if !d.isBasic() {
 			return false
 		}
 	}
 
-	if _, err := ParseStrict(parts[1]); err != nil {
-		return false
-	}
-	return true
+	return n.seq.succ.isBasic()
+
 }

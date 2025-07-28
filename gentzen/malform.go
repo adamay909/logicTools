@@ -2,180 +2,249 @@ package gentzen
 
 import (
 	"math/rand"
+	"strings"
 )
 
-//Malform returns a probably malformed string based on s.
-//Make sure to seed properly (uses math/rand).
+// Malform returns a LaTeX string that is likely  to be a malformed formula.
 func Malform(s string) string {
 
-	tks := latexTokens(Parse(s))
+	var s2 string
+	strategy := rand.Intn(4) + 1
 
-	strategy := rand.Intn(3) + 1
+	for len(s2) == 0 {
 
-	var output string
+		switch strategy {
 
-	switch strategy {
+		case 1:
+			s2 = addIllegal(s)
 
-	case 1:
-		tks = removeToken(tks)
-	case 2:
-		tks = addToken(tks)
-	case 3:
-		tks = changeToken(tks)
-	default:
+		case 2:
+			s2 = removeToken(s)
+
+		case 3:
+			s2 = addToken(s)
+
+		case 4:
+			s2 = changeToken(s)
+		}
 	}
 
-	for _, t := range tks {
-		output = output + t.str
-	}
-
-	return output
+	return s2
 }
 
-func removeToken(tks tokenStr) tokenStr {
+func addIllegal(s string) string {
+
+	n, err := ParseStrict(s, !allowGreekUpper)
+
+	if err != nil {
+		panic(err)
+		return s
+	}
+
+	tks := latexTokens(n)
+
+	cand := `!*+-;:"'?/<>,.`
+
+	r := string(cand[rand.Intn(len(cand))])
+
+	pos := rand.Intn(len(tks) - 1)
+
+	var ntks []string
+
+	ntks = append(ntks, tks[:pos]...)
+
+	ntks = append(ntks, r)
+
+	ntks = append(ntks, tks[pos:]...)
+
+	return strings.Join(ntks, "")
+
+}
+
+func removeToken(s string) string {
+
+	n, err := ParseStrict(s, !allowGreekUpper)
+
+	if err != nil {
+		return s
+	}
+
+	tks := latexTokens(n)
 
 	i := rand.Intn(len(tks))
 	if i == 0 {
-		tks = tks[1:]
-		return tks
+		return strings.Join(tks[1:], "")
 	}
 
 	if i == len(tks)-1 {
 		tks = tks[:i]
-		return tks
+		return strings.Join(tks[:1], "")
 	}
 
 	ntks := tks[:i]
 	ntks = append(ntks, tks[i+1:]...)
-	return ntks
+	return strings.Join(ntks, "")
 
 }
 
-var candidates = []string{
-	"(",
-	")",
-	"[",
-	"]",
-	`\{`,
-	`\}`,
-	`\big(`,
-	`\big)`,
-	`\big[`,
-	`\big]`,
-	`\big\{`,
-	`\big\}`,
-	`\Big(`,
-	`\Big)`,
-	`\Big[`,
-	`\Big]`,
-	`\Big\{`,
-	`\Big\}`,
-	`\bigg(`,
-	`\bigg)`,
-	`\bigg[`,
-	`\bigg]`,
-	`\bigg\{`,
-	`\bigg\}`,
-	`\land `,
-	`\lor `,
-	`\lnot `,
-	`P`,
-	`Q`,
-	`R`,
-	//`\limplies `,
-}
+func addToken(s string) string {
 
-func addToken(tks tokenStr) tokenStr {
+	n, err := ParseStrict(s, !allowGreekUpper)
 
-	i := rand.Intn(len(tks) + 1)
-
-	var t token
-	t.str = candidates[rand.Intn(len(candidates))]
-
-	if i == len(tks) {
-		tks = append(tks, t)
-		return tks
+	if err != nil {
+		return s
 	}
 
-	if i == 0 {
-		ntks := tokenStr{t}
-		tks = append(ntks, tks...)
-		return tks
+	var cand = []string{
+		`\land`,
+		`\lor`,
+		`\lnot`,
+		`P`,
+		`Q`,
+		`R`,
 	}
+
+	if oCOND {
+		cand = append(cand, `\limplies`)
+	}
+
+	c := n.classP()
+	if c > len(brackets)-1 {
+		c = len(brackets)
+	}
+
+	for i := range c {
+		cand = append(cand, brackets[i][0])
+		cand = append(cand, brackets[i][1])
+	}
+
+	tks := latexTokens(n)
+
+	t := cand[rand.Intn(len(cand))]
+
+	i := rand.Intn(len(tks) - 1)
 
 	ntks := tks[:i]
 	ntks = append(ntks, t)
 	ntks = append(ntks, tks[i:]...)
 
-	return ntks
+	return strings.Join(ntks, "")
 }
 
-func changeToken(tks tokenStr) tokenStr {
+func changeToken(s string) string {
+
+	n, err := ParseStrict(s, !allowGreekUpper)
+
+	if err != nil {
+		return s
+	}
+
+	var cand = []string{
+		`\land`,
+		`\lor`,
+		`\lnot`,
+		`P`,
+		`Q`,
+		`R`,
+	}
+
+	if oCOND {
+		cand = append(cand, `\limplies`)
+	}
+
+	c := n.classP()
+	if c > len(brackets)-1 {
+		c = len(brackets)
+	}
+
+	for i := range c {
+		cand = append(cand, brackets[i][0])
+		cand = append(cand, brackets[i][1])
+	}
+
+	tks := latexTokens(n)
 
 	i := rand.Intn(len(tks))
 
-	if tks[i].tokenType == tAtomicSentence {
-		tks[i].str = candidates[rand.Intn(len(candidates)-3)]
-	} else {
-		tks[i].str = candidates[rand.Intn(len(candidates))]
-	}
-	return tks
+	tks[i] = cand[rand.Intn(len(cand))]
+
+	return strings.Join(tks, "")
+
 }
 
-func latexTokens(n *Node) (s tokenStr) {
+func latexTokens(n *Node) []string {
 
-	var t1, t2, t3 token
-	switch {
-	case n.IsUnary():
-		t1.tokenType = tUnary
-		t1.str = n.connectiveDisplay(mLatex)
-		s = append(s, t1)
-		s = append(s, latexTokens(n.subnode1)...)
+	var resp []string
 
-	case n.IsBinary():
-		t1.tokenType = tBinary
-		t1.str = n.connectiveDisplay(mLatex)
-		s = append(s, latexTokens(n.subnode1)...)
-		s = append(s, t1)
-		s = append(s, latexTokens(n.subnode2)...)
+	w := new(strings.Builder)
 
-	default:
-		t1.tokenType = tAtomicSentence
-		t1.str = n.raw
-		s = append(s, t1)
+	ingressFunc := func(e *Node) {
+		w.Reset()
+		latexIngressFunc(e, w)
+		if w.String() != "" {
+			resp = append(resp, w.String())
+		}
+	}
+
+	pivotFunc := func(e *Node) {
+		w.Reset()
+		latexPivotFunc(e, w)
+		if w.String() != "" {
+			resp = append(resp, w.String())
+		}
+	}
+
+	egressFunc := func(e *Node) {
+		w.Reset()
+		latexEgressFunc(e, w)
+		if w.String() != "" {
+			resp = append(resp, w.String())
+		}
+	}
+
+	Serialize(n, ingressFunc, pivotFunc, egressFunc)
+
+	return resp
+
+}
+
+func infixTextTokens(n *Node, m PrintMode) []string {
+
+	if m == O_Latex {
+		return latexTokens(n)
+	}
+
+	var resp []string
+
+	w := new(strings.Builder)
+
+	ingressFunc := func(n *Node) {
+		w.Reset()
+		nomarkupIngressFunc(n, w, m)
+		if w.String() != "" {
+			resp = append(resp, w.String())
+		}
 
 	}
 
-	if n.parent == nil {
-		return s
+	pivotFunc := func(n *Node) {
+		w.Reset()
+		nomarkupPivotFunc(n, w, m)
+		if w.String() != "" {
+			resp = append(resp, w.String())
+		}
 	}
 
-	if n.MainConnective() == neg {
-		return s
+	egressFunc := func(n *Node) {
+		w.Reset()
+		nomarkupEgressFunc(n, w, m)
+		if w.String() != "" {
+			resp = append(resp, w.String())
+		}
 	}
 
-	if n.IsAtomic() {
-		return s
-	}
+	Serialize(n, ingressFunc, pivotFunc, egressFunc)
 
-	var ob1, ob2 string
-	blevel := n.BracketClass()
+	return resp
 
-	if blevel+2 > len(brackets) {
-		ob1 = brackets[len(brackets)-1][0]
-		ob2 = brackets[len(brackets)-1][1]
-	} else {
-		ob1 = brackets[blevel][0]
-		ob2 = brackets[blevel][1]
-	}
-	t2.tokenType = tOpenb
-	t2.str = ob1
-
-	t3.tokenType = tCloseb
-	t3.str = ob2
-
-	tmp := tokenStr{t2}
-	s = append(tmp, s...)
-	s = append(s, t3)
-	return s
 }

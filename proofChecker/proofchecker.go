@@ -7,6 +7,8 @@ import (
 	"github.com/adamay909/logicTools/gentzen"
 )
 
+const clean = true
+
 func checkDerivation() {
 	debug("start proof checker")
 	if dsp.empty() {
@@ -14,13 +16,13 @@ func checkDerivation() {
 	}
 
 	setAttributeByID("display", "class", "inactive-fail")
-	printMessage("")
+	printMessage("", !clean)
 	show("messages")
 	gentzen.SetStrict(false)
 	gentzen.ClearLog()
 	arglines, ok := getArglines(dsp.Input)
 	if !ok {
-		printMessage(gentzen.ShowLog())
+		printMessage(gentzen.ShowLog(), clean)
 		debug("error parsing derivation lines")
 		return
 	}
@@ -28,23 +30,33 @@ func checkDerivation() {
 	displayDerivation()
 
 	if gentzen.CheckDeriv(arglines, dsp.Offset) {
-		printMessage("No Illegal Moves Found")
+		printMessage("OK", !clean)
 		showPrettyDeriv(dsp)
 		setAttributeByID("display", "class", "inactive-success")
 		return
 	}
 
-	printMessage(gentzen.ShowLog())
+	printMessage(gentzen.ShowLog(), clean)
 
 	return
 }
 
-func printMessage(s string) {
+func printMessage(s string, cleanup bool) {
+
+	if cleanup {
+		s = strings.ReplaceAll(s, `/`, `\`)
+
+		for _, e := range allBindings {
+			s = strings.ReplaceAll(s, e[0], e[2])
+		}
+	}
+
 	l := strings.Split(s, "\n")
 	for i := range l {
-		l[i] = "<p>" + l[i] + "</p>" + "\n"
+		l[i] = `<p class="message">` + l[i] + "</p>\n"
 	}
 	s = strings.Join(l, "\n")
+
 	setTextByID("messages", s)
 }
 
@@ -54,12 +66,15 @@ func showPrettyDeriv(d *console) {
 
 	var lines []string
 	if arglines, ok := getArglines(dsp.Input); ok {
-		lines = strings.Split(gentzen.PrintDerivText(arglines, dsp.Offset), "\n")
+		lines = strings.Split(gentzen.PrintDerivation(arglines, dsp.Offset, gentzen.O_ProofChecker), "\n")
 	} else {
 		return
 	}
 	offset, _ := strconv.Atoi(lines[0][:strings.Index(lines[0], ".")])
 	for i, l := range lines {
+
+		debug("received line:" + l)
+
 		if strings.TrimSpace(l) == "" {
 			break
 		}

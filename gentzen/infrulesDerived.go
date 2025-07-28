@@ -4,7 +4,17 @@ import "strings"
 
 func derivR(d *derivNode) bool {
 
+	if !oDR {
+		logger.Print("Unknown inference rule")
+		return false
+	}
+
 	var tf []string
+
+	if len(d.supportingLines) != 1 {
+		logger.Print("Derived Rule depends on a single line")
+		return false
+	}
 
 	seq1 := d.supportingLines[0].line.seq
 	seq2 := d.line.seq
@@ -21,11 +31,6 @@ func derivR(d *derivNode) bool {
 	}
 	if len(tf) == 0 {
 		logger.Print(infrule, "does not match any theorems")
-		return false
-	}
-
-	if len(d.supportingLines) != 1 {
-		logger.Print("Derived Rule depends on a single line")
 		return false
 	}
 
@@ -49,7 +54,7 @@ func derivR(d *derivNode) bool {
 	sn := `>` + s1 + s2
 
 	for _, thc := range tf {
-		Debug("<--Derived Rule check: ", Parse(sn).StringPlain(), " against: ", Parse(thc).StringPlain())
+		Debug("<--Derived Rule check: ", Parse(sn, !allowGreekUpper).StringF(O_PlainText), " against: ", Parse(thc, !allowGreekUpper).StringF(O_PlainText))
 		if sameStructure(thc, sn) {
 			Debug("ok")
 			return true

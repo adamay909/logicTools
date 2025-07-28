@@ -131,17 +131,6 @@ If you use a theorem in a derivation, you must use its abbreviation in the annot
 8. Γ ⊢ ¬P∨Q...2,5,7,∨E
 
 
-### Derived Rules
-
-If derived rules are enabled (default), you may, given a theorem listed above of the form s1⊃s2, use the derived rule of inference: From Γ ⊢ s1 , infer Γ ⊢ s2.
-
-This will save you having to go through Conditional Elimination. If you use a derived rule, append R to the end of the name of the corresponding theorem. E.g.:
-
-1. Γ⊢p⊃q...premise
-2. Γ⊢¬q⊃¬p...1,CPR
-
-The R in CPR indicates that we are taking Contraposition and turning it into a derived rule.
-
 ### The Proof Checker
 
 The proof checker checks whether  each line is in accordance with the proof system. But it does not check whether you have managed to show what you set out to show. You'll have to check that yourself---usually a matter of inspecting the last line of your derivation, possibly in combination with the premises.
@@ -163,48 +152,9 @@ The proof checker will attempt to store the current state of the editor so that 
 You can go back and forth in history using the 'back' and 'forward' buttons.
 
 
-### Extension for Modal Logic
-
-The proof checker can deal with modal logic (even more experimental than other stuff). Given any wff. of sentential logic/predicate logic, prefixing it with &#x25a1; or &#x25c7; results in another wff. The proof checker accepts the following inference rules:
-
-- **Necessity Introduction (&#x25a1;I)** from  ⊢ φ
-infer  ⊢ &#x25a1;φ.
-- **Necessity Elimination (&#x25a1;I)** from Γ ⊢ &#x25a1;φ
-infer Γ ⊢φ.
-- **Possibility Introduction (&#x25c7;I)** from Γ ⊢ φ
-infer Γ ⊢ &#x25c7;φ.
-- **Possibility Elimination (&#x25c7;E)** From Γ ⊢ &#x25c7;φ and ∆, φ ⊢ ψ,
-infer Γ, ∆ ⊢ &#x25c7;ψ , provided ∆ contain no formulas that are not necessities.
-
-
-
-The proof checker also accepts the following axioms (so you can stick to the plain Necessity Introduction rule):
-
-- **K**  ⊢ □(p⊃q)⊃(□p⊃□q)
-- **S4** ⊢ □p⊃□□p
-- **S5** ⊢ ◇p⊃□◇p
-- **Duality (DL)** ⊢ □p⊃¬◇¬p
-- **Duality (DL)** ⊢ ¬◇¬p⊃□p
-- **Duality (DL)** ⊢ ◇p⊃¬□¬p
-- **Duality (DL)** ⊢ ¬□¬p⊃◇p
-
-It also accepts the following theorems that make life easier:
-
-- **S4** ⊢ ◇◇p⊃◇p
-- **S5** ⊢ ◇□p⊃□p
-- **Duality (DL)** ⊢ -□p⊃◇¬p
-- **Duality (DL)** ⊢ □-p⊃¬◇p
-- **Duality (DL)** ⊢ -◇p⊃□¬p
-- **Duality (DL)** ⊢ ◇-p⊃¬□p
-
-As far as the proof checker is concerned, axioms behave just like theorems. The axioms and theorems of modal logic can be turned into derived rules just as the other axioms/theorems.
-
-
-### Installation
-
-This proof-checker is designed to run completely inside the browser so it is easy to host it yourself so long as you are able to host static websites. The docs folder of the GitHub repository contains all the files you need.
 
 ### Copyright
 
 The Go, HTML, and CSS sources for this proof checker written by Masahiro Yamada. Licensed under the MIT License. You can get the source code at:
-[https://github.com/adamay909/logicTools](https://github.com/adamay909/logicTools)
+[https://github.com/adamay909/logicTools](https://github.com/adamay909/logicBook/tools/proofChecker)
+

@@ -10,15 +10,15 @@ func negE(d *derivNode) bool {
 	seq1 := d.supportingLines[0].line.seq
 	seq2 := d.line.seq
 
-	n1 := Parse(seq1.succedent().String())
-	n2 := Parse(seq2.succedent().String())
+	n1 := Parse(seq1.succedent().String(), !allowGreekUpper)
+	n2 := Parse(seq2.succedent().String(), !allowGreekUpper)
 
-	if n1.MainConnective() != neg {
+	if n1.MainConnective() != Neg {
 		logger.Print("premise must be double negation")
 		return false
 	}
 
-	if n1.subnode1.MainConnective() != neg {
+	if n1.subnode1.MainConnective() != Neg {
 		logger.Print("premise must be double negation")
 		return false
 	}
@@ -53,11 +53,11 @@ func negI(d *derivNode) bool {
 	seq2 := d.supportingLines[1].line.seq
 	seq3 := d.line.seq
 
-	n1 := Parse(seq1.succedent().String())
-	n2 := Parse(seq2.succedent().String())
-	n3 := Parse(seq3.succedent().String())
+	n1 := Parse(seq1.succedent().String(), !allowGreekUpper)
+	n2 := Parse(seq2.succedent().String(), !allowGreekUpper)
+	n3 := Parse(seq3.succedent().String(), !allowGreekUpper)
 
-	if n3.MainConnective() != neg {
+	if n3.MainConnective() != Neg {
 		logger.Print("conclusion must be negation")
 		return false
 	}

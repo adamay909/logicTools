@@ -1,17 +1,14 @@
 module github.com/adamay909/logicTools
 
-go 1.18
+go 1.23.0
+
+toolchain go1.24.5
 
 replace github.com/adamay909/logicTools/gentzen => ./gentzen
 
 require (
-	github.com/adamay909/logicTools/gentzen v0.0.0-00010101000000-000000000000
+	golang.org/x/term v0.33.0
 	honnef.co/go/js/dom/v2 v2.0.0-20210725211120-f030747120f2
 )
 
-require (
-	github.com/yuin/goldmark v1.4.13 // indirect
-	golang.org/x/mod v0.7.0 // indirect
-	golang.org/x/sys v0.4.0 // indirect
-	golang.org/x/tools v0.5.0 // indirect
-)
+require golang.org/x/sys v0.34.0 // indirect

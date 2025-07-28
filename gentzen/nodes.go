@@ -1,14 +1,15 @@
 package gentzen
 
 import (
-	"sort"
+	"errors"
 	"strconv"
 	"strings"
 )
 
+// Node holds information about a node in the syntax tree of a formula
 type Node struct {
 	raw                string
-	connective         logicalConstant
+	connective         LogicalConstant
 	subnode1, subnode2 *Node
 	parent             *Node
 	children           []*Node
@@ -16,9 +17,12 @@ type Node struct {
 	predicateLetter    string
 	term               []string
 	flags              []string
+	index              int    //vaule of .index of token on which Node is based
+	tvassigned         []bool //whether truthvalue for given row has been assigned
+	tvalue             []bool //map interpretation row number to truth value
 }
 
-// Child1 returns first chile of n if it exists. Returns ok=false
+// Child1 returns first child of n if it exists. Returns ok=false
 // if n is atomic.
 func (n *Node) Child1() (m *Node, ok bool) {
 
@@ -51,6 +55,8 @@ func (n *Node) Child2() (m *Node, ok bool) {
 	return n.subnode2, ok
 }
 
+// Child1Must returns first child of n. Returns nil if there is no
+// first child.
 func (n *Node) Child1Must() (m *Node) {
 	var k *Node
 	if _, ok := n.Child1(); !ok {
@@ -60,6 +66,8 @@ func (n *Node) Child1Must() (m *Node) {
 	return n.subnode1
 }
 
+// Child2Must returns second child of n. Returns nil if there is no
+// second child.
 func (n *Node) Child2Must() (m *Node) {
 	var k *Node
 	if _, ok := n.Child2(); !ok {
@@ -95,6 +103,7 @@ func (n *Node) Parent() (m *Node, ok bool) {
 	return n.parent, ok
 }
 
+// ParentMust returns the parent of n. nil if n has no parent.
 func (n *Node) ParentMust() (m *Node) {
 	var k *Node
 	if _, ok := n.Parent(); !ok {
@@ -103,6 +112,7 @@ func (n *Node) ParentMust() (m *Node) {
 	return n.parent
 }
 
+// SetParent sets the parent of n to p.
 func (n *Node) SetParent(p *Node) {
 
 	n.parent = p
@@ -114,6 +124,7 @@ func (n *Node) SetFlag(f string) {
 	n.flags = append(n.flags, f)
 }
 
+// RmFlag removes the flag f.
 func (n *Node) RmFlag(f string) {
 	var newflags []string
 
@@ -127,6 +138,7 @@ func (n *Node) RmFlag(f string) {
 	return
 }
 
+// HasFlag returns whether flag fhas been set.
 func (n *Node) HasFlag(f string) bool {
 	for _, s := range n.flags {
 		if s == f {
@@ -136,31 +148,62 @@ func (n *Node) HasFlag(f string) bool {
 	return false
 }
 
+// IsAtomic returns true if n is an atomic formula.
 func (n *Node) IsAtomic() bool {
-	return n.connective == ""
+
+	if n == nil {
+		return false
+	}
+
+	return n.connective == None
 }
 
+// IsPredicate returns true if n is a predicate.
+func (n *Node) IsPredicate() bool {
+
+	if n == nil {
+		return false
+	}
+
+	return n.predicateLetter != ""
+}
+
+// IsConnective returns true if n has a main connective.
+func (n *Node) IsConnective() bool {
+
+	if n == nil {
+		return false
+	}
+
+	return n.connective != None
+}
+
+// SetFormula sets the formula of n to f.
 func (n *Node) SetFormula(f string) {
 	n.raw = f
 }
 
+// Formula returns the formula of n.
 func (n *Node) Formula() string {
-	return printNodePolish(n)
+	return n.String()
 }
 
+// IsBinary returns true if n is a binary node.
 func (n *Node) IsBinary() bool {
 	switch n.MainConnective() {
-	case conj:
+	case Conj:
 		return true
-	case cond:
+	case Cond:
 		return true
-	case disj:
+	case Disj:
 		return true
 	default:
 		return false
 	}
 }
 
+// IsBasic returns true if n is atomic or negation of an
+// atomic formula.
 func (n *Node) IsBasic() bool {
 
 	if n.IsAtomic() {
@@ -174,170 +217,132 @@ func (n *Node) IsBasic() bool {
 	return false
 }
 
+// IsUnary returns true if n is a unary connective node.
 func (n *Node) IsUnary() bool {
 
 	return !n.IsBinary() && !n.IsAtomic()
 
 }
 
+// IsQuantifier returns true if n is a quantifier node.
 func (n *Node) IsQuantifier() bool {
-	return n.MainConnective() == uni || n.MainConnective() == ex
-}
 
-func (n *Node) IsNegation() bool {
-	return n.MainConnective() == neg
-}
-
-func (n *Node) IsConditional() bool {
-	return n.MainConnective() == cond
-}
-
-func (n *Node) IsConjunction() bool {
-	return n.MainConnective() == conj
-}
-
-func (n *Node) IsDisjunction() bool {
-	return n.MainConnective() == disj
-}
-
-func (n *Node) IsDoubleNegation() bool {
-	if !n.IsNegation() {
+	if n == nil {
 		return false
 	}
-	return n.Child1Must().IsNegation()
+
+	return n.MainConnective() == Uni || n.MainConnective() == Ex
 }
 
+// IsNegation returns true if n is a negation node.
+func (n *Node) IsNegation() bool {
+
+	if n == nil {
+		return false
+	}
+
+	return n.MainConnective() == Neg
+}
+
+// IsConditional returns true if n is a conditional node.
+func (n *Node) IsConditional() bool {
+
+	if n == nil {
+		return false
+	}
+
+	return n.MainConnective() == Cond
+
+}
+
+// IsConjunction returns true if n is a conjunction node.
+func (n *Node) IsConjunction() bool {
+
+	if n == nil {
+		return false
+	}
+
+	return n.MainConnective() == Conj
+}
+
+// IsDisjunction returhs true if n is a disjunction node.
+func (n *Node) IsDisjunction() bool {
+
+	if n == nil {
+		return false
+	}
+
+	return n.MainConnective() == Disj
+}
+
+// IsModal returns true if n is a modal operator node.
 func (n *Node) IsModal() bool {
-	return n.MainConnective() == nec || n.MainConnective() == pos
+
+	if n == nil {
+		return false
+	}
+
+	return n.MainConnective() == Nec || n.MainConnective() == Pos
 }
 
-func (n *Node) BracketClass() int {
+func (n *Node) classP() int {
 
-	c := 0
+	class, sclass := 0, 0
 
-	if n.IsAtomic() {
-		if oPL && n.predicateLetter == "=" && n.parent != nil {
-			if n.parent.IsQuantifier() {
-				c++
-			}
+	ln := linearize(n)
+
+	for _, e := range ln {
+		if !e.IsAtomic() {
+			continue
 		}
-		if isGreekFormulaVar(n.Predicate()) && len(n.Terms()) > 0 && n.parent != nil {
-			if n.parent.IsNegation() {
-				c = 2
-			} else {
-				c++
-			}
+		sclass = 0
+		for f := e.parent; f != nil; f = f.parent {
+			sclass++
 		}
-		return c
-	}
-
-	if n.IsQuantifier() {
-		c = n.subnode1.BracketClass()
-		return c
-	}
-
-	if n.IsModal() {
-		c = n.subnode1.BracketClass()
-		return c
-	}
-
-	if n.IsNegation() {
-		c = n.subnode1.BracketClass()
-		if oPL && n.parent != nil {
-			if n.parent.IsQuantifier() {
-				c++
-			}
-			if n.subnode1.Predicate() == "=" {
-				if n.parent.IsNegation() {
-					c++
-				}
-			}
+		if sclass > class {
+			class = sclass
 		}
-		return c
 	}
 
-	c = n.subnode1.BracketClass() + 1
-	if n.subnode2.BracketClass() > n.subnode1.BracketClass() {
-		c = n.subnode2.BracketClass() + 1
-	}
-	return c
+	return class
 }
 
-func (n *Node) Class() int {
-
-	c := 1
-
-	if n.IsAtomic() {
-		return c
-	}
-
-	c = n.subnode1.Class() + 1
-	if n.IsBinary() {
-		if n.subnode2.Class() > n.subnode1.Class() {
-			c = n.subnode2.Class() + 1
-		}
-	}
-	return c
-}
-
-func (n *Node) MainConnective() logicalConstant {
+// MainConnective returns the main connective of n.
+func (n *Node) MainConnective() LogicalConstant {
 	return n.connective
 }
 
-func (n *Node) SetConnective(s logicalConstant) {
+// SetConnective sets the main connective of n to s.
+func (n *Node) SetConnective(s LogicalConstant) {
 	n.connective = s
 	return
 }
 
-func (n *Node) Generation() int {
-
-	g := 0
-	for ; n.parent != nil; n = n.parent {
-		g++
-	}
-
-	return g
-}
-
-func (n *Node) SetBoundVar(v string) {
-	n.variable = v
-	return
-}
-
+// BoundVariable returns the variable bound by n.
+// Return value is the empty string unless n is a quantifier node.
 func (n *Node) BoundVariable() string {
 	return n.variable
 }
 
-func (n *Node) AddTerm(t ...string) {
-
-	n.term = append(n.term, t...)
-	return
-}
-
+// Terms returns the terms of n. Returns an empty slice unless
+// n is a predicate node.
 func (n *Node) Terms() []string {
 	return n.term
 }
 
+// Predicate returns the predicat letter.
 func (n *Node) Predicate() string {
 	return n.predicateLetter
 }
 
+// SetAtomic sets n to be an atomic formula.
 func (n *Node) SetAtomic() {
 	n.subnode1 = nil
 	n.subnode2 = nil
-	n.connective = ""
+	n.connective = None
 }
 
-func (n *Node) SetChild1(c *Node) {
-	n.subnode1 = c
-	return
-}
-
-func (n *Node) SetChild2(c *Node) {
-	n.subnode2 = c
-	return
-}
-
+// IsIdentity returns true if n is an identity node.
 func (n *Node) IsIdentity() bool {
 
 	if !n.IsAtomic() {
@@ -352,11 +357,31 @@ func (n *Node) IsIdentity() bool {
 
 }
 
+// Children returns the child nodes of n in a slice.
+func (n *Node) Children() []*Node {
+
+	var resp []*Node
+
+	resp = append(resp, n.children...)
+
+	return resp
+}
+
+// ClearChildren removes all child nodes of n.
+func (n *Node) ClearChildren() {
+
+	n.children = nil
+}
+
+// HasFreeVars returns true if there are free variables
+// in the formula represented by n.
 func (n *Node) HasFreeVars() bool {
 
 	return len(n.FreeVars()) == 0
 }
 
+// FreeVars returns all the free variables in the formula
+// represented by n.
 func (n *Node) FreeVars() []string {
 
 	var fv []string
@@ -390,39 +415,39 @@ func (n *Node) FreeVars() []string {
 // Return string is formatted in Polish notation.
 func (n *Node) String() string {
 
-	return printNodePolish(n)
+	w := new(strings.Builder)
+
+	ingressFunc := func(e *Node) {
+		polishIngressFunc(e, w)
+	}
+
+	pivotFunc := func(e *Node) {
+		polishPivotFunc(e, w)
+	}
+
+	egressFunc := func(e *Node) {
+		polishEgressFunc(e, w)
+	}
+
+	Serialize(n, ingressFunc, pivotFunc, egressFunc)
+
+	return w.String()
 }
 
-// StringEnglish return English string for n.
-func (n *Node) StringEnglish() string {
+// StringF returns the formula in the format specified by mode.
+func (n *Node) StringF(mode PrintMode) string {
 
-	return printNodeInfix(n, mEnglish)
-	//	return fixBrackets(printNodeInfix(n, mLatex), mLatex)
+	switch mode {
 
-	//		return printNodeLatex(n)
-}
+	case O_Latex, O_English, O_ProofChecker, O_PlainText, O_PlainASCII:
 
-// StringLatex return Latex string for n.
-func (n *Node) StringLatex() string {
+		return printNodeInfix(n, mode)
 
-	return printNodeInfix(n, mLatex)
-	//	return fixBrackets(printNodeInfix(n, mLatex), mLatex)
+	default:
 
-	//		return printNodeLatex(n)
-}
+		return n.String()
 
-// StringLatex return Latex string for n.
-func (n *Node) StringMathJax() string {
-
-	return printNodeInfix(n, mPlainLatex)
-	//return printNodeMathJax(n)
-}
-
-// StringPlain returns plain Unicode string
-func (n *Node) StringPlain() string {
-
-	return printNodeInfix(n, mPlainText)
-	//return printNodePlain(n)
+	}
 }
 
 // ConnectiveCount returns the number of connectives in n.
@@ -440,16 +465,16 @@ func (n *Node) ConnectiveCount() int {
 	return count
 }
 
-// String returns string for c.
-func (c logicalConstant) String() string {
-	return c.Stringf(mPolish)
+// PolishString returns Polish string for c.
+func (c LogicalConstant) PolishString() string {
+	return c.Stringf(O_Polish)
 }
 
-// Sring returns formatted string for c.
-func (c logicalConstant) Stringf(m printMode) string {
+// Stringf returns formatted string for c.
+func (c LogicalConstant) Stringf(m PrintMode) string {
 
 	for _, e := range connectives {
-		if string(c) == e[0] {
+		if codeOf(c) == e[0] {
 			return e[m]
 		}
 	}
@@ -485,57 +510,30 @@ func getSubnodes(n *Node) []*Node {
 }
 
 // order nodes by depth
-func _reorderNodes(nodes []*Node) (out []*Node) {
-
-	d := findMaxDepth(nodes)
-
-	for i := 0; i <= d; i++ {
-
-		for _, j := range nodes {
-			if j.Generation() == i {
-				out = append(out, j)
-			}
-		}
-	}
-	return out
-}
 
 // get subnodes orderd by class
 func orderedNodes(n *Node) (out []*Node) {
 
-	d := n.Class() - 1
+	d := n.classP() - 1
 	nodes := getSubnodes(n)
 
 	for i := d; i >= 0; i-- {
 
 		for _, j := range nodes {
-			if j.Class()-1 == i {
+			if j.classP()-1 == i {
 				out = append(out, j)
 			}
 		}
 	}
 	return out
-}
-
-func findMaxDepth(nodes []*Node) int {
-
-	var ds []int
-
-	for _, n := range nodes {
-		ds = append(ds, n.Generation())
-	}
-
-	sort.Ints(ds)
-
-	return ds[len(ds)-1]
 }
 
 // check if s1 is instance of s0
 func sameStructure(s0, s1 string) bool {
 
 	sn := normalize(s0, s1)
-	n0 := getSubnodes(Parse(sn[0]))
-	n1 := getSubnodes(Parse(sn[1]))
+	n0 := getSubnodes(Parse(sn[0], !allowGreekUpper))
+	n1 := getSubnodes(Parse(sn[1], !allowGreekUpper))
 
 	if len(n0) > len(n1) {
 		return false
@@ -578,7 +576,7 @@ func sameStructure(s0, s1 string) bool {
 
 func (n *Node) display() string {
 
-	return Parse(n.String()).StringPlain()
+	return Parse(n.String(), !allowGreekUpper).StringF(O_PlainText)
 
 }
 
@@ -592,7 +590,7 @@ func normalize(s ...string) []string {
 	var nextatomic func() string
 
 	for _, e := range s {
-		allAtomic = append(allAtomic, Parse(e).AtomicSentences()...)
+		allAtomic = append(allAtomic, Parse(e, !allowGreekUpper).AtomicSentences()...)
 	}
 	availLetters := []string{"P", "Q", "R", "S", "T", "F", "G", "H"}
 	var normal []string
@@ -622,14 +620,14 @@ func normalize(s ...string) []string {
 
 	for _, e := range s {
 
-		atomic := Parse(e).AtomicSentences()
+		atomic := Parse(e, !allowGreekUpper).AtomicSentences()
 
 		for _, a := range atomic {
 			if !oPL {
-				e = Parse(e).ReplaceAtomic(a, nextatomic()).Formula()
+				e = Parse(e, !allowGreekUpper).replaceAtomic(a, nextatomic()).Formula()
 			} else {
-				terms := strings.TrimPrefix(a, Parse(a).predicateLetter)
-				e = Parse(e).ReplaceAtomic(a, nextatomic()+terms).Formula()
+				terms := strings.TrimPrefix(a, Parse(a, !allowGreekUpper).predicateLetter)
+				e = Parse(e, !allowGreekUpper).replaceAtomic(a, nextatomic()+terms).Formula()
 			}
 
 		}
@@ -639,7 +637,7 @@ func normalize(s ...string) []string {
 
 }
 
-func (n *Node) ReplaceAtomic(old, repl string) *Node {
+func (n *Node) replaceAtomic(old, repl string) *Node {
 
 	n1 := getSubnodes(n)
 
@@ -655,6 +653,8 @@ func (n *Node) ReplaceAtomic(old, repl string) *Node {
 
 }
 
+// AtomicSentences returns a slice of the atomic sentences in the formula
+// represented by n.
 func (n *Node) AtomicSentences() []string {
 
 	var as []string
@@ -676,12 +676,15 @@ func (n *Node) AtomicSentences() []string {
 	return as
 }
 
+// AtomicCount returns the number of atomic sentences in n.
 func (n *Node) AtomicCount() int {
 
 	return len(n.AtomicSentences())
 
 }
 
+// IsPureSL returns true if the only logical constants are
+// those of sentential logic (plus identity).
 func (n *Node) IsPureSL() bool {
 
 	ns := getSubnodes(n)
@@ -700,36 +703,341 @@ func (n *Node) IsPureSL() bool {
 	return true
 }
 
+// Conjoin produces a Node that results by conjoining n1 and n1.
 func Conjoin(n1, n2 *Node) *Node {
 
 	s1 := n1.String()
 	s2 := n2.String()
 	s3 := lconj + s1 + s2
 
-	return Parse(s3)
+	return Parse(s3, !allowGreekUpper)
 }
 
+// Disjoin produces a node that results by disjoining n1 and n2.
 func Disjoin(n1, n2 *Node) *Node {
 
 	s1 := n1.String()
 	s2 := n2.String()
 	s3 := ldisj + s1 + s2
 
-	return Parse(s3)
+	return Parse(s3, !allowGreekUpper)
 }
 
+// Negate produces a node that results by negating n.
 func Negate(n *Node) *Node {
 	s1 := n.String()
 	s2 := lneg + s1
 
-	return Parse(s2)
+	return Parse(s2, !allowGreekUpper)
 }
 
+// Conditionalize returns a conditional node that takes
+// n1 as the antecedent and n2 as cosequent.
 func Conditionalize(n1, n2 *Node) *Node {
 
 	s1 := n1.String()
 	s2 := n2.String()
 	s3 := lcond + s1 + s2
 
-	return Parse(s3)
+	return Parse(s3, !allowGreekUpper)
+}
+
+func (n *Node) addFirstChild(n2 *Node) (err error) {
+
+	if len(n.children) != 0 {
+		err = errors.New("malformed: cannot add more than one child to node")
+		return
+	}
+
+	n.subnode1 = n2
+	n.children = append(n.children, n2)
+	n2.parent = n
+
+	return
+}
+
+func (n *Node) addSecondChild(n2 *Node) (err error) {
+
+	if n == nil {
+		err = errors.New("malformed: no appropriate parent node found")
+		return
+	}
+
+	if len(n.children) > 1 {
+		err = errors.New("malformed: cannot add more than two children to node")
+		return
+	}
+
+	n.subnode2 = n2
+	n.children = append(n.children, n2)
+	n2.parent = n
+
+	return
+}
+
+func (n *Node) rootNode() *Node {
+
+	if n == nil {
+		return nil
+	}
+
+	e := new(Node)
+
+	for e = n; e.parent != nil; e = e.parent {
+	}
+
+	return e
+
+}
+
+func (n *Node) validate() (err error) {
+
+	var walk func(*Node) error
+
+	walk = func(e *Node) error {
+
+		if e.IsUnary() && len(e.children) != 1 {
+			err = errors.New("malformed: unary connective must have exactly one child node")
+
+			err = errors.Join(errors.New(strconv.Itoa(e.index)), err)
+			return err
+		}
+
+		if e.IsBinary() && len(e.children) != 2 {
+			err = errors.New("malformed: binary connective must have exactly two child nodes")
+			err = errors.Join(errors.New(strconv.Itoa(e.index)), err)
+			return err
+		}
+
+		if e.IsAtomic() && len(e.children) != 0 {
+			err = errors.New("malformed: non-connective cannot have a child")
+			err = errors.Join(errors.New(strconv.Itoa(e.index)), err)
+			return err
+		}
+
+		if e.IsPredicate() && len(e.term) == 0 {
+			var ch string
+			ch, err = getFirstChar(e.predicateLetter, !allowSubscr, !allowNumeral, !allowGreekUpper, !allowIdentity, allowSpecial)
+			if err != nil {
+				err = errors.Join(errors.New(strconv.Itoa(e.index)), err)
+				return err
+			}
+			if !isGreekLower(ch) {
+				err = errors.New("malformed: predicate letter must be followed by at least one term (else use lower case Greek letter)")
+				err = errors.Join(errors.New(strconv.Itoa(e.index)), err)
+				return err
+			}
+		}
+
+		if e.IsQuantifier() && e.parent != nil {
+
+			for f := e.parent; f != nil; f = f.parent {
+				if f.IsQuantifier() && f.variable == e.variable {
+					err = errors.New("illegal nested quantifier variables")
+					err = errors.Join(errors.New(strconv.Itoa(e.index)), err)
+					return err
+				}
+			}
+		}
+
+		for _, c := range e.children {
+
+			err = walk(c)
+
+			if err != nil {
+				break
+			}
+		}
+
+		return err
+	}
+
+	return walk(n)
+}
+
+func (n *Node) nestingDepth() int {
+
+	d := 0
+
+	var walk func(*Node)
+
+	walk = func(e *Node) {
+
+		if l := e.binaryGenerationNumber(); l > d {
+			d = l
+		}
+
+		for _, c := range e.children {
+			walk(c)
+		}
+	}
+
+	m := Parse(n.String(), !allowGreekUpper)
+
+	walk(m)
+
+	if !prettifyBrackets && d > 1 {
+		d = 1
+	}
+
+	return d
+}
+
+func (n *Node) binaryGenerationNumber() int {
+
+	d := 0
+
+	if n.parent == nil {
+		return d
+	}
+
+	e := new(Node)
+
+	for e = n.parent; e != nil; e = e.parent {
+		if e.IsBinary() {
+			d++
+		}
+	}
+
+	return d
+}
+
+func (n *Node) setraw() {
+
+	if n.predicateLetter == "" {
+		return
+	}
+
+	n.raw = n.predicateLetter
+
+	for _, t := range n.term {
+
+		n.raw = n.raw + t
+
+	}
+
+	return
+}
+
+// AddChild adds n2 as a child of n. The order of children usually matters
+// so be sure to add them in the right order.
+func (n *Node) AddChild(n2 *Node) (err error) {
+
+	if n == nil {
+		return errors.New("no parent to add child")
+	}
+
+	if n.isSaturated() {
+		return errors.New("cannot add child")
+	}
+
+	n.children = append(n.children, n2)
+
+	n2.parent = n
+
+	n.subnode1 = n.children[0]
+
+	if len(n.children) > 1 {
+
+		n.subnode2 = n.children[1]
+
+	}
+
+	return
+
+}
+
+func (n *Node) isSaturated() bool {
+
+	if n.IsBinary() {
+		return len(n.children) > 1
+	}
+
+	if n.IsUnary() {
+		return len(n.children) == 1
+	}
+
+	if n.raw != "" {
+		return true
+	}
+
+	return false
+}
+
+func (n *Node) removeSecondChild() {
+
+	if !n.IsBinary() {
+		return
+	}
+
+	if len(n.children) < 2 {
+		return
+	}
+
+	n.subnode2 = nil
+
+	n.children = nil
+
+	n.children = append(n.children, n.subnode1)
+
+}
+
+func (n *Node) openAncestor() (e *Node) {
+
+	for e = n.parent; e != nil; e = e.parent {
+
+		if !e.isSaturated() {
+			break
+		}
+
+	}
+
+	return e
+
+}
+
+func (n *Node) binaryAncestor() (e *Node) {
+
+	for e = n.parent; e != nil; e = e.parent {
+		if e.IsBinary() {
+			break
+		}
+	}
+
+	return e
+}
+
+func (n *Node) binaryCount() int {
+
+	count := 0
+
+	for _, e := range linearize(n) {
+
+		if e.IsBinary() {
+			count++
+		}
+
+	}
+
+	return count
+}
+
+func (n *Node) isFunctionFormula() bool {
+
+	if n == nil {
+		return false
+	}
+
+	if n.predicateLetter == "" {
+		return false
+	}
+
+	ch := strings.Split(n.predicateLetter, "_")[0]
+
+	if isGreekLower(ch) {
+		return true
+	}
+
+	return false
+
 }

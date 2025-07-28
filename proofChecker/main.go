@@ -16,7 +16,7 @@ import (
 
 // set to true for debug log to stdout
 
-//go:embed assets/html/* assets/files assets/samples
+//go:embed assets/html/*
 var assets embed.FS
 
 // Enable some features for personal teaching material.
@@ -73,10 +73,12 @@ func main() {
 
 	initMessages()
 	gentzen.SetStandardPolish(false)
+	gentzen.SetML(false)
+	gentzen.SetDR(false)
 	setupJS()
 	resetDisplay()
 	hideExtra()
-	hide("menuButton")
+	//	hide("menuButton")
 	loadHistory()
 	stopInput()
 
@@ -237,18 +239,18 @@ func onClick() {
 
 	case "submitInput":
 		getInput()
+		/*
+			case "randomTheorem":
+				oEXTHM = true
+				nextProblem()
 
-	case "randomTheorem":
-		oEXTHM = true
-		nextProblem()
-
-	case "nextExercise":
-		nextProblem()
-	case "prevExercise":
-		prevProblem()
-	case "quitExercise":
-		endRandomExercise()
-
+			case "nextExercise":
+				nextProblem()
+			case "prevExercise":
+				prevProblem()
+			case "quitExercise":
+				endRandomExercise()
+		*/
 	case "arrowUp":
 		handleInput("ArrowUp")
 	case "arrowDown":
@@ -332,7 +334,7 @@ func clearScreen() {
 	dsp.clear()
 	setTextByID("setOffset", "First Line: "+strconv.Itoa(dsp.Offset))
 	display()
-	printMessage("")
+	printMessage("", !clean)
 	hide("messages")
 }
 
@@ -366,15 +368,15 @@ func resetDisplay() {
 	display()
 	toggleClipboardType()
 	toggleTheorems()
-	toggleDR()
-	toggleML()
+	//	toggleDR()
+	//	toggleML()
 	togglePL()
 	toggleSettings()
 	toggleMenuButton()
 	setDisplay()
 	focusInput()
-	exercises = nil
-	expos = 0
+	//exercises = nil
+	//expos = 0
 }
 
 func toggleTheorems() {
@@ -798,7 +800,7 @@ func loadFile(name string, t string) {
 	hide("backButton")
 	hide("exerciseList")
 	hide("extra")
-	printMessage("")
+	printMessage("", !clean)
 	hide("messages")
 	display()
 	stopInput()
@@ -827,7 +829,7 @@ func getInput() {
 	dsp.Title = title
 	dsp.Input = lines
 	display()
-	printMessage("")
+	printMessage("", !clean)
 	hide("messages")
 	hide("textinput")
 	hide("extra")

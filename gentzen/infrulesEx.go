@@ -10,7 +10,7 @@ func exI(d *derivNode) bool {
 	seq1 := d.supportingLines[0].line.seq
 	seq2 := d.line.seq
 
-	if Parse(seq2.succedent().String()).MainConnective() != ex {
+	if Parse(seq2.succedent().String(), !allowGreekUpper).MainConnective() != Ex {
 		logger.Print("conclusion must be existentially quantified")
 		return false
 	}
@@ -65,7 +65,7 @@ func exEhelper(seq1, seq2, seq3 sequent) (v bool, msg string) {
 
 	v = false
 
-	if Parse(seq1.succedent().String()).MainConnective() != ex {
+	if Parse(seq1.succedent().String(), !allowGreekUpper).MainConnective() != Ex {
 		msg = "no existential quantification in premises"
 		return
 	}
@@ -96,7 +96,7 @@ func exEhelper(seq1, seq2, seq3 sequent) (v bool, msg string) {
 		return
 	}
 
-	if Parse(seq3.s).hasTerm(kappa) {
+	if Parse(seq3.s, !allowGreekUpper).hasTerm(kappa) {
 		msg = kappa + " may not appear in concluding succedent"
 		return
 	}
@@ -109,7 +109,7 @@ func exEhelper(seq1, seq2, seq3 sequent) (v bool, msg string) {
 		if isFormulaSet(d.String()) {
 			continue
 		}
-		if Parse(d).hasTerm(kappa) {
+		if Parse(d, !allowGreekUpper).hasTerm(kappa) {
 			msg = kappa + " may not appear in any datum items"
 			return
 		}
@@ -122,7 +122,7 @@ func exEhelper(seq1, seq2, seq3 sequent) (v bool, msg string) {
 		if isFormulaSet(d.String()) {
 			continue
 		}
-		if Parse(d).hasTerm(kappa) {
+		if Parse(d, !allowGreekUpper).hasTerm(kappa) {
 			msg = kappa + " may not appear in any datum items"
 			return
 		}

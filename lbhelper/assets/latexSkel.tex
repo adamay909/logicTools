@@ -1,0 +1,43 @@
+\documentclass[#FONTSIZE#,letterpaper,table]{logicbook}
+
+\usepackage{hyperref}
+%**********************************
+%	STYLISTIC STUFF
+%**********************************
+\usepackage{natbib}
+\bibliographystyle{chicago-sentence}
+\usepackage{enumitem}
+\sloppy
+\frenchspacing
+\hypersetup{hidelinks}
+\usepackage{forest}
+
+\setlength{\parindent}{0em}
+
+\setlength{\parskip}{0.5em}
+
+
+\geometry{#PAPERSIZE#, lmargin=2cm, rmargin=2cm, tmargin=2cm, bmargin=1.5cm}
+\usepackage{logicfonts}
+\usepackage{logic_commands}
+\newcommand{\plsh}[1]{\input{|"lbhelper -f #1"}}
+\newcommand{\plshe}[1]{\input{|"lbhelper -e #1"}}
+\newcommand{\plsheab}[1]{\input{|"lbhelper -ab -e #1"}}
+\newcommand{\plshs}[1]{\input{|"lbhelper -s '#1'"}}
+\newcommand{\pltt}[1]{\input{|"lbhelper -tt #1"}}
+\newcommand{\plstf}[1]{\input{|"lbhelper -stf #1"}}
+\newcommand{\plsts}[1]{\input{|"lbhelper -sts #1"}}
+
+\newcommand{\lbh}[1]{\input{|"lbhelper #1"}}
+
+%\usepackage{enumitem}
+#ANSWERS#
+
+
+\pagestyle{plain}
+
+\begin{document}
+
+#DUMMY#
+
+\end{document}

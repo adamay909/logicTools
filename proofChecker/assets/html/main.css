@@ -1,12 +1,11 @@
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Math&display=swap');
+</style>
 
-@font-face {
- font-family: 'Noto Sans Math';
- src: url(assets/NotoSansMath.woff2) format('woff2');
-}
 
-@font-face {
- font-family: 'math';
- src: url(assets/math.otf) format('opentype');
+p.message {
+ padding: 0em;
+ margin:0em;
 }
 
 div#messages>p {
@@ -28,11 +27,13 @@ img {
 }
 
 body {
- font-family: 'Noto Sans Math', sans-serif;
-} 
+  font-family: "Noto Sans Math", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
 
 .greek {
- font-family: 'math', 'Noto Sans Math', sans-serif;
+ font-family: serif;
  font-size: 1.08em;
 }
 
@@ -129,6 +130,14 @@ width: 10em;
 background-color: white;
 }
 
+button.menuButton {
+ border: none;
+font-size:1em;
+font-style:italic;
+font-weight:bold;
+width: 2em;
+background-color: white;
+}
 div#display {
  position: relative;
  height: 40rem;
@@ -390,3 +399,16 @@ margin-top:0em;
   margin-top: 2em;
  }
 }
+
+.big {
+ font-size: 1.1em;
+}
+
+.bigg {
+ font-size:1.2em;
+}
+
+.biggg {
+ font-size: 1.3em;
+}
+

@@ -1,7 +1,7 @@
 package gentzen
 
+//go:generate stringer -type=tokenID
 import (
-	"errors"
 	"strings"
 )
 
@@ -13,6 +13,7 @@ type token struct {
 	variable  string   //for PL
 	predicate string   //for PL
 	term      []string //for PL
+	index     int      //index within string
 
 }
 
@@ -32,25 +33,20 @@ const (
 	tTerm
 	tOpenb
 	tCloseb
+	tIdent
+	tComma
+	tNull tokenID = 0
 )
 
 const (
 	tConnective tokenID = tConj | tDisj | tNeg | tCond | tUni | tEx | tNec | tPos
-)
 
-const (
 	tQuantifier tokenID = tUni | tEx
-)
 
-const (
 	tModalOperator tokenID = tNec | tPos
-)
 
-const (
 	tUnary tokenID = tNeg | tUni | tEx | tNec | tPos
-)
 
-const (
 	tBinary tokenID = tConj | tCond | tDisj
 )
 
@@ -91,13 +87,25 @@ func (t token) String() string {
 	return t.str
 }
 
-func (t token) StringMathJax() string {
-	if t.isConnective() {
-		return logicalConstant(t.str).StringMathJax()
+func (t token) StringF(m PrintMode) string {
+
+	if m != O_ProofChecker {
+		return t.String()
+	}
+
+	if isGreekLowerCase(t.str) {
+		return greekCharOf(t.str)
+	}
+	if t.isQuantifier() {
+		for _, e := range connectivesPL {
+			if e[2] == t.str {
+				return e[O_PlainText] + t.variable
+			}
+		}
+		//		return t.str + t.variable
 	}
 	return t.str
 }
-
 func (t token) isConj() bool {
 	return t.tokenType == tConj
 }
@@ -133,6 +141,7 @@ func (t token) isNec() bool {
 func (t token) isPos() bool {
 	return t.tokenType == tPos
 }
+
 func (t token) isUnary() bool {
 
 	return t.isNeg() || t.isUni() || t.isEx() || t.isNec() || t.isPos()
@@ -161,127 +170,27 @@ func (t token) terms() []string {
 	return t.term
 }
 
-func (t tokenID) logicConstant() logicalConstant {
+func (t tokenID) logicConstant() LogicalConstant {
 	switch t {
 	case tNeg:
-		return neg
+		return Neg
 	case tConj:
-		return conj
+		return Conj
 	case tDisj:
-		return disj
+		return Disj
 	case tCond:
-		return cond
+		return Cond
 	case tUni:
-		return uni
+		return Uni
 	case tEx:
-		return ex
+		return Ex
 	case tNec:
-		return nec
+		return Nec
 	case tPos:
-		return pos
+		return Pos
 	default:
-		return logicalConstant("")
+		return None
 	}
-}
-func tokenize(s string) (t tokenStr, err error) {
-
-	//we igonre all spaces and tabs, etc
-	s = cleanString(s)
-
-	var e token
-	for len(s) > 0 {
-		e, s = nextToken(s)
-		t = append(t, e)
-	}
-
-	//we are done if are not doing predicate logic
-	if !oPL {
-
-		return t, err
-	}
-
-	t, err = tokenizePLround2(t)
-
-	return t, err
-}
-
-func (t tokenStr) String() string {
-
-	var s string
-
-	for _, e := range t {
-		s = s + e.String()
-	}
-	return s
-}
-
-// nextToken returns the next token in s and
-// returns the remainder string r. Works with
-// predicate logic.
-func nextToken(s string) (t token, r string) {
-
-	pos := 1
-	sr := []rune(s)
-
-	switch {
-	case string(sr[:pos]) == ldisj:
-		t.tokenType = tDisj
-	case string(sr[:pos]) == lconj:
-		t.tokenType = tConj
-	case string(sr[:pos]) == lcond:
-		t.tokenType = tCond
-	case string(sr[:pos]) == lneg:
-		t.tokenType = tNeg
-	case string(sr[:pos]) == luni:
-		t.tokenType = tUni
-	case string(sr[:pos]) == lex:
-		t.tokenType = tEx
-	case string(sr[:pos]) == lnec:
-		t.tokenType = tNec
-	case string(sr[:pos]) == lpos:
-		t.tokenType = tPos
-	case isGreekFormulaVar(string(sr[:pos])):
-		t.tokenType = tPredicate
-	case isFormulaSet(string(sr[:pos])):
-		t.tokenType = tAtomicSentence
-		if len(s) > 1+pos {
-			if string(sr[pos:pos+1]) == `_` {
-				pos = pos + 2
-			}
-		}
-	case isLowerCase(string(sr[:pos])):
-		t.tokenType = tTerm
-		if len(s) > 1+pos {
-			if string(sr[pos:pos+1]) == `_` {
-				pos = pos + 2
-			}
-		}
-	default:
-		t.tokenType = tPredicate
-		if len(sr) > 1+pos {
-			if string(sr[pos:pos+1]) == `\` {
-				pos = pos + 2
-			}
-			if len(sr) > 1+pos {
-				if string(sr[pos:pos+1]) == `_` {
-					pos = pos + 2
-				}
-			}
-		}
-
-	}
-	if !oPL {
-		if t.tokenType == tTerm || t.tokenType == tPredicate {
-			t.tokenType = tAtomicSentence
-		}
-		if t.tokenType == tUni || t.tokenType == tEx {
-			t.tokenType = tAtomicSentence
-		}
-	}
-	t.str = string(sr[:pos])
-	r = string(sr[pos:])
-
-	return t, r
 }
 
 func cleanString(s string) string {
@@ -336,94 +245,22 @@ func isGreekFormulaVar(s string) bool {
 	return false
 }
 
-func tokenizePLround2(t tokenStr) (tokenStr, error) {
-	var t2 tokenStr
-	var e token
-	var err error
-	for i := 0; i < len(t); i++ {
-		e = t[i]
+func (t *token) isIdentity() bool {
 
-		var n token
-		if e.isQuantifier() {
-			if i > len(t)-2 {
-				err = errors.New("quantifier without variable")
-				return t, err
-			}
-			if !t[i+1].isTerm() {
-				err = errors.New("quantifier without variable")
-				return t, err
-			}
-			n.tokenType = e.tokenType
-			n.str = e.str
-			n.variable = t[i+1].str
-			t2 = append(t2, n)
-			i++
-			continue
-		}
-		if e.isAtomicSentence() {
-			t2 = append(t2, e)
-			continue
-		}
-
-		if e.isPredicate() {
-			if isGreekFormulaVar(e.str) {
-				if i == len(t)-1 {
-					n.tokenType = tAtomicSentence
-					n.predicate = e.str
-					n.str = e.str
-					t2 = append(t2, n)
-					continue
-				}
-				if !t[i+1].isTerm() {
-					n.tokenType = tAtomicSentence
-					n.predicate = e.str
-					n.str = e.str
-					t2 = append(t2, n)
-					continue
-				}
-			}
-			if i == len(t)-1 {
-				err = errors.New("predicate without term")
-				return t, err
-			}
-			if !t[i+1].isTerm() {
-				err = errors.New("predicate without term, " + t[i+1].str)
-				return t, err
-			}
-			n.tokenType = tAtomicSentence
-			n.predicate = e.str
-			n.str = e.str
-			for j := i + 1; j < len(t); j++ {
-				if !t[j].isTerm() {
-					break
-				}
-				n.term = append(n.term, t[j].str)
-				i++
-			}
-			if isGreekFormulaVar(e.str) {
-				n.str = n.str + "("
-			}
-			for _, e := range n.term {
-				n.str = n.str + e
-			}
-
-			if isGreekFormulaVar(e.str) {
-				n.str = n.str + ")"
-			}
-			t2 = append(t2, n)
-			continue
-		}
-		if e.isConnective() {
-			t2 = append(t2, e)
-			continue
-		}
-		if e.isOpenb() || e.isCloseb() {
-			t2 = append(t2, e)
-			continue
-		}
-		err = errors.New("something wrong: " + e.str)
-		return t, err
+	if t.tokenType != tPredicate {
+		return false
 	}
-	return t2, err
+
+	return t.str == `=`
+
+}
+
+func (t *token) isNegIdentity() bool {
+
+	if t.tokenType != tPredicate {
+		return false
+	}
+
+	return t.str == `/=`
 
 }

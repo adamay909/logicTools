@@ -10,7 +10,7 @@ func assumption(d *derivNode) bool {
 	seq := d.line.seq
 
 	if seq.datum().String() != seq.succedent().String() {
-		logger.Print("datum and subseqent cannot differ for assumption")
+		logger.Print("datum and succedent cannot differ for assumption")
 		return false
 	}
 	return true

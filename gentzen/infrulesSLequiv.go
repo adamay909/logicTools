@@ -2,7 +2,7 @@ package gentzen
 
 import "strconv"
 
-func SLform(n *Node) *Node {
+func slForm(n *Node) *Node {
 
 	if oPL {
 		logger.Print("some functionality not available for Predicate Logic")
@@ -52,16 +52,16 @@ func equivSL(s1, s2 string) bool {
 
 	restorePL := false
 
-	n1 := Parse(s1)
-	n2 := Parse(s2)
+	n1 := Parse(s1, !allowGreekUpper)
+	n2 := Parse(s2, !allowGreekUpper)
 
 	if oPL {
 		restorePL = true
 		oPL = false
 	}
 
-	s1 = SLform(n1).Formula()
-	s2 = SLform(n2).Formula()
+	s1 = slForm(n1).Formula()
+	s2 = slForm(n2).Formula()
 
 	s3 := lconj + lcond + s1 + s2 + lcond + s2 + s1
 

@@ -81,7 +81,7 @@ var (
 	}
 
 	connBindings = [][3]string{
-		[3]string{`V`, `\vee`, "\u2228"},
+		//	[3]string{`V`, `\vee`, "\u2228"},
 		[3]string{`v`, `\vee`, "\u2228"},
 		[3]string{`-`, `\neg`, "\u00ac"},
 		[3]string{`^`, `\wedge`, "\u2227"},
@@ -96,8 +96,8 @@ var (
 	}
 
 	mlBindings = [][3]string{
-		[3]string{`[`, `\lnec`, "\u25fb"},
-		[3]string{`<`, `\lpos`, "\u25c7"},
+		//			[3]string{`[`, `\lnec`, "\u25fb"},
+		//			[3]string{`<`, `\lpos`, "\u25c7"},
 	}
 
 	turnstileBindings = [][3]string{

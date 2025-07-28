@@ -10,10 +10,10 @@ func conjE(d *derivNode) bool {
 	seq1 := d.supportingLines[0].line.seq
 	seq2 := d.line.seq
 
-	n1 := Parse(seq1.succedent().String())
-	n2 := Parse(seq2.succedent().String())
+	n1 := Parse(seq1.succedent().String(), !allowGreekUpper)
+	n2 := Parse(seq2.succedent().String(), !allowGreekUpper)
 
-	if n1.MainConnective() != conj {
+	if n1.MainConnective() != Conj {
 		logger.Print("must start with conjunction")
 		return false
 	}
@@ -49,11 +49,11 @@ func conjI(d *derivNode) bool {
 	seq2 := d.supportingLines[1].line.seq
 	seq3 := d.line.seq
 
-	n1 := Parse(seq1.succedent().String())
-	n2 := Parse(seq2.succedent().String())
-	n3 := Parse(seq3.succedent().String())
+	n1 := Parse(seq1.succedent().String(), !allowGreekUpper)
+	n2 := Parse(seq2.succedent().String(), !allowGreekUpper)
+	n3 := Parse(seq3.succedent().String(), !allowGreekUpper)
 
-	if n3.MainConnective() != conj {
+	if n3.MainConnective() != Conj {
 		logger.Print("conclusion must be a conjunction")
 		return false
 	}

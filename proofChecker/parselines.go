@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -45,6 +46,9 @@ func getArglines(c []inputLine) (s []string, ok bool) {
 		}
 
 		s = append(s, datum+";"+succ+";"+replaceInfrules(annot))
+
+		fmt.Println("got line: ", s[len(s)-1])
+
 	}
 	return
 }
@@ -127,47 +131,37 @@ func parseLine(l []string, raw bool) (datum, succ, annot string, err error) {
 
 	var formula *gentzen.Node
 
-	subs := false
-	substr := ""
-
 	//Deal with datum
 	data := strings.Split(datum, ",")
 	datum = ""
 	for _, e := range data {
-		debug("datum check: ", e)
-		f := strings.TrimSpace(e)
-		if len(f) == 0 {
-			continue
-		}
-		if subscript(f) != "" {
-			subs = true
-			substr = subscript(f)
-			f = strings.TrimSpace(removeSubscript(f))
-		}
 
-		if isGreekLetter(f) {
-			f, _ = tkOf(f, tktex, tktxt, greekBindings)
-			if subs {
-				f = f + "_" + substr
-			}
-			datum = datum + f + ","
+		if len(e) == 0 {
 			continue
 		}
-		formula, err = gentzen.InfixParser(tk(e))
+		debug("datum check: ", e)
+		// formula, err = gentzen.InfixParser(tk(e))
+		formula, err = gentzen.ParseInfix(e, true)
+
 		if err != nil {
+			fmt.Println("initial parse", err)
 			return
 		}
 		datum = datum + formula.String() + ","
 	}
 	datum = strings.TrimSuffix(datum, ",")
 
+	debug("datum is ", datum)
+
 	//Deal with succedent
 
-	formula, err = gentzen.InfixParser(tk(succ))
+	formula, err = gentzen.ParseInfix(succ, false)
 	if err != nil {
 		return
 	}
 	succ = formula.String()
+
+	debug("succ is ", succ)
 
 	return
 }
@@ -281,32 +275,32 @@ func tk(s string) (t []string) {
 
 func replaceInfrules(s string) string {
 	infrules := [][2]string{
-		[2]string{`\negE`, `ne`},
-		[2]string{`\negI`, `ni`},
-		[2]string{`\veeE`, `de`},
-		[2]string{`\veeI`, `di`},
-		[2]string{`\wedgeE`, `ke`},
-		[2]string{`\wedgeI`, `ki`},
-		[2]string{`\supsetE`, `ce`},
-		[2]string{`\supsetI`, `ci`},
+		[2]string{`-E`, `ne`},
+		[2]string{`-I`, `ni`},
+		[2]string{`vE`, `de`},
+		[2]string{`vI`, `di`},
+		[2]string{`^E`, `ke`},
+		[2]string{`^I`, `ki`},
+		[2]string{`>E`, `ce`},
+		[2]string{`>I`, `ci`},
 		[2]string{`A`, `a`},
 		[2]string{`M`, `m`},
-		[2]string{`\forallE`, `ue`},
-		[2]string{`\forallI`, `ui`},
-		[2]string{`\existsE`, `ee`},
-		[2]string{`\existsI`, `ei`},
+		[2]string{`UE`, `ue`},
+		[2]string{`UI`, `ui`},
+		[2]string{`XE`, `ee`},
+		[2]string{`XI`, `ei`},
 		[2]string{`=E`, `=e`},
 		[2]string{`=I`, `=i`},
-		[2]string{`\lnecE`, `le`},
-		[2]string{`\lnecI`, `li`},
-		[2]string{`S5\lnecI`, `mli`},
-		[2]string{`S4\lnecI`, `pli`},
-		[2]string{`T\lnecI`, `tli`},
-		[2]string{`\lposE`, `me`},
-		[2]string{`S5\lposE`, `mme`},
-		[2]string{`\lposI`, `mi`},
-		[2]string{`SC`, `sc`},
-		[2]string{`logic`, `sl`},
+		//	[2]string{`\lnecE`, `le`},
+		//	[2]string{`\lnecI`, `li`},
+		//	[2]string{`S5\lnecI`, `mli`},
+		//	[2]string{`S4\lnecI`, `pli`},
+		//	[2]string{`T\lnecI`, `tli`},
+		//	[2]string{`\lposE`, `me`},
+		//	[2]string{`S5\lposE`, `mme`},
+		//	[2]string{`\lposI`, `mi`},
+		//	[2]string{`SC`, `sc`},
+		//	[2]string{`logic`, `sl`},
 	}
 	s = strings.ReplaceAll(s, " ", "")
 	a := strings.Split(s, ",")

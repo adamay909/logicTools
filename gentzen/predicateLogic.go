@@ -14,8 +14,8 @@ func isInstanceOf(s1, s2 string) (val bool, variable, term string) {
 
 	val = false
 
-	n1 := Parse(s1)
-	n2 := Parse(s2)
+	n1 := Parse(s1, !allowGreekUpper)
+	n2 := Parse(s2, !allowGreekUpper)
 
 	if !n2.MainConnective().isQuantifier() {
 		return
@@ -69,8 +69,8 @@ func isInstanceOf(s1, s2 string) (val bool, variable, term string) {
 // check if s1 is modal instance of s2 (i.e., s1 is s2 minus modal operator)
 func isModalInstanceOf(s1, s2 string) bool {
 
-	n1 := Parse(s1)
-	n2 := Parse(s2)
+	n1 := Parse(s1, !allowGreekUpper)
+	n2 := Parse(s2, !allowGreekUpper)
 
 	if !n2.MainConnective().isModalOperator() {
 		return false
@@ -96,7 +96,7 @@ func replaceTerms(n *Node, old, subst string) *Node {
 
 	s = strings.ReplaceAll(s, old, subst)
 
-	return Parse(s)
+	return Parse(s, !allowGreekUpper)
 }
 
 func (n *Node) replaceTerm(p int, v string) (old, subst string) {

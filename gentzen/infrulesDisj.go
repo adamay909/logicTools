@@ -15,10 +15,10 @@ func disjI(d *derivNode) bool {
 	seq1 := d.supportingLines[0].line.seq
 	seq2 := d.line.seq
 
-	n1 := Parse(seq1.succedent().String())
-	n2 := Parse(seq2.succedent().String())
+	n1 := Parse(seq1.succedent().String(), !allowGreekUpper)
+	n2 := Parse(seq2.succedent().String(), !allowGreekUpper)
 
-	if n2.MainConnective() != disj {
+	if n2.MainConnective() != Disj {
 		logger.Print("conclusion must be a disjunction")
 		return false
 	}
@@ -95,7 +95,7 @@ func disjEhelper3(seq []sequent, i int) (seq1, seq2, seq3 sequent, err error) {
 	ok := false
 	for j = range seq {
 
-		if Parse(seq[j].succedent()).MainConnective() == disj {
+		if Parse(seq[j].succedent(), !allowGreekUpper).MainConnective() == Disj {
 			seq1 = seq[j]
 			switch j {
 			case 0:
@@ -108,8 +108,8 @@ func disjEhelper3(seq []sequent, i int) (seq1, seq2, seq3 sequent, err error) {
 				seq2 = seq[0]
 				seq3 = seq[1]
 			}
-			d1 := datum(Parse(seq1.succedent()).Child1Must().Formula())
-			d2 := datum(Parse(seq1.succedent()).Child2Must().Formula())
+			d1 := datum(Parse(seq1.succedent(), !allowGreekUpper).Child1Must().Formula())
+			d2 := datum(Parse(seq1.succedent(), !allowGreekUpper).Child2Must().Formula())
 			if !datumIncludes(seq2.datumSlice(), d1) && !datumIncludes(seq3.datumSlice(), d1) {
 				continue
 			}
@@ -131,11 +131,11 @@ func disjEhelper3(seq []sequent, i int) (seq1, seq2, seq3 sequent, err error) {
 
 func disjEhelper4(seq2, seq3, seq4 sequent) (err error) {
 
-	want := Parse(seq4.succedent()).Formula()
+	want := Parse(seq4.succedent(), !allowGreekUpper).Formula()
 
-	have1 := Parse(seq2.succedent()).Formula()
+	have1 := Parse(seq2.succedent(), !allowGreekUpper).Formula()
 
-	have2 := Parse(seq3.succedent()).Formula()
+	have2 := Parse(seq3.succedent(), !allowGreekUpper).Formula()
 
 	if want != have1 {
 		err = errors.New("succedents of premises do not match succedent of conclusion")
@@ -154,8 +154,8 @@ func disjEhelper5(seq ...sequent) bool {
 
 	datumU := datumUnion(seq[0].datumSlice(), seq[1].datumSlice(), seq[2].datumSlice())
 
-	d1 := Parse(seq[0].succedent()).Child1Must().Formula()
-	d2 := Parse(seq[0].succedent()).Child2Must().Formula()
+	d1 := Parse(seq[0].succedent(), !allowGreekUpper).Child1Must().Formula()
+	d2 := Parse(seq[0].succedent(), !allowGreekUpper).Child2Must().Formula()
 
 	want := datumRm(datumU, d1, d2)
 	have := seq[3].datumSlice()

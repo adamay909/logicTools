@@ -343,7 +343,7 @@ func rewriteHistory() {
 	}
 	jumpToHistoryEnd()
 	cleanHistory()
-	printMessage("")
+	printMessage("", !clean)
 	hide("messages")
 	hideExtra()
 	show("console")
@@ -376,7 +376,7 @@ func clearHistory() {
 	historyPosition = len(history)
 	saveHistory()
 	display()
-	printMessage("")
+	printMessage("", !clean)
 	hide("messages")
 	hideExtra()
 	show("console")

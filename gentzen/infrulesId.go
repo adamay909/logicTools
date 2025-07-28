@@ -16,7 +16,7 @@ func idI(d *derivNode) bool {
 		return false
 	}
 
-	n := Parse(seq.succedent().String())
+	n := Parse(seq.succedent().String(), !allowGreekUpper)
 
 	if !n.IsAtomic() {
 		logger.Print("must be atomic identity statement")
@@ -56,14 +56,14 @@ func idE(d *derivNode) bool {
 		return false
 	}
 
-	n := Parse(seq.succedent().String())
+	n := Parse(seq.succedent().String(), !allowGreekUpper)
 
-	if n.MainConnective() != cond {
+	if n.MainConnective() != Cond {
 		logger.Print("main connective must be conditional")
 		return false
 	}
 
-	if n.subnode1.MainConnective() != conj {
+	if n.subnode1.MainConnective() != Conj {
 		logger.Print("antecedent must be conjunction")
 		return false
 	}

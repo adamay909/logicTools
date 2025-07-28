@@ -33,12 +33,12 @@ func condE(d *derivNode) bool {
 
 func condEhelper(seq1, seq2, seq3 sequent) (v bool, msg string) {
 
-	n1 := Parse(seq1.succedent().String())
-	n2 := Parse(seq2.succedent().String())
-	n3 := Parse(seq3.succedent().String())
+	n1 := Parse(seq1.succedent().String(), !allowGreekUpper)
+	n2 := Parse(seq2.succedent().String(), !allowGreekUpper)
+	n3 := Parse(seq3.succedent().String(), !allowGreekUpper)
 	v = false
 
-	if n1.MainConnective() != cond {
+	if n1.MainConnective() != Cond {
 		msg = "no conditional found"
 		return
 	}
@@ -83,10 +83,10 @@ func condI(d *derivNode) bool {
 	seq1 := d.supportingLines[0].line.seq
 	seq2 := d.line.seq
 
-	n1 := Parse(seq1.succedent().String())
-	n2 := Parse(seq2.succedent().String())
+	n1 := Parse(seq1.succedent().String(), !allowGreekUpper)
+	n2 := Parse(seq2.succedent().String(), !allowGreekUpper)
 
-	if n2.MainConnective() != cond {
+	if n2.MainConnective() != Cond {
 		logger.Print("main connective of conclusion must be conditional")
 		return false
 	}

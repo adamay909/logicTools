@@ -2,6 +2,8 @@ package gentzen
 
 import (
 	"math/rand"
+	"strconv"
+	"strings"
 )
 
 var (
@@ -10,149 +12,175 @@ var (
 		"Q",
 		"R",
 		"S",
-		"T",
 		"W",
+		"M",
+		"L",
+		"G",
+		"H",
+		"J",
+	}
+
+	logConn = []string{
+		"N",
+		"K",
+		"A",
+		"C",
+		"U",
+		"X",
+	}
+
+	predicateLetters = []string{
+		"F",
+		"G",
+		"H",
+		"J",
+		"E",
+		"P",
+		"Q",
+		"S",
+		"R",
 		"Y",
+		"W",
 		"Z",
 		"M",
 		"L",
 	}
+
+	constantLetters = []string{
+		"a",
+		"b",
+		"c",
+		"d",
+		"e",
+		"h",
+		"m",
+		"n",
+	}
+
+	variableLetters = []string{
+		"x",
+		"y",
+		"z",
+		"t",
+		"p",
+	}
+
+	pletters = strings.Join(predicateLetters, "")
 )
 
-func genRand(m, d int, fixed bool) string {
+// RandomSentence returns a randomly generated sentence of
+// sentential logic with maximum class of maxh and
+// at most maxatomic atomic sentences. Use -1 if you don't
+// want any caps on the class or number of atomic sentences.
+func RandomSentence(maxh, maxatomic int) string {
 
-	if m > len(atomicE) {
-		m = len(atomicE)
+	return genRand(maxh, maxatomic)
+
+}
+
+// maxh is maximum height of the syntax tree of generated sentence
+// corresponds to class in the text
+// maxatomic is the maximum number of atomic sentence to use (if less than 11, the sentences are distinct upper case letters; if more, the sentences are lowercase s followed by an arabic numeral subscript)
+func genRand(maxh, maxatomic int) string {
+
+	if oPL {
+		return "Predicate Logic Not Implemented"
 	}
 
-	s := new(Node)
-	s.raw = chooseAtomic(m)
-	s.SetAtomic()
+	generateAtomicSentences := false
 
-	for s.ConnectiveCount() < d {
+	if maxatomic > len(atomicE) {
+		generateAtomicSentences = true
+	}
 
-		nodes := getSubnodes(s)
-		changed := false
-		for _, e := range nodes {
-			if !e.IsAtomic() {
-				continue
+	s := make([]string, 1000)
+
+	lastConn := 4
+
+	if !oCOND {
+		lastConn = 3
+	}
+
+	newNode := logConn[rand.Intn(lastConn)]
+
+	s = append(s, newNode)
+
+	constantCount := 1
+
+	openNode := 0
+
+	switch newNode {
+
+	case "K", "A", "C":
+		openNode = 2
+
+	default:
+		openNode = 1
+	}
+
+	height := 1
+
+	openRight := height
+
+	for openNode > 0 {
+
+		if height != maxh && rand.Intn(2) == 1 {
+
+			newNode = logConn[rand.Intn(lastConn)]
+
+			constantCount++
+
+			height++
+
+			if newNode != "N" {
+
+				openNode++
+
+				openRight++
+
 			}
-			if rand.Intn(4) == 0 {
-				continue
+		} else {
+
+			if !generateAtomicSentences {
+				newNode = atomicE[rand.Intn(maxatomic)]
+			} else {
+				newNode = "s_" + strconv.Itoa(rand.Intn(maxatomic))
 			}
-			changed = true
-			e.connective = chooseConnective()
-			c1 := e.mkchild()
-			c1.raw = chooseAtomic(m)
-			c1.SetAtomic()
+			openNode--
 
-			if e.IsBinary() {
-				c2 := e.mkchild()
+			height = openRight
 
-				c2.raw = chooseAtomic(m)
-				c2.SetAtomic()
-			}
-			e.raw = e.String()
+			openRight = height
+
 		}
-		if !changed {
-			break
-		}
+
+		s = append(s, newNode)
+
 	}
 
-	return s.String()
-}
+	for openNode > 0 {
 
-func chooseAtomic(m int) string {
+		if !generateAtomicSentences {
+			newNode = atomicE[rand.Intn(maxatomic)]
+		} else {
+			newNode = "s_" + strconv.Itoa(rand.Intn(maxatomic))
+		}
+		newNode = atomicE[rand.Intn(maxatomic)]
 
-	return atomicE[rand.Intn(m)]
+		openNode--
 
-}
+		s = append(s, newNode)
 
-func chooseConnective() logicalConstant {
+	}
 
-	return logicalConstant(connectivesSL[rand.Intn(len(connectivesSL))][0])
+	return strings.Join(s, "")
 
 }
 
-/*
-flatten node.
-For each atomic sentence decide whether to replace it with compound.If yes:
-	decide on connective
-	decide on child(ren)
-Repeat until either max depth is reached or no changes were made
-*/
+// maxh is maximum height of the syntax tree of generated sentence
+// corresponds to class in the text
+func genRandPL() string {
 
-func _genRand(m, d int, fixed bool) string {
-
-	if m > len(atomicE) {
-		m = len(atomicE)
-	}
-
-	cand := generateCandidates(m, fixed)
-
-	var s, sNew, sOld string
-
-	s = "P"
-	for Parse(s).ConnectiveCount() < d {
-		sNew = ""
-		sOld = s
-		for _, c := range s {
-			sNew = sNew + replace(string(c), cand)
-		}
-
-		if s == sNew {
-			break
-		}
-		s = sNew
-	}
-	if Parse(s).ConnectiveCount() > d {
-		s = sOld
-	}
-	return s
-
-}
-
-func generateCandidates(m int, fixed bool) []string {
-
-	var r []string
-	var perm []int
-
-	if fixed {
-		for i := 0; i < len(atomicE); i++ {
-			perm = append(perm, i)
-		}
-	} else {
-		perm = rand.Perm(len(atomicE))
-	}
-	for _, n1 := range perm[:m] {
-		s1 := atomicE[n1]
-
-		for _, n2 := range perm[:m] {
-			s2 := atomicE[n2]
-			for _, c := range connectivesSL {
-
-				if c[0] == lneg {
-					r = append(r, string(c[0])+s1)
-					continue
-				}
-				r = append(r, string(c[0])+s1+s2)
-			}
-		}
-	}
-	return r
-}
-
-func replace(s string, cand []string) string {
-
-	if isConnective(s) {
-		return s
-	}
-	d := rand.Intn(2)
-
-	if d == 0 {
-		return s
-	}
-
-	return cand[rand.Intn(len(cand))]
+	return ""
 
 }
