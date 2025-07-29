@@ -15,21 +15,21 @@ Lbhelper is a program primarily designed for help with producing the logic [text
 
 The following symbols are used for the Polish notation (also see examples below):
 
-  - N negation
-  - K conjunction
-  - A disjunction
-  - C conditional
-  - U universal quantifier
-  - X existential quantifier
+	negation: N
+	conjunction: K
+	disjunction: A
+	conditional: C
+	universal quantifier: U
+	existential quantifier: X
 
 For input in infix notation, we use the following ASCII characters for the logical constants:
 
-  - \- for negation
-  - ^ for conjunction
-  - v for disjunction
-  - > for material implication
-  - U for universal quantifier
-  - X for existential quantifier
+	negation: -
+	conjunction: ^
+	disjunction: v
+	material implication: >
+	universal quantifier: U
+	existential quantifier: X
 
 This facilitates typing.
 
