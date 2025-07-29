@@ -1,7 +1,7 @@
 /*
 Package gentzen provides some tools for parsing, serializing, and checking proofs (both porpositional logic and first order predicate logic with identity), printing truth tables, syntax trees (propositional logic), semantic tableaux, and a few other things.
 
-You need the commands defined in logic_commands.sty (included with the source files for the text book available at [https://github.com/adamay909/logicbook].
+You need the commands defined in logic_commands.sty (included with the source files for the textbook available at [https://github.com/adamay909/logicbook].
 
 The main entry points expect inputs as plain strings in the Polish notation. For historical reasons, the default for the logical constants is non-standard:
 

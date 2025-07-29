@@ -1,6 +1,6 @@
 ## Overview
 
-Ttexercises is a tool for generating truth table exercises to go with my [logic text book](https://github.com/adamay909/logicbook). There are two types of exercises: fill in the blanks, and detect errors.
+Ttexercises is a tool for generating truth table exercises to go with my logic [textbook](https://github.com/adamay909/logicbook). There are two types of exercises: fill in the blanks, and detect errors.
 
 For fill-in-the-blanks type exercises, you can choose to hide the values of some rows, columns, or cells.
 
@@ -32,7 +32,7 @@ By default, the output is Stdout but you probably want to direct the output to a
 
 	$ttexercises -dest exercise.tex -del -n 8 CApqKpq
 
-The output is always in LaTeX with commands defined in the style files for the text book. It's coded so that you can use [lbhelper](https://github.com/adamay909/logicTools/tree/main/lbhelper) to compile the exercise version as well as the answer key version from a single file. For instance, assuming you saved the output to exericise.tex
+The output is always in LaTeX with commands defined in the style files for the [textbook](https://github.com/adamay909/logicbook). It's coded so that you can use [lbhelper](https://github.com/adamay909/logicTools/tree/main/lbhelper) to compile the exercise version as well as the answer key version from a single file. For instance, assuming you saved the output to exericise.tex
 
 	$lbhelper -compile exercise.tex
 
@@ -48,7 +48,7 @@ You probably also don't want to input the relevant formulas by hand. You can rea
 
 You could generate the list of sentences using [logicFormulas](https://github.com/adamay909/logicTools/tree/main/logicFormulas). The resulting LaTeX might want some extra editing like inserting question numbers but that's trivial work that any decent text editor can accomplish in just a few steps (each individual table starts with a line that begins with %%% followed by a single space and then the formula in the Polish notation; it's LaTeX so you can use the enumerate environment). This way, you can easily generate hundreds of thousands of truth table exercises in no time.
 
-The generated truth tables are 'wide' ones that I prefer and use in the text book. You can switch to 'narrow' truth tables with the -narrow flag.
+The generated truth tables are 'wide' ones that I prefer and use in the [textbook](https://github.com/adamay909/logicbook). You can switch to 'narrow' truth tables with the -narrow flag.
 
 ### Complete list of flags
 
