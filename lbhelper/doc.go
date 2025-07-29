@@ -67,7 +67,7 @@ Convert formula from ASCII infix to LaTeX:
 	$ lbhelper -p -infix 'XxGx > -UxGx'
 	\p{\lthereis x  Gx\mc{\limplies }\lnot  \lforall x  Gx}
 
-The identity sign can also be used. For the Polish notation, the identity sign gets treated as a 2-place predicate. In the infix notation, it used in the normal fashion. For the infix notation, you can use /= to stand for 'not equal':
+The identity sign can also be used. For the Polish notation, the identity sign gets treated as a 2-place predicate. In the infix notation, it is used in the normal fashion. For the infix notation, you can use /= to stand for 'not equal':
 
 	$ lbhelper -p -ascii UxXyN=xy
 	UxXyx/=y
