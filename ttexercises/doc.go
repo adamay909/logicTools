@@ -48,6 +48,11 @@ You probably also don't want to input the relevant formulas by hand. You can rea
 
 You could generate the list of sentences using [logicFormulas]. The resulting LaTeX might want some extra editing like inserting question numbers but that's trivial work that any decent text editor can accomplish in just a few steps (each individual table starts with a line that begins with %%% followed by a single space and then the formula in the Polish notation; it's LaTeX so you can use the enumerate environment). This way, you can easily generate hundreds of thousands of truth table exercises in no time.
 
+You could also pipe the output of [logicFormulas] directly to ttexercises. E.g.,:
+
+	logicFormulas -random -n 1000 -maxClass 3 -maxAtomic 4 |ttexercises -errors -n 8 -dest exercise
+
+
 The generated truth tables are 'wide' ones that I prefer and use in the [textbook]. You can switch to 'narrow' truth tables with the -narrow flag.
 
 # Complete list of flags

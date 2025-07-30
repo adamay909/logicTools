@@ -1,9 +1,9 @@
 /*
-LogicFormulas is a tool for generating random sentences of sentential logic. It is intended for use with my [logic textbook] (to generate formulas for exercises and the like).
+LogicFormulas is a tool for generating random sentences of sentential logic. It is intended for use with my logic [textbook] (to generate formulas for exercises and the like).
 
 # Some examples.
 
-Generate 100 random sentences:
+Generate 10 random sentences:
 
 	$logicFormulas -random -n 10
 
@@ -110,7 +110,7 @@ Of course, you can convert to other formats, too, or do things like generate tru
 
 
 
-[logic textbook]: https://github.com/adamay909/logicbook
+[textbook]: https://github.com/adamay909/logicbook
 
 [lbhelper]: https://github.com/adamay909/logicTools/tree/main/lbhelper
 

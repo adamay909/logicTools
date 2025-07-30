@@ -26,6 +26,7 @@ func confirmOverwrite(name string) bool {
 
 }
 
+// CreateFile creates a file. It asks for confirmation if the file already exists.
 func CreateFile(name string) *os.File {
 
 	if FileExists(name) {
@@ -58,6 +59,7 @@ func CreateFile(name string) *os.File {
 	return file
 }
 
+// FileExists returns whether the named file exists.
 func FileExists(name string) bool {
 
 	_, err := os.Stat(name)
