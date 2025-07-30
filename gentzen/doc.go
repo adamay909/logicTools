@@ -5,12 +5,12 @@ You need the commands defined in logic_commands.sty (included with the source fi
 
 The main entry points expect inputs as plain strings in the Polish notation. For historical reasons, the default for the logical constants is non-standard:
 
-  - negation: -
-  - conjunction: ^
-  - disjunction: v
-  - conditional: >
-  - universal quantifier: U
-  - existential quantifier X
+   negation: -
+   conjunction: ^
+   disjunction: v
+   conditional: >
+   universal quantifier: U
+   existential quantifier X
 
 You can switch to a more standard Polish notation with
 
@@ -18,12 +18,12 @@ You can switch to a more standard Polish notation with
 
 which will switch the notation to:
 
-  - negation: N
-  - conjunction: K
-  - disjunction: A
-  - conditional: C
-  - universal quantifier: U
-  - existential quantifier X
+   negation: N
+   conjunction: K
+   disjunction: A
+   conditional: C
+   universal quantifier: U
+   existential quantifier X
 
 Either way, some letters are reserved for logical constants and are therefore not allowed for use as sentence or predicate letters.
 
