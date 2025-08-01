@@ -46,7 +46,9 @@ func processString(input string) (output string, err error) {
 	}
 
 	if !*seq {
-		if n, err = parser(input, gu); err != nil {
+		n, err = parser(input, gu)
+		input = n.String()
+		if err != nil {
 			err = errors.New("ERROR: " + err.Error() + "\n")
 			return
 		}
@@ -64,9 +66,6 @@ func processString(input string) (output string, err error) {
 			return "", err
 		}
 
-		n, _ = parser(input, gu)
-		input = n.String()
-
 		tt, err := gentzen.GenerateTruthTable(input)
 		if err != nil {
 			err = errors.New("ERROR: " + err.Error() + "\n")
@@ -80,8 +79,6 @@ func processString(input string) (output string, err error) {
 			err = errors.New("ERROR: truth table can only produced for sentential logic")
 			return "", err
 		}
-		n, _ = parser(input, gu)
-		input = n.String()
 
 		tt, err := gentzen.GenerateTruthTableNarrow(input)
 		if err != nil {
@@ -92,11 +89,9 @@ func processString(input string) (output string, err error) {
 		output = tt.PrintTruthTable(mode, false)
 
 	case *stf:
-		n, _ = parser(input, gu)
 		output = n.SyntaxTree()
 
 	case *sts:
-		n, _ = parser(input, gu)
 		output = n.SyntaxTreeSimple()
 
 	case *seq:
@@ -112,8 +107,6 @@ func processString(input string) (output string, err error) {
 			err = errors.New("ERROR: tableau not supported for predicate logic" + "\n")
 			return
 		}
-		n, _ = parser(input, gu)
-		input = n.String()
 		output = gentzen.PrintSemanticTableau(input)
 
 	case *proof:
@@ -127,7 +120,6 @@ func processString(input string) (output string, err error) {
 		}
 
 	default:
-		n, _ = parser(input, gu)
 		if mode == gentzen.O_Latex {
 			output = encloseMath(n.StringF(mode), *m)
 		} else {
