@@ -112,6 +112,8 @@ func processString(input string) (output string, err error) {
 			err = errors.New("ERROR: tableau not supported for predicate logic" + "\n")
 			return
 		}
+		n, _ = parser(input, gu)
+		input = n.String()
 		output = gentzen.PrintSemanticTableau(input)
 
 	case *proof:
