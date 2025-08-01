@@ -47,11 +47,11 @@ func processString(input string) (output string, err error) {
 
 	if !*seq {
 		n, err = parser(input, gu)
-		input = n.String()
 		if err != nil {
 			err = errors.New("ERROR: " + err.Error() + "\n")
 			return
 		}
+		input = n.String()
 	}
 
 	if *normalize && !*seq {
