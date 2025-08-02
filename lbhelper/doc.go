@@ -268,7 +268,7 @@ NOTE: Many of the source files for the exercises for the [textbook] require enab
 	  	output formatted as infix with unicode logical symbols
 
 [textbook]: https://github.com/adamay909/logicbook
-[https://github.com/adamay909/logicbook]: https://github.com/adamay909/logicbooks
+[https://github.com/adamay909/logicbook]: https://github.com/adamay909/logicbook
 */
 //go:generate pkgdoc2readme
 package main

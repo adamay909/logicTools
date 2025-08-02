@@ -1,6 +1,6 @@
 ## Overview
 
-Lbhelper is a program primarily designed for help with producing the logic [textbook](https://github.com/adamay909/logicbook) at [https://github.com/adamay909/logicbook](https://github.com/adamay909/logicbooks) but it can do some other things, too. It can:
+Lbhelper is a program primarily designed for help with producing the logic [textbook](https://github.com/adamay909/logicbook) at [https://github.com/adamay909/logicbook](https://github.com/adamay909/logicbook) but it can do some other things, too. It can:
 
   - convert formulas in Polish notation to a LaTeX code for a more standard infix notation;
   - convert formulas in Polish to a more standard infix notation in Unicode;
