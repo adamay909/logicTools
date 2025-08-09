@@ -24,16 +24,9 @@ func conjE(d *derivNode) bool {
 			return false
 		}
 	}
-	if strictCheck {
-		if !datumsEqual(seq1.datumSlice(), seq2.datumSlice()) {
-			logger.Print("datum of conclusion must be same as datum of premise")
-			return false
-		}
-	} else {
-		if !datumsEquiv(seq1.datumSlice(), seq2.datumSlice()) {
-			logger.Print("datum of conclusion must be same as datum of premise")
-			return false
-		}
+	if !datumsEquiv(seq1.datumSlice(), seq2.datumSlice()) {
+		logger.Print("datum of conclusion must be same as datum of premise")
+		return false
 	}
 	return true
 }
@@ -70,16 +63,9 @@ func conjI(d *derivNode) bool {
 	}
 
 	datumCanonical := datumUnion(seq1.datumSlice(), seq2.datumSlice())
-	if strictCheck {
-		if !datumsEqual(datumCanonical, seq3.datumSlice()) {
-			logger.Print("datum of conclusion must be union of datums of premises")
-			return false
-		}
-	} else {
-		if !datumsEquiv(datumCanonical, seq3.datumSlice()) {
-			logger.Print("datum of conclusion must be union of datums of premises")
-			return false
-		}
+	if !datumsEquiv(datumCanonical, seq3.datumSlice()) {
+		logger.Print("datum of conclusion must be union of datums of premises")
+		return false
 	}
 
 	return true

@@ -21,16 +21,9 @@ func uniE(d *derivNode) bool {
 		return false
 	}
 
-	if strictCheck {
-		if !datumsEqual(seq1.datumSlice(), seq2.datumSlice()) {
-			logger.Print("datum cannot change")
-			return false
-		}
-	} else {
-		if !datumsEquiv(seq1.datumSlice(), seq2.datumSlice()) {
-			logger.Print("datum cannot change")
-			return false
-		}
+	if !datumsEquiv(seq1.datumSlice(), seq2.datumSlice()) {
+		logger.Print("datum cannot change")
+		return false
 	}
 
 	return true
@@ -58,16 +51,9 @@ func uniI(d *derivNode) bool {
 		return false
 	}
 
-	if strictCheck {
-		if !datumsEqual(seq1.datumSlice(), seq2.datumSlice()) {
-			logger.Print("datum cannot change")
-			return false
-		}
-	} else {
-		if !datumsEquiv(seq1.datumSlice(), seq2.datumSlice()) {
-			logger.Print("datum cannot change")
-			return false
-		}
+	if !datumsEquiv(seq1.datumSlice(), seq2.datumSlice()) {
+		logger.Print("datum cannot change")
+		return false
 	}
 
 	for _, d := range seq1.datumSlice() {

@@ -73,8 +73,3 @@ func SetDR(v bool) {
 func SetAllowTheorems(v bool) {
 	oTHM = v
 }
-
-// SetStrict sets whether inferece rules should be checked strictly.
-func SetStrict(v bool) {
-	strictCheck = v
-}

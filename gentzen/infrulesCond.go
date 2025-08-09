@@ -56,16 +56,9 @@ func condEhelper(seq1, seq2, seq3 sequent) (v bool, msg string) {
 		return
 	}
 
-	if strictCheck {
-		if !equalSequents(canonicalSeq, seq3) {
-			msg = "datum of conclusion must be union of datums of premises"
-			return
-		}
-	} else {
-		if !equivSequents(canonicalSeq, seq3) {
-			msg = "datum of conclusion must be union of datums of premises"
-			return
-		}
+	if !equivSequents(canonicalSeq, seq3) {
+		msg = "datum of conclusion must be union of datums of premises"
+		return
 	}
 	v = true
 
@@ -105,16 +98,9 @@ func condI(d *derivNode) bool {
 	canonicalPrem := mkSequent(d1, n2.Child2Must())
 	//canonicalPrem := sequent{datum(d1.String()), plshFormula(n2.Child2Must().Formula())}
 
-	if strictCheck {
-		if !equalSequents(canonicalPrem, seq1) {
-			logger.Print("must remove exactly one datum item")
-			return false
-		}
-	} else {
-		if !equivSequents(canonicalPrem, seq1) {
-			logger.Print("must remove exactly one datum item")
-			return false
-		}
+	if !equivSequents(canonicalPrem, seq1) {
+		logger.Print("must remove exactly one datum item")
+		return false
 	}
 	return true
 }

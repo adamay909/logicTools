@@ -57,16 +57,9 @@ func scopeReplacement(d *derivNode) bool {
 		return false
 	}
 
-	if strictCheck {
-		if !datumsEqual(s1.datumSlice(), s2.datumSlice()) {
-			logger.Print("datum cannot change")
-			return false
-		}
-	} else {
-		if !datumsEquiv(s1.datumSlice(), s2.datumSlice()) {
-			logger.Print("datum cannot change")
-			return false
-		}
+	if !datumsEquiv(s1.datumSlice(), s2.datumSlice()) {
+		logger.Print("datum cannot change")
+		return false
 	}
 
 	return true

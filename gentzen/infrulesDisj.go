@@ -27,16 +27,9 @@ func disjI(d *derivNode) bool {
 		logger.Print("premise is not one of disjuncts")
 		return false
 	}
-	if strictCheck {
-		if !datumsEqual(seq1.datumSlice(), seq2.datumSlice()) {
-			logger.Print("datum cannot change")
-			return false
-		}
-	} else {
-		if !datumsEquiv(seq1.datumSlice(), seq2.datumSlice()) {
-			logger.Print("datum cannot change")
-			return false
-		}
+	if !datumsEquiv(seq1.datumSlice(), seq2.datumSlice()) {
+		logger.Print("datum cannot change")
+		return false
 	}
 
 	return true
@@ -159,8 +152,5 @@ func disjEhelper5(seq ...sequent) bool {
 
 	want := datumRm(datumU, d1, d2)
 	have := seq[3].datumSlice()
-	if strictCheck {
-		return datumsEqual(want, have)
-	}
 	return datumsEquiv(want, have)
 }

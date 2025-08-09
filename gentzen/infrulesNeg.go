@@ -27,16 +27,9 @@ func negE(d *derivNode) bool {
 		logger.Print("conclusion is not the elimnation of double negation")
 		return false
 	}
-	if strictCheck {
-		if !datumsEqual(seq1.datumSlice(), seq2.datumSlice()) {
-			logger.Print("datum must remain same")
-			return false
-		}
-	} else {
-		if !datumsEquiv(seq1.datumSlice(), seq2.datumSlice()) {
-			logger.Print("datum must remain same")
-			return false
-		}
+	if !datumsEquiv(seq1.datumSlice(), seq2.datumSlice()) {
+		logger.Print("datum must remain same")
+		return false
 	}
 
 	return true
@@ -81,16 +74,9 @@ func negI(d *derivNode) bool {
 
 	wantDatum := datumUnion(wantDatum1, wantDatum2)
 
-	if strictCheck {
-		if !datumsEqual(wantDatum, seq3.datumSlice()) {
-			logger.Print("check datum of conclusion")
-			return false
-		}
-	} else {
-		if !datumsEquiv(wantDatum, seq3.datumSlice()) {
-			logger.Print("check datum of conclusion")
-			return false
-		}
+	if !datumsEquiv(wantDatum, seq3.datumSlice()) {
+		logger.Print("check datum of conclusion")
+		return false
 	}
 
 	return true

@@ -35,16 +35,9 @@ func derivR(d *derivNode) bool {
 	}
 
 	//check datums
-	if strictCheck {
-		if !datumsEqual(seq1.datumSlice(), seq2.datumSlice()) {
-			logger.Print("datum cannot change")
-			return false
-		}
-	} else {
-		if !datumsEquiv(seq1.datumSlice(), seq2.datumSlice()) {
-			logger.Print("datum cannot change")
-			return false
-		}
+	if !datumsEquiv(seq1.datumSlice(), seq2.datumSlice()) {
+		logger.Print("datum cannot change")
+		return false
 	}
 
 	//check for match with theorem

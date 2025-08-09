@@ -263,7 +263,6 @@ func ltxof(e string) string {
 
 func printTree() {
 
-	gentzen.SetStrict(false)
 	gentzen.ClearLog()
 	arglines, ok := getArglines(dsp.Input)
 	if !ok {

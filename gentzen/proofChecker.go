@@ -47,7 +47,7 @@ const (
 	sl  = "sl"
 )
 
-var strictCheck bool
+var _strictCheck bool
 
 /*
 CheckDeriv checks the derivation given by lines.

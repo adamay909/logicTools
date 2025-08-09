@@ -18,7 +18,6 @@ func checkDerivation() {
 	setAttributeByID("display", "class", "inactive-fail")
 	printMessage("", !clean)
 	show("messages")
-	gentzen.SetStrict(false)
 	gentzen.ClearLog()
 	arglines, ok := getArglines(dsp.Input)
 	if !ok {

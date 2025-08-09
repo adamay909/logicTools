@@ -15,16 +15,9 @@ func exI(d *derivNode) bool {
 		return false
 	}
 
-	if strictCheck {
-		if !datumsEqual(seq1.datumSlice(), seq2.datumSlice()) {
-			logger.Print("datum cannot change")
-			return false
-		}
-	} else {
-		if !datumsEquiv(seq1.datumSlice(), seq2.datumSlice()) {
-			logger.Print("datum cannot change")
-			return false
-		}
+	if !datumsEquiv(seq1.datumSlice(), seq2.datumSlice()) {
+		logger.Print("datum cannot change")
+		return false
 	}
 
 	val, _, _ := isInstanceOf(seq1.succedent().String(), seq2.succedent().String())
@@ -127,18 +120,10 @@ func exEhelper(seq1, seq2, seq3 sequent) (v bool, msg string) {
 			return
 		}
 	}
-	if strictCheck {
-		if !datumsEqual(datumUnion(datum1, datum2), seq3.datumSlice()) {
-			msg = "datum of conclusion must be union of datums of premise"
-			v = false
-			return
-		}
-	} else {
-		if !datumsEquiv(datumUnion(datum1, datum2), seq3.datumSlice()) {
-			msg = "datum of conclusion must be union of datums of premise"
-			v = false
-			return
-		}
+	if !datumsEquiv(datumUnion(datum1, datum2), seq3.datumSlice()) {
+		msg = "datum of conclusion must be union of datums of premise"
+		v = false
+		return
 	}
 	v = true
 	msg = ""
