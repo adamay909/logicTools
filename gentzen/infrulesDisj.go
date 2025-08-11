@@ -37,19 +37,20 @@ func disjI(d *derivNode) bool {
 
 func disjE(d *derivNode) bool {
 
+	var seq1, seq2, seq3, seq4 sequent
+
+	var seq []sequent
+
 	if len(d.supportingLines) != 3 {
 		logger.Print("Disjunction Elimination depends on three lines")
 		return false
 	}
 
-	seq1 := d.supportingLines[0].line.seq
-	seq2 := d.supportingLines[1].line.seq
-	seq3 := d.supportingLines[2].line.seq
-	seq4 := d.line.seq
+	for i := range d.supportingLines {
+		seq = append(seq, d.supportingLines[i].line.seq)
+	}
 
 	var err error
-
-	seq := []sequent{seq1, seq2, seq3}
 
 	//check if there are premises of the right form
 	for i := 0; i < 3; i++ {
@@ -63,6 +64,8 @@ func disjE(d *derivNode) bool {
 		logger.Print(err.Error())
 		return false
 	}
+
+	seq4 = d.line.seq
 
 	//check if non-disjunction premises have the right succedent
 	err = disjEhelper4(seq2, seq3, seq4)

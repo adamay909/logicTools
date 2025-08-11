@@ -169,7 +169,7 @@ func isSequent(c string) (err error) {
 			continue
 		}
 
-		_, err := ParseStrict(d, !allowGreekUpper)
+		_, err = ParseStrict(d, !allowGreekUpper)
 
 		if err != nil {
 			return err
@@ -182,10 +182,7 @@ func isSequent(c string) (err error) {
 		err = errors.New("Not a sequent")
 		return
 	}
-	if containsFormulaSet(fields[1]) {
-		err = errors.New("Cannot have place holders for sets of formulas in succedent")
-		return
-	}
+
 	_, err = ParseStrict(fields[1], !allowGreekUpper)
 	if err != nil {
 		return
@@ -213,38 +210,25 @@ func parseDerivline(s string) (al argLine, err error) {
 	al.seq.d = datum(strings.TrimSpace(fields[0]))
 	al.seq.s = plshFormula(strings.TrimSpace(fields[1]))
 
-	if len(fields) == 4 {
-		al.inf = fields[3]
-	}
-
 	if len(strings.TrimSpace(fields[2])) == 0 {
-		err = errors.New("you need: datum, succedent and at least one of: line references, inference rule")
+		err = errors.New("you need datum, succedent and at least one of: line references, inference rule")
 		return
 	}
 
 	ln := strings.Split(fields[2], ",")
 
-	var i int
-	var e string
+	al.inf = "rewrite" //default for inference rule
 
-	for i = 0; i < len(ln); i++ {
-		e = ln[i]
+	for i, e := range ln {
 		n, err := strconv.Atoi(e)
 		if err != nil {
+			al.inf = strings.TrimSpace(ln[i]) //non-number is inf-rule
+			if i < len(ln)-1 {
+				err = errors.New("You must have no more than one inference rule and it must be the last item in the annotation")
+			}
 			break
 		}
 		al.lines = append(al.lines, n)
-	}
-
-	al.inf = "rewrite"
-
-	if len(ln[i:]) > 0 {
-		al.inf = strings.TrimSpace(ln[i])
-	}
-
-	if len(ln[i:]) > 1 {
-		err = errors.New("You must have no more than one inference rule")
-		return
 	}
 
 	return

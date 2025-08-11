@@ -33,7 +33,7 @@ func lineRefsOK(derivation []argLine, offset int) bool {
 	for n := range derivation {
 		for _, l := range derivation[n].lines {
 			if l < offset || l >= n+offset {
-				logger.Print("illegal reference to line ", l)
+				logger.Print("line", n+offset, "illegal reference to line ", l)
 				ok = false
 			}
 		}

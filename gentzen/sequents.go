@@ -156,13 +156,14 @@ func datumAdd[dat datum | string](d1 datumSlice, d ...dat) datumSlice {
 func datumRm[dat datum | string](d1 datumSlice, d ...dat) datumSlice {
 
 	var r datumSlice
+
 	r = append(r, d1...)
+
 	for _, e := range d {
 		r = slicesRemove(r, datum(e))
 	}
 
 	return r
-
 }
 
 // check if d1 contains d2

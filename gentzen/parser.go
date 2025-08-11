@@ -244,6 +244,11 @@ func tokenize(s string, permitGreekUpper bool, permitSpecial bool) (t tokenStr, 
 		t = append(t, e)
 
 	}
+
+	if len(t) == 0 {
+		err = errors.New("no valid symbols found")
+	}
+
 	return
 }
 

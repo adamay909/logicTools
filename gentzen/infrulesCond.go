@@ -50,7 +50,6 @@ func condEhelper(seq1, seq2, seq3 sequent) (v bool, msg string) {
 
 	d3 := datumUnion(seq1.datumSlice(), seq2.datumSlice())
 	canonicalSeq := mkSequent(d3, n1.Child2Must())
-	//canonicalSeq := sequent{datum(d3.String()), plshFormula(n1.Child2Must().Formula())}
 	if canonicalSeq.succedent().String() != n3.Formula() {
 		msg = "conclusion does not match consequent of conditional"
 		return
@@ -94,11 +93,10 @@ func condI(d *derivNode) bool {
 		return false
 	}
 
-	d1 := datumAdd(seq2.datumSlice(), datum(n2.Child1Must().Formula()))
-	canonicalPrem := mkSequent(d1, n2.Child2Must())
-	//canonicalPrem := sequent{datum(d1.String()), plshFormula(n2.Child2Must().Formula())}
+	d1 := datumRm(seq1.datumSlice(), n2.Child1Must().Formula())
+	canonicalConc := mkSequent(d1, n2.Formula())
 
-	if !equivSequents(canonicalPrem, seq1) {
+	if !equivSequents(seq2, canonicalConc) {
 		logger.Print("must remove exactly one datum item")
 		return false
 	}

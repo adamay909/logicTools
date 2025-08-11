@@ -13,11 +13,12 @@ func monotonicity(d *derivNode) bool {
 
 	Debug("checking datum 1: ", ini.datumSlice(), " against: ", res.datumSlice())
 
-	if isSeqAddition(ini, res) {
-		return true
+	if !isSeqAddition(ini, res) {
+
+		logger.Print("Monotonicity requires adding item to datum", n)
+		return false
+
 	}
 
-	logger.Print("Monotonicity requires adding item to datum", n)
-	return false
-
+	return true
 }

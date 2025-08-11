@@ -18,12 +18,12 @@ func negE(d *derivNode) bool {
 		return false
 	}
 
-	if n1.subnode1.MainConnective() != Neg {
+	if n1.Child1Must().MainConnective() != Neg {
 		logger.Print("premise must be double negation")
 		return false
 	}
 
-	if n1.subnode1.subnode1.Formula() != n2.Formula() {
+	if n1.Child1Must().Child1Must().Formula() != n2.Formula() {
 		logger.Print("conclusion is not the elimnation of double negation")
 		return false
 	}

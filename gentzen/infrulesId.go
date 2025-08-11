@@ -63,21 +63,21 @@ func idE(d *derivNode) bool {
 		return false
 	}
 
-	if n.subnode1.MainConnective() != Conj {
+	if n.Child1Must().MainConnective() != Conj {
 		logger.Print("antecedent must be conjunction")
 		return false
 	}
 
-	if !n.subnode1.subnode1.IsIdentity() {
+	if !n.Child1Must().Child1Must().IsIdentity() {
 		logger.Print("first conjunct must be identity")
 		return false
 	}
 
-	k1 := n.subnode1.subnode1.Terms()[0]
-	k2 := n.subnode1.subnode1.Terms()[1]
+	k1 := n.Child1Must().Child1Must().Terms()[0]
+	k2 := n.Child1Must().Child1Must().Terms()[1]
 
-	s1 := n.subnode1.subnode2
-	s2 := n.subnode2
+	s1 := n.Child1Must().Child2Must()
+	s2 := n.Child2Must()
 
 	s3 := replaceTerms(s2, k2, k1)
 

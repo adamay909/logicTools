@@ -18,12 +18,11 @@ func conjE(d *derivNode) bool {
 		return false
 	}
 
-	if n2.Formula() != n1.subnode1.Formula() {
-		if n2.Formula() != n1.subnode2.Formula() {
-			logger.Print("conclusion not one of conjuncts")
-			return false
-		}
+	if n2.Formula() != n1.Child1Must().Formula() && n2.Formula() != n1.Child2Must().Formula() {
+		logger.Print("conclusion not one of conjuncts")
+		return false
 	}
+
 	if !datumsEquiv(seq1.datumSlice(), seq2.datumSlice()) {
 		logger.Print("datum of conclusion must be same as datum of premise")
 		return false
@@ -51,13 +50,13 @@ func conjI(d *derivNode) bool {
 		return false
 	}
 
-	if n1.Formula() != n3.subnode1.Formula() && n1.Formula() != n3.subnode2.Formula() {
+	if n1.Formula() != n3.Child1Must().Formula() && n1.Formula() != n3.Child2Must().Formula() {
 		logger.Print("succedent of conclusion must be conjunction of succedents of premises")
 
 		return false
 	}
 
-	if n2.Formula() != n3.subnode1.Formula() && n2.Formula() != n3.subnode2.Formula() {
+	if n2.Formula() != n3.Child1Must().Formula() && n2.Formula() != n3.Child2Must().Formula() {
 		logger.Print("succedent of conclusion must be conjunction of succedents of premises")
 		return false
 	}

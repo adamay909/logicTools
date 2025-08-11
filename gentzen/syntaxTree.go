@@ -23,10 +23,10 @@ func ltree(n *Node, simple bool) string {
 
 		if !m.IsAtomic() {
 
-			r = r + lt(m.subnode1)
+			r = r + lt(m.children[0])
 
 			if m.IsBinary() {
-				r = r + lt(m.subnode2)
+				r = r + lt(m.children[1])
 			}
 
 		}

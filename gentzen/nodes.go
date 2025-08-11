@@ -8,18 +8,18 @@ import (
 
 // Node holds information about a node in the syntax tree of a formula
 type Node struct {
-	raw                string
-	connective         LogicalConstant
-	subnode1, subnode2 *Node
-	parent             *Node
-	children           []*Node
-	variable           string
-	predicateLetter    string
-	term               []string
-	flags              []string
-	index              int    //vaule of .index of token on which Node is based
-	tvassigned         []bool //whether truthvalue for given row has been assigned
-	tvalue             []bool //map interpretation row number to truth value
+	raw        string
+	connective LogicalConstant
+	//	subnode1, subnode2 *Node
+	parent          *Node
+	children        []*Node
+	variable        string
+	predicateLetter string
+	term            []string
+	flags           []string
+	index           int    //vaule of .index of token on which Node is based
+	tvassigned      []bool //whether truthvalue for given row has been assigned
+	tvalue          []bool //map interpretation row number to truth value
 }
 
 // Child1 returns first child of n if it exists. Returns ok=false
@@ -33,7 +33,7 @@ func (n *Node) Child1() (m *Node, ok bool) {
 
 	ok = true
 
-	return n.subnode1, ok
+	return n.children[0], ok
 }
 
 // Child2 returns first chile of n if it exists. Returns ok=false
@@ -52,7 +52,7 @@ func (n *Node) Child2() (m *Node, ok bool) {
 
 	ok = true
 
-	return n.subnode2, ok
+	return n.children[1], ok
 }
 
 // Child1Must returns first child of n. Returns nil if there is no
@@ -63,7 +63,7 @@ func (n *Node) Child1Must() (m *Node) {
 		return k
 	}
 
-	return n.subnode1
+	return n.children[0]
 }
 
 // Child2Must returns second child of n. Returns nil if there is no
@@ -73,7 +73,7 @@ func (n *Node) Child2Must() (m *Node) {
 	if _, ok := n.Child2(); !ok {
 		return k
 	}
-	return n.subnode2
+	return n.children[1]
 }
 
 func (n *Node) mkchild() *Node {
@@ -82,10 +82,11 @@ func (n *Node) mkchild() *Node {
 	c.parent = n
 	c.SetAtomic()
 	n.children = append(n.children, c)
-	n.subnode1 = n.children[0]
-	if len(n.children) > 1 {
-		n.subnode2 = n.children[1]
-	}
+	/*	n.subnode1 = n.children[0]
+		if len(n.children) > 1 {
+			n.subnode2 = n.children[1]
+		}
+	*/
 	return c
 
 }
@@ -337,8 +338,7 @@ func (n *Node) Predicate() string {
 
 // SetAtomic sets n to be an atomic formula.
 func (n *Node) SetAtomic() {
-	n.subnode1 = nil
-	n.subnode2 = nil
+	n.children = nil
 	n.connective = None
 }
 
@@ -483,30 +483,33 @@ func (c LogicalConstant) Stringf(m PrintMode) string {
 
 func getSubnodes(n *Node) []*Node {
 
-	var gs func(n *Node, list []*Node) []*Node
+	return linearize(n)
+	/*
+		var gs func(n *Node, list []*Node) []*Node
 
-	gs = func(n *Node, list []*Node) []*Node {
+		gs = func(n *Node, list []*Node) []*Node {
 
-		list = append(list, n)
+			list = append(list, n)
 
-		if n.IsAtomic() {
+			if n.IsAtomic() {
+				return list
+			}
+
+			if n.subnode1 != nil {
+				list = gs(n.subnode1, list)
+			}
+
+			if n.subnode2 != nil {
+				list = gs(n.subnode2, list)
+			}
+
 			return list
 		}
 
-		if n.subnode1 != nil {
-			list = gs(n.subnode1, list)
-		}
+		var list []*Node
 
-		if n.subnode2 != nil {
-			list = gs(n.subnode2, list)
-		}
-
-		return list
-	}
-
-	var list []*Node
-
-	return gs(n, list)
+		return gs(n, list)
+	*/
 }
 
 // order nodes by depth
@@ -749,7 +752,6 @@ func (n *Node) addFirstChild(n2 *Node) (err error) {
 		return
 	}
 
-	n.subnode1 = n2
 	n.children = append(n.children, n2)
 	n2.parent = n
 
@@ -768,7 +770,6 @@ func (n *Node) addSecondChild(n2 *Node) (err error) {
 		return
 	}
 
-	n.subnode2 = n2
 	n.children = append(n.children, n2)
 	n2.parent = n
 
@@ -935,14 +936,6 @@ func (n *Node) AddChild(n2 *Node) (err error) {
 
 	n2.parent = n
 
-	n.subnode1 = n.children[0]
-
-	if len(n.children) > 1 {
-
-		n.subnode2 = n.children[1]
-
-	}
-
 	return
 
 }
@@ -974,11 +967,7 @@ func (n *Node) removeSecondChild() {
 		return
 	}
 
-	n.subnode2 = nil
-
-	n.children = nil
-
-	n.children = append(n.children, n.subnode1)
+	n.children = n.children[:1]
 
 }
 
