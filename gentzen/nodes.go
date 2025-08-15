@@ -74,7 +74,7 @@ func isBasic(n *Node) bool {
 		return true
 	}
 	if isNegation(n) {
-		if n.Child(1).Check(isAtomic) {
+		if n.Child(0).Check(isAtomic) {
 			return true
 		}
 	}
@@ -186,12 +186,12 @@ func freeVars(n *Node) []string {
 
 			f := e
 
-			for ; f.Parent != nil; f = f.Parent {
+			for ; f.Parent() != nil; f = f.Parent() {
 				if f.Val.variable == t {
 					break
 				}
 			}
-			if f.Parent == nil && f.Val.variable != t {
+			if f.Parent() == nil && f.Val.variable != t {
 				fv = append(fv, t)
 			}
 		}
@@ -516,9 +516,9 @@ func validate(n *Node) (err error) {
 			}
 		}
 
-		if isQuantifier(e) && e.Parent != nil {
+		if isQuantifier(e) && e.Parent() != nil {
 
-			for f := e.Parent; f != nil; f = f.Parent {
+			for f := e.Parent(); f != nil; f = f.Parent() {
 				if isQuantifier(f) && f.Val.variable == e.Val.variable {
 					err = errors.New("illegal nested quantifier variables")
 					err = errors.Join(errors.New(strconv.Itoa(e.Val.index)), err)
@@ -605,7 +605,7 @@ func isSaturated(n *Node) bool {
 // so it can be used with ju's FindFunc method.
 func openAncestor(n *Node) (r []*Node) {
 
-	for e := n.Parent; e != nil; e = e.Parent {
+	for e := n.Parent(); e != nil; e = e.Parent() {
 
 		if !isSaturated(e) {
 			r = append(r, e)
@@ -625,7 +625,7 @@ func openAncestor(n *Node) (r []*Node) {
 // returns the first binary ancestor
 func binaryAncestor(n *Node) (r []*Node) {
 
-	for e := n.Parent; e != nil; e = e.Parent {
+	for e := n.Parent(); e != nil; e = e.Parent() {
 		if isBinary(e) {
 			r = append(r, e)
 			break

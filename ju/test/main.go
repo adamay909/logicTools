@@ -2,134 +2,68 @@ package main
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/adamay909/logicTools/ju"
 )
 
-type mynodeval struct {
-	content string
+type mynodeval interface {
+	isNodeVal()
 }
 
 type mynode = ju.Node[mynodeval]
 
-type mynode2 struct {
-	mynode
-	test string
+type nodetype1 struct {
+	good bool
 }
 
-func parse(s string) *mynode2 {
+type nodetype2 struct {
+	great bool
+}
 
-	prevnode := new(mynode2)
-	n := new(mynode2)
+func (n nodetype1) isNodeVal() {}
 
-	for i, c := range s {
+func (n nodetype2) isNodeVal() {}
 
-		n = new(mynode2)
-
-		n.test = "hello"
-
-		n.Val.content = string(c)
-
-		if i == 0 {
-			prevnode = n
-			continue
-		}
-
-		openAncestor(prevnode).AddChild(n)
-
-		prevnode = n
+func (n *nodetype1) say() string {
+	if n.good == true {
+		return "good!"
+	} else {
+		return "boo"
 	}
-
-	return prevnode.Root()
 }
 
-func openAncestor(n *mynode2) *mynode2 {
-
-	e := new(mynode2)
-
-	for e = n; e != nil; e = e.Parent {
-
-		switch e.Val.content {
-
-		case "C", "K", "A":
-			if len(e.Children()) < 2 {
-				return e
-			}
-
-		case "N":
-			if len(e.Children()) == 0 {
-				return e
-			}
-
-		default:
-			continue
-		}
+func (n *nodetype2) respond() int {
+	if n.great {
+		return 1
+	} else {
+		return 0
 	}
-
-	return nil
-}
-
-func render(n *mynode2) string {
-
-	fmt.Println("rendering")
-	var ingressFunc func(*mynode2)
-
-	w := new(strings.Builder)
-
-	ingressFunc = func(e *mynode2) {
-		w.WriteString(e.Val.content)
-	}
-
-	donothing := func(e *mynode2) {
-		return
-	}
-
-	n.Walk(ingressFunc, donothing, donothing)
-
-	return w.String()
-}
-
-func isConditional(n *mynode) bool {
-	return n.Val.content == "C"
-}
-
-func stringer(n *mynode) string {
-
-	return "success: " + render(n)
-}
-
-func negateFunc(n any, v ...any) {
-
-	m, ok := n.(*mynode)
-
-	if !ok {
-		panic("ju: improper use of function double")
-	}
-
-	p := new(mynode)
-
-	p.Val.content = "N"
-
-	p.AddChild(m)
 }
 
 func main() {
 
-	ju.SetStringFunc[mynodeval](stringer)
+	v1 := nodetype1{good: true}
 
-	s := "CKCpqNqNp"
+	v2 := nodetype2{great: false}
 
-	var nd mynode2
+	n1 := new(mynode)
 
-	fmt.Println("processing", s)
+	n1.Val = v1
 
-	nd.ast = parse(s)
+	n2 := new(mynode)
 
-	nd.test = "hello"
+	n2.Val = v2
 
-	fmt.Println(nd.ast)
+	n1.AddChild(n2)
 
-	fmt.Println(nd.test)
+	e := n1.Child(0)
 
+	_, ok := e.Val.(nodetype2)
+
+	if !ok {
+		fmt.Println("FAIL")
+		return
+	}
+
+	fmt.Println(e.Val.(nodetype2))
 }

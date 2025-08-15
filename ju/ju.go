@@ -3,24 +3,42 @@ package ju
 /* Node is a generic type implementing a node in a tree whose values are stored in type T. The values can be accessed through the struct field Val.
  */
 type Node[T any] struct {
-	Parent,
-	FirstChild,
-	Left,
-	Right *Node[T]
+	parent,
+	firstChild,
+	left,
+	right *Node[T]
 	Val  T
 	Flag map[any]any
+}
+
+// Parent returns parent of n
+func (n *Node[T]) Parent() *Node[T] {
+
+	return n.parent
+}
+
+// Left returns left sibling (if any) of n
+func (n *Node[T]) Left() *Node[T] {
+
+	return n.left
+}
+
+// Right returns left sibling (if any) of n
+func (n *Node[T]) Right() *Node[T] {
+
+	return n.right
 }
 
 // LastChild returns the last child if n. nil if n has no child.
 func (n *Node[T]) LastChild() *Node[T] {
 
-	if n.FirstChild == nil {
+	if n.firstChild == nil {
 		return nil
 	}
 
 	c := new(Node[T])
 
-	for c = n.FirstChild; c.Right != nil; c = c.Right {
+	for c = n.firstChild; c.right != nil; c = c.right {
 	}
 
 	return c
@@ -31,7 +49,7 @@ func (n *Node[T]) Children() []*Node[T] {
 
 	var resp []*Node[T]
 
-	for c := n.FirstChild; c != nil; c = c.Right {
+	for c := n.firstChild; c != nil; c = c.right {
 		resp = append(resp, c)
 	}
 
@@ -41,13 +59,13 @@ func (n *Node[T]) Children() []*Node[T] {
 // IsFirstSibling returns true iff. n is left-most sibling.
 func (n *Node[T]) IsFirstSibling() bool {
 
-	return n.Left == nil
+	return n.left == nil
 }
 
 // IsLastSibling returns true iff. n is right-most sibling.
 func (n *Node[T]) IsLastSibling() bool {
 
-	return n.Right == nil
+	return n.right == nil
 }
 
 // LastSibling returns the right-most sibling of n.
@@ -55,7 +73,7 @@ func (n *Node[T]) LastSibling() *Node[T] {
 
 	s := new(Node[T])
 
-	for s = n; s.Right != nil; s = s.Right {
+	for s = n; s.right != nil; s = s.right {
 	}
 	return s
 }
@@ -65,7 +83,7 @@ func (n *Node[T]) FirstSibling() *Node[T] {
 
 	s := new(Node[T])
 
-	for s = n; s.Left != nil; s = s.Left {
+	for s = n; s.left != nil; s = s.left {
 	}
 
 	return s
@@ -74,13 +92,13 @@ func (n *Node[T]) FirstSibling() *Node[T] {
 // ChildCount returns the number of child nodes of n.
 func (n *Node[T]) ChildCount() int {
 
-	if n.FirstChild == nil {
+	if n.firstChild == nil {
 		return 0
 	}
 
 	i := 1
 
-	for c := n.FirstChild; c != nil; c = c.Right {
+	for c := n.firstChild; c != nil; c = c.right {
 		i++
 	}
 
@@ -94,29 +112,30 @@ func (n *Node[T]) SiblingCount() int {
 
 	s := new(Node[T])
 
-	for s = n; s != nil; s = s.Left {
+	for s = n; s != nil; s = s.left {
 		c++
 	}
 
-	for s = n.Right; s != nil; s = s.Right {
+	for s = n.right; s != nil; s = s.right {
 		c++
 	}
 
 	return c
 }
 
-// Child returns the i-th child of n.
+// Child returns the i-th child of n. WE START COUNTING AT CHILD 0 (not 1).
 func (n *Node[T]) Child(i int) *Node[T] {
 
-	if n.FirstChild == nil {
+	if n.firstChild == nil {
 		return nil
 	}
 
-	for k, c := 1, n.FirstChild; c != nil; k, c = k+1, c.Right {
+	for k, c := 0, n.firstChild; c != nil; k, c = k+1, c.right {
 		if k == i {
 			return c
 		}
 	}
+
 	return nil
 }
 
@@ -125,7 +144,7 @@ func (n *Node[T]) Root() *Node[T] {
 
 	e := new(Node[T])
 
-	for e = n; e.Parent != nil; e = e.Parent {
+	for e = n; e.parent != nil; e = e.parent {
 	}
 
 	return e
@@ -134,47 +153,47 @@ func (n *Node[T]) Root() *Node[T] {
 // AddChild adds n2 as the last child of n.
 func (n *Node[T]) AddChild(n2 *Node[T]) {
 
-	if n.FirstChild == nil {
-		n.FirstChild = n2
+	if n.firstChild == nil {
+		n.firstChild = n2
 	} else {
-		n.LastChild().Right = n2
+		n.LastChild().right = n2
 	}
 
-	n2.Parent = n
+	n2.parent = n
 }
 
 // InsertRight inserts n2 to the right of n. n2's parent will be the
 // same as as n's.
 func (n *Node[T]) InsertRight(n2 *Node[T]) {
 
-	nr := n.Right
+	nr := n.right
 
-	n.Right = n2
-	n2.Left = n
-	n2.Right = nr
+	n.right = n2
+	n2.left = n
+	n2.right = nr
 	if nr != nil {
-		nr.Left = n2
+		nr.left = n2
 	}
 
-	n2.Parent = n.Parent
+	n2.parent = n.parent
 }
 
 // InsertLeft inserts n2 to the left of n. n2's parent will be the same as n's.
 func (n *Node[T]) InsertLeft(n2 *Node[T]) {
 
-	nl := n.Left
+	nl := n.left
 
-	n.Left = n2
-	n2.Right = n
-	n2.Left = nl
+	n.left = n2
+	n2.right = n
+	n2.left = nl
 	if nl != nil {
-		nl.Right = n2
+		nl.right = n2
 	}
 
-	n2.Parent = n.Parent
+	n2.parent = n.parent
 
-	if n2.Parent != nil && n2.Left == nil {
-		n.Parent.FirstChild = n2
+	if n2.parent != nil && n2.left == nil {
+		n.parent.firstChild = n2
 	}
 }
 
@@ -182,54 +201,54 @@ func (n *Node[T]) InsertLeft(n2 *Node[T]) {
 // afterwards. n will have no siblings and no parent but keeps its children so you get a detached tree rooted in n.
 func (n *Node[T]) Remove() {
 
-	nl := n.Left
-	nr := n.Right
+	nl := n.left
+	nr := n.right
 
 	if nl != nil {
-		nl.Right = nr
+		nl.right = nr
 	}
 
 	if nr != nil {
-		nr.Left = nl
+		nr.left = nl
 	}
 
-	n.Right = nil
-	n.Left = nil
-	n.Parent = nil
+	n.right = nil
+	n.left = nil
+	n.parent = nil
 }
 
 // Replace n with n2. n will be the root of a detached tree afterwards.
 func (n *Node[T]) ReplaceWith(n2 *Node[T]) {
 
-	n2.Parent = n.Parent
-	n2.Left = n.Left
-	n2.Right = n.Right
+	n2.parent = n.parent
+	n2.left = n.left
+	n2.right = n.right
 
-	if n2.Left != nil {
-		n2.Left.Right = n2
+	if n2.left != nil {
+		n2.left.right = n2
 	}
 
-	if n2.Right != nil {
-		n2.Right.Left = n2
+	if n2.right != nil {
+		n2.right.left = n2
 	}
 
-	n.Parent = nil
-	n.Left = nil
-	n.Right = nil
+	n.parent = nil
+	n.left = nil
+	n.right = nil
 }
 
 // RemoveChildren removes the children of n. All the child nodes of n will have no parent afterwards.
 func (n *Node[T]) RemoveChildren() {
 
-	if n.FirstChild == nil {
+	if n.firstChild == nil {
 		return
 	}
 
-	for c := n.FirstChild; c != nil; c = c.Right {
-		c.Parent = nil
+	for c := n.firstChild; c != nil; c = c.right {
+		c.parent = nil
 	}
 
-	n.FirstChild = nil
+	n.firstChild = nil
 }
 
 // SetFlag sets a flag with key k and value v.
@@ -363,7 +382,7 @@ func (n *Node[T]) Depth() int {
 
 	d := -1
 
-	for e := n; e != nil; e = e.Parent {
+	for e := n; e != nil; e = e.parent {
 		d++
 	}
 

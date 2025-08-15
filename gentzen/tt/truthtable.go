@@ -1,6 +1,7 @@
 package gentzen
 
 import (
+	"errors"
 	"slices"
 	"strconv"
 	"strings"
@@ -511,4 +512,62 @@ func isTautologySub(s string) bool {
 	}
 
 	return true
+}
+
+func truthValueOf(s string, val []bool) (bool, err) {
+
+	var atomic []string
+
+	tks, err := tokenize(s, !allowGreekUpper, !allowSpecial)
+
+	if err != nil {
+		panic(err)
+	}
+
+	for _, t := range tks {
+
+		if t.tokenType != tAtomicSentence {
+			continue
+		}
+
+		if !slices.Contains(atomic, t.str) {
+			atomic = append(atomic, t.str)
+		}
+	}
+
+	if len(atomic) != len(val) {
+		err = errors.New("truthValueOf: length of supplied interpretation does not match number of atomic sentences")
+		return false, err
+	}
+
+	s = strings.ReplaceAll(s, "C", "AN")
+
+	s0 := s
+
+	for i := range atomic {
+		if val[i] == true {
+			s0 = strings.ReplaceAll(s0, atomic[i], "T")
+		} else {
+			s0 = strings.ReplaceAll(s0, atomic[i], "F")
+		}
+	}
+
+	for len(s0) > 1 {
+
+		s0 = strings.ReplaceAll(s0, "NT", "F")
+		s0 = strings.ReplaceAll(s0, "NF", "T")
+
+		s0 = strings.ReplaceAll(s0, "KTT", "T")
+		s0 = strings.ReplaceAll(s0, "KTF", "F")
+		s0 = strings.ReplaceAll(s0, "KFT", "F")
+		s0 = strings.ReplaceAll(s0, "KFF", "F")
+
+		s0 = strings.ReplaceAll(s0, "ATT", "T")
+		s0 = strings.ReplaceAll(s0, "ATF", "T")
+		s0 = strings.ReplaceAll(s0, "AFT", "T")
+		s0 = strings.ReplaceAll(s0, "AFF", "F")
+
+	}
+
+	return s0 == "T", err
 }

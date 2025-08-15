@@ -35,7 +35,7 @@ func latexIngressFunc(n *Node, w *strings.Builder) {
 
 	if isBinary(n) {
 
-		if n.Parent == nil {
+		if n.Parent() == nil {
 			return
 		}
 
@@ -56,13 +56,13 @@ func latexIngressFunc(n *Node, w *strings.Builder) {
 		return
 	}
 
-	if n.Parent == nil {
+	if n.Parent() == nil {
 		w.WriteString(`\mc{`)
 	}
 
 	w.WriteString(connectiveDisplay(n, O_Latex))
 
-	if n.Parent == nil {
+	if n.Parent() == nil {
 		w.WriteString(`}`)
 	}
 
@@ -73,13 +73,13 @@ func latexPivotFunc(n *Node, w *strings.Builder) {
 
 	if n.Check(isBinary) {
 
-		if n.Parent == nil {
+		if n.Parent() == nil {
 			w.WriteString(`\mc{`)
 		}
 
 		w.WriteString(connectiveDisplay(n, O_Latex))
 
-		if n.Parent == nil {
+		if n.Parent() == nil {
 			w.WriteString(`}`)
 		}
 	}
@@ -91,7 +91,7 @@ func latexEgressFunc(n *Node, w *strings.Builder) {
 		return
 	}
 
-	if n.Parent == nil {
+	if n.Parent() == nil {
 		return
 	}
 
@@ -153,7 +153,7 @@ func predicateString(n *Node, mode PrintMode) string {
 	resp := ""
 
 	if rune(n.Val.predicateLetter[0]) == '=' {
-		if n.Parent != nil && n.Parent.Check(isNegation) {
+		if n.Parent() != nil && n.Parent().Check(isNegation) {
 			return resp
 		}
 
@@ -268,7 +268,7 @@ func nomarkupIngressFunc(n *Node, w *strings.Builder, mode PrintMode) {
 
 		}
 
-		if n.Parent != nil {
+		if n.Parent() != nil {
 			d := binaryHeight(n)
 
 			if d > len(br)-1 {
@@ -346,7 +346,7 @@ func nomarkupEgressFunc(n *Node, w *strings.Builder, mode PrintMode) {
 
 	}
 
-	if n.Parent != nil {
+	if n.Parent() != nil {
 		d := binaryHeight(n)
 
 		if d > len(br)-1 {

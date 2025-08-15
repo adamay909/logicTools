@@ -255,8 +255,6 @@ func parseInfix(tk tokenStr) (n *Node, err error) {
 
 		if r != nil {
 
-			fmt.Println(tk, ": parseInfix recovered:", r)
-
 			err = errors.New("0\nmalformed:" + tk.String() + "\nrecovered: " + fmt.Sprint(r))
 
 		}
@@ -326,7 +324,7 @@ func parseInfix(tk tokenStr) (n *Node, err error) {
 
 			e := n
 
-			for e = n.Parent; e != nil && isUnary(e); e = e.Parent {
+			for e = n.Parent(); e != nil && isUnary(e); e = e.Parent() {
 			}
 
 			if e != nil && isSaturated(e) {
