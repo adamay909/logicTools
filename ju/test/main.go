@@ -66,4 +66,19 @@ func main() {
 	}
 
 	fmt.Println(e.Val.(nodetype2))
+
+	const (
+		awesome int = iota
+		super
+		mega
+	)
+	n1.SetFlag(awesome)
+
+	fmt.Println("has flag awesome", n1.HasFlag(awesome))
+
+	fmt.Println("hasflag mega", n1.HasFlag(mega))
+
+	n1.RmFlag(awesome)
+
+	fmt.Println("after removal: has flag awesome", n1.HasFlag(awesome))
 }

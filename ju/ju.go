@@ -252,11 +252,21 @@ func (n *Node[T]) RemoveChildren() {
 }
 
 // SetFlag sets a flag with key k and value v.
-func (n *Node[T]) SetFlag(k, v any) {
+func (n *Node[T]) SetFlag(k any, v ...any) {
 
 	n.ensureFlagInitialized()
 
-	n.Flag[k] = v
+	switch len(v) {
+
+	case 0:
+		n.Flag[k] = nil
+
+	case 1:
+		n.Flag[k] = v[0]
+
+	default:
+		n.Flag[k] = v
+	}
 }
 
 // HasFlag returns true if a flag with key k has been set.
