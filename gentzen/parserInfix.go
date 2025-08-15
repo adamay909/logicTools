@@ -261,6 +261,7 @@ func parseInfix(tk tokenStr) (n *Node, err error) {
 
 		}
 	}()
+
 	var normalNodeOpen = tOpenb | tUnary | tAtomicSentence
 
 	if oPL {
@@ -294,20 +295,16 @@ func parseInfix(tk tokenStr) (n *Node, err error) {
 			openbrackets++
 			brackets++
 
-			if prevNode.isFunctionFormula() {
+			if isFunctionFormula(prevNode) {
 				expect = tTerm
 				continue
 			}
 
 			n = new(Node)
-			n.index = t.index
+			n.Val.index = t.index
 
 			if prevNode != nil {
-				err = prevNode.AddChild(n)
-				if err != nil {
-					err = errors.New(strconv.Itoa(t.index))
-					return
-				}
+				prevNode.AddChild(n)
 			}
 
 			expect = normalNodeOpen
@@ -317,26 +314,22 @@ func parseInfix(tk tokenStr) (n *Node, err error) {
 		case t.tokenType == tAtomicSentence:
 
 			n = new(Node)
-			n.index = t.index
+			n.Val.index = t.index
 
-			n.raw = t.str
+			n.Val.raw = t.str
 
 			if prevNode != nil {
-				err = prevNode.AddChild(n)
-				if err != nil {
-					err = errors.New(strconv.Itoa(t.index))
-					return
-				}
+				prevNode.AddChild(n)
 			}
 
 			expect = tBinary
 
 			e := n
 
-			for e = n.parent; e != nil && e.IsUnary(); e = e.parent {
+			for e = n.Parent; e != nil && isUnary(e); e = e.Parent {
 			}
 
-			if e != nil && e.isSaturated() {
+			if e != nil && isSaturated(e) {
 				expect = tCloseb
 			}
 
@@ -344,23 +337,19 @@ func parseInfix(tk tokenStr) (n *Node, err error) {
 
 		case t.isBinary():
 
-			e := prevNode.openAncestor()
+			e := prevNode.FindFunc(openAncestor)[0]
 
 			if e == nil {
 
 				n = new(Node)
-				n.index = t.index
-				n.SetConnective(t.tokenType.logicConstant())
+				n.Val.index = t.index
+				n.Val.connective = t.tokenType.logicConstant()
 
-				err = n.AddChild(prevNode.rootNode())
-				if err != nil {
-					err = errors.New(strconv.Itoa(t.index))
-					return
-				}
+				n.AddChild(prevNode.Root())
 
 			} else {
-				e.SetConnective(t.tokenType.logicConstant())
-				e.index = t.index
+				e.Val.connective = t.tokenType.logicConstant()
+				e.Val.index = t.index
 				n = e
 			}
 
@@ -371,17 +360,13 @@ func parseInfix(tk tokenStr) (n *Node, err error) {
 		case t.tokenType == tNeg:
 
 			n = new(Node)
-			n.index = t.index
+			n.Val.index = t.index
 
-			n.SetConnective(t.tokenType.logicConstant())
+			n.Val.connective = t.tokenType.logicConstant()
 
 			if prevNode != nil {
 
-				err = prevNode.AddChild(n)
-				if err != nil {
-					err = errors.New(strconv.Itoa(t.index))
-					return
-				}
+				prevNode.AddChild(n)
 
 			}
 
@@ -392,17 +377,13 @@ func parseInfix(tk tokenStr) (n *Node, err error) {
 		case t.isQuantifier():
 
 			n = new(Node)
-			n.index = t.index
+			n.Val.index = t.index
 
-			n.SetConnective(t.tokenType.logicConstant())
+			n.Val.connective = t.tokenType.logicConstant()
 
 			if prevNode != nil {
 
-				err = prevNode.AddChild(n)
-				if err != nil {
-					err = errors.New(strconv.Itoa(t.index))
-					return
-				}
+				prevNode.AddChild(n)
 
 			}
 
@@ -413,28 +394,24 @@ func parseInfix(tk tokenStr) (n *Node, err error) {
 		case t.tokenType == tPredicate:
 
 			n = new(Node)
-			n.index = t.index
+			n.Val.index = t.index
 
-			n.SetAtomic()
+			n.Val.connective = None
 
-			n.predicateLetter = t.str
+			n.Val.predicateLetter = t.str
 
-			n.setraw()
+			setraw(n)
 
 			if prevNode != nil {
 
-				err = prevNode.AddChild(n)
-				if err != nil {
-					err = errors.New(strconv.Itoa(t.index))
-					return
-				}
+				prevNode.AddChild(n)
 
 			}
 
 			expect = tTerm | tCloseb | tBinary
 
 			if oPL {
-				if n.isFunctionFormula() {
+				if isFunctionFormula(n) {
 					expect = tOpenb | tCloseb | tBinary
 				}
 			}
@@ -444,16 +421,16 @@ func parseInfix(tk tokenStr) (n *Node, err error) {
 		case t.tokenType == tIdent:
 
 			n = new(Node)
-			n.index = t.index
+			n.Val.index = t.index
 
-			n.predicateLetter = "="
+			n.Val.predicateLetter = "="
 
-			n.setraw()
+			setraw(n)
 
 			if t.str == "/=" {
 				n2 := new(Node)
-				n.index = t.index
-				n2.SetConnective(Neg)
+				n.Val.index = t.index
+				n2.Val.connective = Neg
 				n2.AddChild(n)
 				n = n2
 			}
@@ -466,15 +443,15 @@ func parseInfix(tk tokenStr) (n *Node, err error) {
 
 			prevNode = n
 
-			if n.IsNegation() {
-				prevNode = n.children[0]
+			if isNegation(n) {
+				prevNode = n.Children()[0]
 			}
 
-		case t.tokenType == tTerm && prevNode.isFunctionFormula():
+		case t.tokenType == tTerm && prevNode.Check(isFunctionFormula):
 
-			prevNode.term = append(prevNode.term, t.str)
+			prevNode.Val.term = append(prevNode.Val.term, t.str)
 
-			prevNode.setraw()
+			setraw(prevNode)
 
 			expect = tComma | tCloseb
 
@@ -482,14 +459,14 @@ func parseInfix(tk tokenStr) (n *Node, err error) {
 
 			expect = tTerm
 
-		case t.tokenType == tTerm && prevNode.IsAtomic():
+		case t.tokenType == tTerm && prevNode.Val.connective == None:
 
-			prevNode.term = append(prevNode.term, t.str)
+			prevNode.Val.term = append(prevNode.Val.term, t.str)
 
-			prevNode.setraw()
+			setraw(prevNode)
 
-			if prevNode.predicateLetter == "=" {
-				if len(prevNode.term) == 2 {
+			if prevNode.Val.predicateLetter == "=" {
+				if len(prevNode.Val.term) == 2 {
 					expect = tCloseb | tBinary
 				} else {
 					expect = tTerm
@@ -499,9 +476,9 @@ func parseInfix(tk tokenStr) (n *Node, err error) {
 				expect = tTerm | tCloseb | tBinary
 			}
 
-		case t.tokenType == tTerm && prevNode.IsQuantifier():
+		case t.tokenType == tTerm && prevNode.Check(isQuantifier):
 
-			prevNode.variable = t.str
+			prevNode.Val.variable = t.str
 
 			expect = normalNodeOpen
 
@@ -515,11 +492,11 @@ func parseInfix(tk tokenStr) (n *Node, err error) {
 
 			}
 
-			e := prevNode.binaryAncestor()
+			e := prevNode.FindFunc(binaryAncestor)[0]
 
 			if e == nil {
 
-				prevNode = prevNode.rootNode()
+				prevNode = prevNode.Root()
 
 			} else {
 
@@ -546,7 +523,7 @@ func parseInfix(tk tokenStr) (n *Node, err error) {
 	//	fmt.Println("binary count", prevNode.rootNode().binaryCount())
 	//	fmt.Println("bracket pairs", brackets)
 
-	bcount := prevNode.rootNode().binaryCount()
+	bcount := binaryCount(prevNode.Root())
 
 	if bcount != 0 {
 		if brackets < bcount-1 {
@@ -560,6 +537,6 @@ func parseInfix(tk tokenStr) (n *Node, err error) {
 		}
 	}
 
-	return prevNode.rootNode(), prevNode.rootNode().validate()
+	return prevNode.Root(), validate(prevNode.Root())
 
 }

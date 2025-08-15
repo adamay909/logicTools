@@ -13,10 +13,10 @@ func printNodeInfix(n *Node, m PrintMode) string {
 	switch m {
 
 	case O_Latex:
-		return n.laTeXString()
+		return laTeXString(n)
 
 	case O_PlainText, O_PlainASCII, O_English, O_ProofChecker:
-		return n.plainString(m)
+		return plainString(n, m)
 
 	default:
 		fmt.Println(m, "UNSUPPORTED")
@@ -38,7 +38,7 @@ func (c LogicalConstant) isNegation() bool {
 	return c == Neg
 }
 
-func (n *Node) connectiveDisplay(m PrintMode) string {
+func connectiveDisplay(n *Node, m PrintMode) string {
 
 	if m == O_ProofChecker {
 		m = O_PlainText
@@ -47,12 +47,12 @@ func (n *Node) connectiveDisplay(m PrintMode) string {
 	var s string
 
 	for _, c := range connectives {
-		if codeOf(n.MainConnective()) == c[0] {
+		if codeOf(n.Val.connective) == c[0] {
 			s = c[int(m)]
 		}
 	}
-	if n.MainConnective().isQuantifier() {
-		s = s + n.BoundVariable()
+	if n.Val.connective.isQuantifier() {
+		s = s + n.Val.variable
 		if m == O_Latex {
 			s = s + ` `
 		}

@@ -1,7 +1,7 @@
 package gentzen
 
 /**************************************
-The variables defined here should be treated as constants except by functins defined in this
+The variables defined here should be treated as constants except by functions defined in this
 file.
 *************************************/
 
@@ -96,37 +96,38 @@ var plainBrackets = simpleBrackets[:2]
 
 var connectivesSL, connectivesPL, connectivesML [][7]string
 
-var infRules = [][]string{
-	{`a`, `A`, `A`, `A`},
-	{`m`, `M`, `M`, `M`},
-	{`ki`, `\conjI`, `\conjI`, "\u2227I"},
-	{`ke`, `\conjE`, `\conjE`, "\u2227E"},
-	{`di`, `\disjI`, `\disjI`, "\u2228I"},
-	{`de`, `\disjE`, `\disjE`, "\u2228E"},
-	{`ni`, `\negI`, `\negI`, "\u00acI"},
-	{`ne`, `\negE`, `\negE`, "\u00acE"},
-	{`ci`, `\condI`, `\condI`, "\u2283I"},
-	{`ce`, `\condE`, `\condE`, "\u2283E"},
-	{`ui`, `\uniI`, `\uniI`, "\u2200I"},
-	{`ue`, `\uniE`, `\uniE`, "\u2200E"},
-	{`ei`, `\exI`, `\exI`, "\u2203I"},
-	{`ee`, `\exE`, `\exE`, "\u2203E"},
-	{`=i`, `\iI`, `\iI`, `=I`},
-	{`=e`, `\iE`, `\iE`, `=E`},
-	{li, `\necI`, `\necI`, "\u25a1I"},
-	{mli, `S5\necI`, `S5\necI`, "S5\u25a1I"},
-	{pli, `S4\necI`, `S4\necI`, "S4\u25a1I"},
-	{tli, `T\necI`, `T\necI`, "T\u25a1I"},
-	{le, `\necE`, `\necE`, "\u25a1E"},
-	{mi, `\posI`, `\posI`, "\u25c7I"},
-	{me, `\posE`, `\posE`, "\u25c7E"},
-	{mme, `S5\posE`, `S5\posE`, "S5\u25c7E"},
-	{sc, "SC", "SC", "SC"},
-	{sl, "logic", "logic", "logic"},
-	{"rewrite", "", "", ""},
-	{`\lposDR`, `\lposDR`, `\lposDR`, "\u25c7DR"},
-}
-
+/*
+	var infRules = [][]string{
+		{`a`, `A`, `A`, `A`},
+		{`m`, `M`, `M`, `M`},
+		{`ki`, `\conjI`, `\conjI`, "\u2227I"},
+		{`ke`, `\conjE`, `\conjE`, "\u2227E"},
+		{`di`, `\disjI`, `\disjI`, "\u2228I"},
+		{`de`, `\disjE`, `\disjE`, "\u2228E"},
+		{`ni`, `\negI`, `\negI`, "\u00acI"},
+		{`ne`, `\negE`, `\negE`, "\u00acE"},
+		{`ci`, `\condI`, `\condI`, "\u2283I"},
+		{`ce`, `\condE`, `\condE`, "\u2283E"},
+		{`ui`, `\uniI`, `\uniI`, "\u2200I"},
+		{`ue`, `\uniE`, `\uniE`, "\u2200E"},
+		{`ei`, `\exI`, `\exI`, "\u2203I"},
+		{`ee`, `\exE`, `\exE`, "\u2203E"},
+		{`=i`, `\iI`, `\iI`, `=I`},
+		{`=e`, `\iE`, `\iE`, `=E`},
+		{li, `\necI`, `\necI`, "\u25a1I"},
+		{mli, `S5\necI`, `S5\necI`, "S5\u25a1I"},
+		{pli, `S4\necI`, `S4\necI`, "S4\u25a1I"},
+		{tli, `T\necI`, `T\necI`, "T\u25a1I"},
+		{le, `\necE`, `\necE`, "\u25a1E"},
+		{mi, `\posI`, `\posI`, "\u25c7I"},
+		{me, `\posE`, `\posE`, "\u25c7E"},
+		{mme, `S5\posE`, `S5\posE`, "S5\u25c7E"},
+		{sc, "SC", "SC", "SC"},
+		{sl, "logic", "logic", "logic"},
+		{"rewrite", "", "", ""},
+		{`\lposDR`, `\lposDR`, `\lposDR`, "\u25c7DR"},
+	}
+*/
 var greekUCBindings = [][3]string{
 	[3]string{`/G`, `\Gamma`, "\u0393"},
 	[3]string{`/D`, `\Delta`, "\u0394"},

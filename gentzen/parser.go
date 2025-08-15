@@ -75,16 +75,16 @@ func parse(tk tokenStr) (n *Node, err error) {
 		t := tk[c]
 
 		currentNode = new(Node)
-		currentNode.index = t.index
+		currentNode.Val.index = t.index
 		nc++
 
 		switch {
 
 		case t.isConnective() && !t.isQuantifier():
-			currentNode.SetConnective(t.tokenType.logicConstant())
+			currentNode.Val.connective = t.tokenType.logicConstant()
 
 		case t.isQuantifier():
-			currentNode.SetConnective(t.tokenType.logicConstant())
+			currentNode.Val.connective = t.tokenType.logicConstant()
 			c++
 			if c == len(tk) {
 				err = errors.New(strconv.Itoa(t.index))
@@ -95,30 +95,30 @@ func parse(tk tokenStr) (n *Node, err error) {
 				err = errors.New(strconv.Itoa(t.index))
 				return
 			}
-			currentNode.variable = t.str
+			currentNode.Val.variable = t.str
 
 		case t.isPredicate():
-			currentNode.SetAtomic()
-			currentNode.predicateLetter = t.str
+			currentNode.Val.connective = None
+			currentNode.Val.predicateLetter = t.str
 			for c++; c < len(tk); c++ {
 				t = tk[c]
 				if t.tokenType != tTerm {
 					c--
 					break
 				}
-				currentNode.term = append(currentNode.term, t.str)
+				currentNode.Val.term = append(currentNode.Val.term, t.str)
 			}
 
-			if currentNode.predicateLetter == "=" && len(currentNode.term) != 2 {
+			if currentNode.Val.predicateLetter == "=" && len(currentNode.Val.term) != 2 {
 				err = errors.New(strconv.Itoa(t.index))
 				return
 			}
 
-			currentNode.setraw()
+			setraw(currentNode)
 
 		case t.tokenType == tAtomicSentence:
-			currentNode.SetFormula(t.str)
-			currentNode.SetAtomic()
+			currentNode.Val.raw = t.str
+			currentNode.Val.connective = None
 
 		case t.tokenType == tTerm:
 			err = errors.New(strconv.Itoa(t.index))
@@ -134,10 +134,10 @@ func parse(tk tokenStr) (n *Node, err error) {
 			continue
 		}
 
-		if !prevNode.isSaturated() {
-			err = prevNode.AddChild(currentNode)
+		if !isSaturated(prevNode) {
+			prevNode.AddChild(currentNode)
 		} else {
-			err = prevNode.openAncestor().AddChild(currentNode)
+			prevNode.FindFunc(openAncestor)[0].AddChild(currentNode)
 		}
 
 		if err != nil {
@@ -148,9 +148,9 @@ func parse(tk tokenStr) (n *Node, err error) {
 		prevNode = currentNode
 	}
 
-	n = prevNode.rootNode()
+	n = prevNode.Root()
 
-	err = n.validate()
+	err = validate(n)
 
 	if err != nil {
 		return

@@ -19,13 +19,14 @@ func IsWff(s string) bool {
 
 }
 
+/*
 // IsTautology returns whether s is a tautology.
 func IsTautology(s string) bool {
 
 	return isTautologyTableaux(s)
 
 }
-
+*/
 // Class returns the (minimum) class number of s.
 func Class(s string) int {
 
@@ -104,9 +105,11 @@ func SubSentences(s string) []string {
 	return resp
 }
 
+/*
 // Equivalent returns whether s1 and s2 are logically equivalent.
 func Equivalent(s1, s2 string) bool {
 
 	return IsTautology("K" + "C" + s1 + s2 + "C" + s2 + s1)
 
 }
+*/

@@ -27,6 +27,7 @@ func (tks tokenStr) StringF(m PrintMode) string {
 
 	return w.String()
 }
+
 func (tks tokenStr) wffAt(i int) (resp tokenStr) {
 
 	openNode := 1
@@ -115,10 +116,20 @@ func (tks tokenStr) isWff() bool {
 
 }
 
-// Replace atomic sentences with subscripted sentence variables.
+// Replace atomic sentences with subscripted sentence variables. If
+// l is not supplied, p is used as the common sentence letter. Else the
+// the first letter in l is used (so just supply one argument at most).
 // The left most atomic sentence is p_1 and the others are named in
 // ascending order.
-func (tks tokenStr) normalize() {
+func (tks tokenStr) normalize(l ...string) {
+
+	var v string
+
+	if len(l) == 0 {
+		v = "p_"
+	} else {
+		v = l[0] + "_"
+	}
 
 	if oPL {
 		return
@@ -143,7 +154,7 @@ func (tks tokenStr) normalize() {
 	repl := make(map[string]string, len(atomicS))
 
 	for i, o := range atomicS {
-		repl[o] = `p_` + strconv.Itoa(i+1)
+		repl[o] = v + strconv.Itoa(i+1)
 	}
 
 	for i := range tks {
@@ -258,4 +269,26 @@ func (tks tokenStr) isBasic() bool {
 	}
 
 	return false
+}
+
+func (tks tokenStr) height() int {
+
+	h := -1
+
+	var subs, subst []tokenStr
+
+	for subs = append(subs, tks); len(subs) != 0; {
+
+		h++
+
+		subst = nil
+
+		for _, e := range subs {
+			subst = append(subst, e.subFormulas()...)
+		}
+
+		subs = nil
+		subs = append(subs, subst...)
+	}
+	return h
 }

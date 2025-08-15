@@ -108,7 +108,7 @@ func addToken(s string) string {
 		cand = append(cand, `\limplies`)
 	}
 
-	c := n.classP()
+	c := n.Height()
 	if c > len(brackets)-1 {
 		c = len(brackets)
 	}
@@ -152,7 +152,7 @@ func changeToken(s string) string {
 		cand = append(cand, `\limplies`)
 	}
 
-	c := n.classP()
+	c := n.Height()
 	if c > len(brackets)-1 {
 		c = len(brackets)
 	}
@@ -202,7 +202,7 @@ func latexTokens(n *Node) []string {
 		}
 	}
 
-	Serialize(n, ingressFunc, pivotFunc, egressFunc)
+	n.Walk(ingressFunc, pivotFunc, egressFunc)
 
 	return resp
 
@@ -243,7 +243,7 @@ func infixTextTokens(n *Node, m PrintMode) []string {
 		}
 	}
 
-	Serialize(n, ingressFunc, pivotFunc, egressFunc)
+	n.Walk(ingressFunc, pivotFunc, egressFunc)
 
 	return resp
 

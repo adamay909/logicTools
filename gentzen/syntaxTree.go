@@ -7,26 +7,26 @@ func ltree(n *Node, simple bool) string {
 	var lt func(n *Node) string
 
 	disp := func(k *Node) string {
-		if k.IsAtomic() {
-			return k.StringF(O_Latex)
+		if k.Val.connective == None {
+			return StringF(k, O_Latex)
 		}
-		return k.MainConnective().Stringf(O_Latex)
+		return k.Val.connective.Stringf(O_Latex)
 	}
 
 	lt = func(m *Node) (r string) {
 		if simple {
 			r = `[ \p{` + disp(m) + `} `
 		} else {
-			r = `[ \p{` + Parse(m.String(), !allowGreekUpper).StringF(O_Latex) + `} `
+			r = `[ \p{` + StringF(Parse(m.String(), !allowGreekUpper), O_Latex) + `} `
 		}
 		r = r + "\n"
 
-		if !m.IsAtomic() {
+		if m.Val.connective != None {
 
-			r = r + lt(m.children[0])
+			r = r + lt(m.Children()[0])
 
-			if m.IsBinary() {
-				r = r + lt(m.children[1])
+			if isBinary(m) {
+				r = r + lt(m.Children()[1])
 			}
 
 		}
@@ -54,14 +54,14 @@ func ltree(n *Node, simple bool) string {
 
 // SyntaxTree returns the latex code for printing the
 // syntax tree of n. Each node will be printed as a full formula.
-func (n *Node) SyntaxTree() string {
+func SyntaxTree(n *Node) string {
 
 	return ltree(n, false)
 
 }
 
 // SyntaxTreeSimple is like SyntaxTree but the nodes are represented by a single connective or, in the case leadnodes, by atomic sentence letters.
-func (n *Node) SyntaxTreeSimple() string {
+func SyntaxTreeSimple(n *Node) string {
 
 	return ltree(n, true)
 

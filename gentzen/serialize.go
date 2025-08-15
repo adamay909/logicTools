@@ -4,148 +4,17 @@ import (
 	"strings"
 )
 
-/*
-Serialize walks depth-first and left-branch-first the tree rooted at n.
-The three functions specify what to do as the process enters a node,
-as it switches to a sibling, and as it is done with the node.
-
-Here is an example of the use of Serialize. You can serialize the nodes
-as a one-dimensional slice like this:
-
-	func order(n *Node) []*Node {
-
-	 var response []*Node
-
-	 infunc := func (n *Node) {
-		response = append(response, n)
-	   }
-
-	 pivotfunc := func (n *Node) {
-	   }
-
-	 efunc := func (n *Node) {
-	   }
-
-	  return Serialize(n, infunc, pivotfunc, func)
-	}
-
-You can get a one-dimensional slice in a reverse Polish style like this:
-
-	func order(n *Node) []*Node {
-
-	 var response []*Node
-
-	 infunc := func (n *Node) {
-	   }
-
-	 pivotfunc := func (n *Node) {
-	   }
-
-	 efunc := func (n *Node) {
-		response = append(response, n)
-	   }
-
-	  return Serialize(n, infunc, pivotfunc, func)
-	}
-*/
-func Serialize(n *Node, ingressFunc, pivotFunc, egressFunc func(*Node)) {
-
-	var walk func(*Node)
-
-	walk = func(e *Node) {
-
-		if e == nil {
-			return
-		}
-
-		ingressFunc(e)
-
-		for i, c := range e.children {
-
-			walk(c)
-
-			if i < len(e.children)-1 {
-				pivotFunc(e)
-			}
-
-		}
-
-		egressFunc(e)
-
-	}
-
-	walk(n)
-
-}
-
-func linearize(n *Node) []*Node {
-
-	var resp []*Node
-
-	ingressFunc := func(e *Node) {
-
-		if e == nil {
-			return
-		}
-
-		resp = append(resp, e)
-
-	}
-
-	pivotFunc := func(e *Node) {
-		return
-	}
-
-	egressFunc := func(e *Node) {
-		return
-	}
-
-	Serialize(n, ingressFunc, pivotFunc, egressFunc)
-
-	return resp
-
-}
-
-// linearize postfix style
-func linearizeBT(n *Node) []*Node {
-
-	var resp []*Node
-
-	egressFunc := func(e *Node) {
-
-		if e == nil {
-			return
-		}
-
-		resp = append(resp, e)
-
-	}
-
-	pivotFunc := func(e *Node) {
-		return
-	}
-
-	ingressFunc := func(e *Node) {
-		return
-	}
-
-	Serialize(n, ingressFunc, pivotFunc, egressFunc)
-
-	return resp
-
-}
-
 func polishIngressFunc(n *Node, w *strings.Builder) {
 
-	if n.IsConnective() {
-		w.WriteString(codeOf(n.connective))
-		if n.IsQuantifier() {
-			w.WriteString(n.variable)
+	if n.Val.connective != None {
+		w.WriteString(codeOf(n.Val.connective))
+		if n.Val.connective.isQuantifier() {
+			w.WriteString(n.Val.variable)
 		}
 		return
 	}
 
-	w.WriteString(n.raw)
+	w.WriteString(n.Val.raw)
 
 }
 
@@ -159,18 +28,18 @@ func polishEgressFunc(n *Node, w *strings.Builder) {
 
 func latexIngressFunc(n *Node, w *strings.Builder) {
 
-	if !n.IsConnective() {
-		w.WriteString(n.predicateString(O_Latex))
+	if n.Val.connective == None {
+		w.WriteString(predicateString(n, O_Latex))
 		return
 	}
 
-	if n.IsBinary() {
+	if isBinary(n) {
 
-		if n.parent == nil {
+		if n.Parent == nil {
 			return
 		}
 
-		d := n.nestingDepth()
+		d := binaryHeight(n)
 
 		if d > len(brackets)-1 {
 			d = len(brackets) - 1
@@ -181,19 +50,19 @@ func latexIngressFunc(n *Node, w *strings.Builder) {
 		return
 	}
 
-	if n.IsNegation() && n.children[0].predicateLetter == "=" {
+	if n.Check(isNegation) && n.Children()[0].Val.predicateLetter == "=" {
 
-		w.WriteString(`\nident{` + encodeString(n.children[0].term[0], O_Latex) + `}` + `{` + encodeString(n.children[0].term[1], O_Latex) + `} `)
+		w.WriteString(`\nident{` + encodeString(n.Children()[0].Val.term[0], O_Latex) + `}` + `{` + encodeString(n.Children()[0].Val.term[1], O_Latex) + `} `)
 		return
 	}
 
-	if n.parent == nil {
+	if n.Parent == nil {
 		w.WriteString(`\mc{`)
 	}
 
-	w.WriteString(n.connectiveDisplay(O_Latex))
+	w.WriteString(connectiveDisplay(n, O_Latex))
 
-	if n.parent == nil {
+	if n.Parent == nil {
 		w.WriteString(`}`)
 	}
 
@@ -202,15 +71,15 @@ func latexIngressFunc(n *Node, w *strings.Builder) {
 
 func latexPivotFunc(n *Node, w *strings.Builder) {
 
-	if n.IsBinary() {
+	if n.Check(isBinary) {
 
-		if n.parent == nil {
+		if n.Parent == nil {
 			w.WriteString(`\mc{`)
 		}
 
-		w.WriteString(n.connectiveDisplay(O_Latex))
+		w.WriteString(connectiveDisplay(n, O_Latex))
 
-		if n.parent == nil {
+		if n.Parent == nil {
 			w.WriteString(`}`)
 		}
 	}
@@ -218,15 +87,15 @@ func latexPivotFunc(n *Node, w *strings.Builder) {
 
 func latexEgressFunc(n *Node, w *strings.Builder) {
 
-	if !n.IsBinary() {
+	if !n.Check(isBinary) {
 		return
 	}
 
-	if n.parent == nil {
+	if n.Parent == nil {
 		return
 	}
 
-	d := n.nestingDepth()
+	d := binaryHeight(n)
 
 	if d > len(brackets)-1 {
 		d = len(brackets) - 1
@@ -235,7 +104,7 @@ func latexEgressFunc(n *Node, w *strings.Builder) {
 	w.WriteString(brackets[d][1])
 }
 
-func (n *Node) laTeXString() string {
+func laTeXString(n *Node) string {
 
 	w := new(strings.Builder)
 
@@ -251,64 +120,64 @@ func (n *Node) laTeXString() string {
 		latexEgressFunc(e, w)
 	}
 
-	Serialize(n, ingressFunc, pivotFunc, egressFunc)
+	n.Walk(ingressFunc, pivotFunc, egressFunc)
 
 	return w.String()
 
 }
 
-func (n *Node) predicateString(mode PrintMode) string {
+func predicateString(n *Node, mode PrintMode) string {
 
 	if mode == O_ProofChecker {
 		mode = O_PlainText
 	}
 
-	if n.IsConnective() {
+	if n.Val.connective != None {
 		return ""
 	}
 
-	n.setraw()
+	setraw(n)
 
 	if !oPL {
-		return encodeString(n.raw, mode)
+		return encodeString(n.Val.raw, mode)
 	}
 
-	if !n.IsPredicate() {
-		return encodeString(n.raw, mode)
+	if !n.Check(isPredicate) {
+		return encodeString(n.Val.raw, mode)
 	}
 
-	if isRomanUpper(rune(n.predicateLetter[0])) {
-		return encodeString(n.raw, mode)
+	if isRomanUpper(rune(n.Val.predicateLetter[0])) {
+		return encodeString(n.Val.raw, mode)
 	}
 
 	resp := ""
 
-	if rune(n.predicateLetter[0]) == '=' {
-		if n.parent != nil && n.parent.IsNegation() {
+	if rune(n.Val.predicateLetter[0]) == '=' {
+		if n.Parent != nil && n.Parent.Check(isNegation) {
 			return resp
 		}
 
 		switch mode {
 
 		case O_Latex:
-			resp = `\ident{` + encodeString(n.term[0], mode) + `}` + `{` + encodeString(n.term[1], mode) + `}`
+			resp = `\ident{` + encodeString(n.Val.term[0], mode) + `}` + `{` + encodeString(n.Val.term[1], mode) + `}`
 
 		case O_PlainText:
-			resp = encodeString(n.term[0], mode) + "=" + encodeString(n.term[1], mode)
+			resp = encodeString(n.Val.term[0], mode) + "=" + encodeString(n.Val.term[1], mode)
 
 		default:
-			resp = n.raw
+			resp = n.Val.raw
 		}
 		return resp
 	}
 
-	resp = encodeString(n.predicateLetter, mode)
+	resp = encodeString(n.Val.predicateLetter, mode)
 
-	if len(n.term) > 0 {
+	if len(n.Val.term) > 0 {
 
 		var terms []string
 
-		for _, e := range n.term {
+		for _, e := range n.Val.term {
 			terms = append(terms, encodeString(e, mode))
 		}
 		resp = resp + `(`
@@ -374,12 +243,12 @@ func encodeString(s string, m PrintMode) string {
 
 func nomarkupIngressFunc(n *Node, w *strings.Builder, mode PrintMode) {
 
-	if !n.IsConnective() {
-		w.WriteString(n.predicateString(O_PlainText))
+	if n.Val.connective == None {
+		w.WriteString(predicateString(n, O_PlainText))
 		return
 	}
 
-	if n.IsBinary() {
+	if n.Check(isBinary) {
 
 		var br [][2]string
 
@@ -399,8 +268,8 @@ func nomarkupIngressFunc(n *Node, w *strings.Builder, mode PrintMode) {
 
 		}
 
-		if n.parent != nil {
-			d := n.nestingDepth()
+		if n.Parent != nil {
+			d := binaryHeight(n)
 
 			if d > len(br)-1 {
 				d = len(br) - 1
@@ -410,7 +279,7 @@ func nomarkupIngressFunc(n *Node, w *strings.Builder, mode PrintMode) {
 		}
 
 		if mode == O_English {
-			if n.IsConditional() {
+			if n.Check(isConditional) {
 				w.WriteString("if ")
 			}
 		}
@@ -418,23 +287,23 @@ func nomarkupIngressFunc(n *Node, w *strings.Builder, mode PrintMode) {
 		return
 	}
 
-	if n.IsNegation() && n.children[0].predicateLetter == "=" {
+	if n.Check(isNegation) && n.Children()[0].Val.predicateLetter == "=" {
 
 		if mode == O_PlainText {
-			w.WriteString(toUnicodeString(n.children[0].term[0]) + "≠" + toUnicodeString(n.children[0].term[1]))
+			w.WriteString(toUnicodeString(n.Children()[0].Val.term[0]) + "≠" + toUnicodeString(n.Children()[0].Val.term[1]))
 		} else {
-			w.WriteString(toUnicodeString(n.children[0].term[0]) + "/=" + toUnicodeString(n.children[0].term[1]))
+			w.WriteString(toUnicodeString(n.Children()[0].Val.term[0]) + "/=" + toUnicodeString(n.Children()[0].Val.term[1]))
 		}
 		return
 	}
 
-	w.WriteString(n.connectiveDisplay(mode))
+	w.WriteString(connectiveDisplay(n, mode))
 
 }
 
 func nomarkupPivotFunc(n *Node, w *strings.Builder, mode PrintMode) {
 
-	if !n.IsBinary() {
+	if !isBinary(n) {
 		return
 	}
 
@@ -443,19 +312,19 @@ func nomarkupPivotFunc(n *Node, w *strings.Builder, mode PrintMode) {
 	}
 
 	if mode == O_English {
-		if n.IsConditional() {
+		if isConditional(n) {
 			w.WriteString(`, then `)
 			return
 		}
 	}
 
-	w.WriteString(n.connectiveDisplay(mode))
+	w.WriteString(connectiveDisplay(n, mode))
 
 }
 
 func nomarkupEgressFunc(n *Node, w *strings.Builder, mode PrintMode) {
 
-	if !n.IsBinary() {
+	if !isBinary(n) {
 		return
 	}
 
@@ -477,8 +346,8 @@ func nomarkupEgressFunc(n *Node, w *strings.Builder, mode PrintMode) {
 
 	}
 
-	if n.parent != nil {
-		d := n.nestingDepth()
+	if n.Parent != nil {
+		d := binaryHeight(n)
 
 		if d > len(br)-1 {
 			d = len(br) - 1
@@ -488,7 +357,7 @@ func nomarkupEgressFunc(n *Node, w *strings.Builder, mode PrintMode) {
 	}
 }
 
-func (n *Node) plainString(m PrintMode) string {
+func plainString(n *Node, m PrintMode) string {
 
 	w := new(strings.Builder)
 
@@ -504,7 +373,7 @@ func (n *Node) plainString(m PrintMode) string {
 		nomarkupEgressFunc(n, w, m)
 	}
 
-	Serialize(n, ingressFunc, pivotFunc, egressFunc)
+	n.Walk(ingressFunc, pivotFunc, egressFunc)
 
 	return w.String()
 
