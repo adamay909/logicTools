@@ -9,7 +9,7 @@ func slForm(n *Node) *Node {
 		return n
 	}
 
-	atomic := n.AtomicSentences()
+	atomic := atomicSentences(n)
 
 	count := 0
 
@@ -23,19 +23,19 @@ func slForm(n *Node) *Node {
 		return ret
 	}
 
-	ns := getSubnodes(n)
+	ns := n.Linearize()
 	found := true
 	for found {
 		found = false
 		for _, e := range ns {
 
-			if !e.HasFlag("c") && (e.IsQuantifier() || e.IsModal() || e.IsAtomic()) {
+			if !e.HasFlag("c") && (e.Check(isQuantifier) || e.Check(isAtomic)) {
 				s := nextLetter()
-				target := e.Formula()
+				target := e.String()
 				for j := range ns {
-					if ns[j].Formula() == target && !ns[j].HasFlag("c") {
-						ns[j].SetAtomic()
-						ns[j].SetFormula(s)
+					if ns[j].String() == target && !ns[j].HasFlag("c") {
+						ns[j].Val.connective = None
+						ns[j].Val.raw = s
 						ns[j].SetFlag("c")
 					}
 				}
@@ -43,7 +43,7 @@ func slForm(n *Node) *Node {
 				break
 			}
 		}
-		ns = getSubnodes(ns[0])
+		ns = ns[0].Linearize()
 	}
 	return ns[0]
 }
@@ -60,8 +60,8 @@ func equivSL(s1, s2 string) bool {
 		oPL = false
 	}
 
-	s1 = slForm(n1).Formula()
-	s2 = slForm(n2).Formula()
+	s1 = slForm(n1).String()
+	s2 = slForm(n2).String()
 
 	s3 := lconj + lcond + s1 + s2 + lcond + s2 + s1
 

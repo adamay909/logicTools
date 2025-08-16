@@ -261,50 +261,72 @@ func (c LogicalConstant) Stringf(m PrintMode) string {
 	return ""
 }
 
-/*
 // check if s1 is instance of s0
 func sameStructure(s0, s1 string) bool {
 
 	sn := normalize(s0, s1)
-	n0 := getSubnodes(Parse(sn[0], !allowGreekUpper))
-	n1 := getSubnodes(Parse(sn[1], !allowGreekUpper))
+	n0 := Parse(sn[0], !allowGreekUpper).Linearize()
+	n1 := Parse(sn[1], !allowGreekUpper).Linearize()
 
 	if len(n0) > len(n1) {
 		return false
 	}
 
-	atomic := n0[0].AtomicSentences()
+	atomic := atomicSentences(n0[0])
 
 	Debug("<--sameStructure*************************")
 	for k, a := range atomic {
 
-		Debug("Round", k, ": compare ", n0[0].display(), " against ", n1[0].display())
+		Debug("Round", k, ": compare ", n0[0].String(), " against ", n1[0].String())
 
 		for i := range n0 {
-			if n0[i].Formula() == a {
-				repl := n1[i].Formula()
-				n1[i].SetAtomic()
+			if n0[i].String() == a {
+				repl := n1[i].String()
+				n1[i].Val.connective = None
 				for j := range n0 {
 					if n0[j].HasFlag("c") {
 						continue
 					}
-					if n0[j].Formula() == a {
-						n0[j].SetFormula(repl)
+					if n0[j].String() == a {
+						n0[j].Val.raw = repl
 						n0[j].SetFlag("c")
 					}
 				}
 			}
-			n0 = getSubnodes(n0[0])
-			n1 = getSubnodes(n1[0])
+			n0 = n0[0].Linearize()
+			n1 = n1[0].Linearize()
 		}
 	}
-	Debug("Result: ", n0[0].display(), " against ", n1[0].display())
+	Debug("Result: ", n0[0].String(), " against ", n1[0].String())
 	Debug("--done structure check-->")
 
-	return n0[0].Formula() == n1[0].Formula()
+	return n0[0].String() == n1[0].String()
 
 }
-*/
+
+func normalize(s ...string) []string {
+
+	var tks tokenStr
+
+	resp := make([]string, 0, len(s))
+
+	var err error
+
+	for _, e := range s {
+
+		tks, err = tokenize(e, !allowGreekUpper, !allowSpecial)
+		if err != nil {
+			logger.Print(s, "not wff!")
+			return resp
+		}
+		tks.normalize()
+
+		resp = append(resp, tks.String())
+	}
+
+	return resp
+}
+
 /*
 //display is for displaying the text of a node that might have
 //non-standard raw text
@@ -360,10 +382,10 @@ func normalize(s ...string) []string {
 
 		for _, a := range atomic {
 			if !oPL {
-				e = Parse(e, !allowGreekUpper).replaceAtomic(a, nextatomic()).Formula()
+				e = Parse(e, !allowGreekUpper).replaceAtomic(a, nextatomic()).String()
 			} else {
 				terms := strings.TrimPrefix(a, Parse(a, !allowGreekUpper).predicateLetter)
-				e = Parse(e, !allowGreekUpper).replaceAtomic(a, nextatomic()+terms).Formula()
+				e = Parse(e, !allowGreekUpper).replaceAtomic(a, nextatomic()+terms).String()
 			}
 
 		}
@@ -372,7 +394,7 @@ func normalize(s ...string) []string {
 	return out
 
 }
-*/
+
 /*
 func (n *Node) replaceAtomic(old, repl string) *Node {
 
@@ -382,7 +404,7 @@ func (n *Node) replaceAtomic(old, repl string) *Node {
 		if !n1[i].IsAtomic() {
 			continue
 		}
-		if n1[i].Formula() == old {
+		if n1[i].String() == old {
 			n1[i].SetFormula(repl)
 		}
 	}
@@ -390,17 +412,17 @@ func (n *Node) replaceAtomic(old, repl string) *Node {
 
 }
 */
-/*
+
 // AtomicSentences returns a slice of the atomic sentences in the formula
 // represented by n.
-func (n *Node) AtomicSentences() []string {
+func atomicSentences(n *Node) []string {
 
 	var as []string
 
-	ns := getSubnodes(n)
+	ns := n.Linearize()
 
 	for _, e := range ns {
-		if !e.IsAtomic() {
+		if !e.Check(isAtomic) {
 			continue
 		}
 
@@ -414,6 +436,7 @@ func (n *Node) AtomicSentences() []string {
 	return as
 }
 
+/*
 // AtomicCount returns the number of atomic sentences in n.
 func (n *Node) AtomicCount() int {
 

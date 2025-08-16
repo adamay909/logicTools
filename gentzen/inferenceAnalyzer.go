@@ -255,7 +255,7 @@ func theoremDeriv(d *derivNode) bool {
 
 	Debug("Theorems:============")
 	for _, e := range thms {
-		Debug(Parse(e[2], !allowGreekUpper).display())
+		Debug(Parse(e[2], !allowGreekUpper).String())
 	}
 	Debug("=================")
 

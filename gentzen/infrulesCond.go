@@ -38,19 +38,19 @@ func condEhelper(seq1, seq2, seq3 sequent) (v bool, msg string) {
 	n3 := Parse(seq3.succedent().String(), !allowGreekUpper)
 	v = false
 
-	if n1.MainConnective() != Cond {
+	if n1.Val.connective != Cond {
 		msg = "no conditional found"
 		return
 	}
 
-	if n2.Formula() != n1.Child1Must().Formula() {
+	if n2.String() != n1.Child(0).String() {
 		msg = "mismatch between conditional and other premise"
 		return
 	}
 
 	d3 := datumUnion(seq1.datumSlice(), seq2.datumSlice())
-	canonicalSeq := mkSequent(d3, n1.Child2Must())
-	if canonicalSeq.succedent().String() != n3.Formula() {
+	canonicalSeq := mkSequent(d3, n1.Child(1))
+	if canonicalSeq.succedent().String() != n3.String() {
 		msg = "conclusion does not match consequent of conditional"
 		return
 	}
@@ -78,23 +78,23 @@ func condI(d *derivNode) bool {
 	n1 := Parse(seq1.succedent().String(), !allowGreekUpper)
 	n2 := Parse(seq2.succedent().String(), !allowGreekUpper)
 
-	if n2.MainConnective() != Cond {
+	if n2.Val.connective != Cond {
 		logger.Print("main connective of conclusion must be conditional")
 		return false
 	}
 
-	if n2.Child2Must().Formula() != n1.Formula() {
+	if n2.Child(1).String() != n1.String() {
 		logger.Print("consequent of conclusion must be succedent of premise")
 		return false
 	}
 
-	if !datumIncludes(seq1.datumSlice(), datum(n2.Child1Must().Formula())) {
+	if !datumIncludes(seq1.datumSlice(), datum(n2.Child(0).String())) {
 		logger.Print("antecedent of conditional must be in datum of premise")
 		return false
 	}
 
-	d1 := datumRm(seq1.datumSlice(), n2.Child1Must().Formula())
-	canonicalConc := mkSequent(d1, n2.Formula())
+	d1 := datumRm(seq1.datumSlice(), n2.Child(0).String())
+	canonicalConc := mkSequent(d1, n2.String())
 
 	if !equivSequents(seq2, canonicalConc) {
 		logger.Print("must remove exactly one datum item")

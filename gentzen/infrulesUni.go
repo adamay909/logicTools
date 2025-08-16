@@ -10,7 +10,7 @@ func uniE(d *derivNode) bool {
 	seq1 := d.supportingLines[0].line.seq
 	seq2 := d.line.seq
 
-	if Parse(seq1.succedent().String(), !allowGreekUpper).MainConnective() != Uni {
+	if Parse(seq1.succedent().String(), !allowGreekUpper).Val.connective != Uni {
 		logger.Print("premise must be universally quantified")
 		return false
 	}
@@ -39,7 +39,7 @@ func uniI(d *derivNode) bool {
 	seq1 := d.supportingLines[0].line.seq
 	seq2 := d.line.seq
 
-	if Parse(seq2.succedent().String(), !allowGreekUpper).MainConnective() != Uni {
+	if Parse(seq2.succedent().String(), !allowGreekUpper).Val.connective != Uni {
 		logger.Print("conclusion must be universally quantified")
 		return false
 	}
@@ -63,7 +63,7 @@ func uniI(d *derivNode) bool {
 		if isFormulaSet(d.String()) {
 			continue
 		}
-		if Parse(d, !allowGreekUpper).hasTerm(term) {
+		if hasTerm(Parse(d, !allowGreekUpper), term) {
 			logger.Print(term, " cannot appear in datum")
 			return false
 		}

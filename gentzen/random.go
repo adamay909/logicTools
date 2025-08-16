@@ -39,11 +39,6 @@ var (
 		"Q",
 		"S",
 		"R",
-		"Y",
-		"W",
-		"Z",
-		"M",
-		"L",
 	}
 
 	constantLetters = []string{
@@ -53,8 +48,9 @@ var (
 		"d",
 		"e",
 		"h",
+		"g",
+		"k",
 		"m",
-		"n",
 	}
 
 	variableLetters = []string{
@@ -64,7 +60,6 @@ var (
 		"t",
 		"p",
 	}
-
 	pletters = strings.Join(predicateLetters, "")
 )
 
@@ -95,10 +90,10 @@ func genRand(maxh, maxatomic int) string {
 
 	s := make([]string, 1000)
 
-	lastConn := 4
+	lastConn := len(logConn)
 
 	if !oCOND {
-		lastConn = 3
+		lastConn = lastConn - 1
 	}
 
 	newNode := logConn[rand.Intn(lastConn)]
@@ -177,10 +172,100 @@ func genRand(maxh, maxatomic int) string {
 
 }
 
-// maxh is maximum height of the syntax tree of generated sentence
+/*
 // corresponds to class in the text
+// maxatomic is the maximum number of atomic sentence to use (if less than 11, the sentences are distinct upper case letters; if more, the sentences are lowercase s followed by an arabic numeral subscript)
 func genRandPL() string {
 
-	return ""
+	availVars := make([]string, len(variableLetters))
+
+	availVars = append(availVars, variableLetters...)
+
+	s := make([]string, 1000)
+
+	varletter := ""
+
+	lastConn := len(logConn)
+
+	newNode := logConn[rand.Intn(lastConn)]
+
+	openNode := 0
+
+	var openQ []int
+
+	var varInUse []string
+	switch newNode {
+
+	case "K", "A", "C":
+		openNode = 2
+
+	case "U", "X":
+		openNode = 1
+		varletter = availVars[rand.Intn(len(availVars))]
+		availVars = slices.DeleteFunc(availVars, func(e string) bool { return e == varletter })
+		newNode = newNode + varletter
+		openQ = append(openQ, 0)
+
+	default:
+		openNode = 1
+	}
+
+	s = append(s, newNode)
+
+	for openNode > 0 {
+
+		if rand.Intn(2) == 1 {
+
+			if len(availVars) == 0 {
+				newNode = logConn[rand.Intn(lastConn-2)]
+			} else {
+				newNode = logConn[rand.Intn(lastConn)]
+				z
+			}
+
+			if newNode == "U" || newNode == "X" {
+				varletter = availVars[rand.Intn(len(availVars))]
+				varInUse = append(varInUse, varletter)
+				availVars = slices.DeleteFunc(availVars, func(e string) bool { return e == varletter })
+				newNode = newNode + varletter
+				openQ = append(openQ, 0)
+			}
+
+			for i := range openQ {
+				openQ[i]++
+			}
+
+			if newNode == "K" || newNode == "A" || newNode == "C" {
+
+				openNode++
+			}
+
+		} else {
+
+			newNode = predicateLetters[rand.Intn(len(predicateLetters))]
+
+			if len(openQ) > 0 && rand.Intn(3) > 1 {
+				newNode = newNode + varInUse[rand.Intn(len(varInUse))]
+			} else {
+				newNode = newNode + constantLetters[rand.Intn(len(constantLetters))]
+			}
+
+			openNode--
+			for i := range openQ {
+				openQ[i]--
+				if openQ[i] == 0 {
+					varInUse = slices.DeleteFunc(varInUse, func(e string) bool { return e == varInUse[i] })
+					openQ = openQ[:i]
+					break
+				}
+			}
+		}
+
+		s = append(s, newNode)
+
+	}
+
+	return strings.Join(s, "")
 
 }
+*/

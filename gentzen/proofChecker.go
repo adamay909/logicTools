@@ -262,7 +262,7 @@ func printArgline(al argLine, m PrintMode) string {
 
 	datumstring := al.printDatum(m)
 
-	succstring := Parse(al.seq.succedent().String(), !allowGreekUpper).StringF(m)
+	succstring := StringF(Parse(al.seq.succedent().String(), !allowGreekUpper), m)
 
 	annotation := al.printAnnotation(m)
 
@@ -317,7 +317,7 @@ func (al argLine) printDatum(m PrintMode) string {
 				return ""
 			}
 
-			datumstring = datumstring + n.StringF(m) + `, `
+			datumstring = datumstring + StringF(n, m) + `, `
 		}
 		datumstring = strings.TrimRight(datumstring, ", ")
 	}

@@ -47,7 +47,7 @@ func derivR(d *derivNode) bool {
 	sn := `>` + s1 + s2
 
 	for _, thc := range tf {
-		Debug("<--Derived Rule check: ", Parse(sn, !allowGreekUpper).StringF(O_PlainText), " against: ", Parse(thc, !allowGreekUpper).StringF(O_PlainText))
+		Debug("<--Derived Rule check: ", StringF(Parse(sn, !allowGreekUpper), O_PlainText), " against: ", StringF(Parse(thc, !allowGreekUpper), O_PlainText))
 		if sameStructure(thc, sn) {
 			Debug("ok")
 			return true

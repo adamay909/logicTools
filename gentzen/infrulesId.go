@@ -18,22 +18,22 @@ func idI(d *derivNode) bool {
 
 	n := Parse(seq.succedent().String(), !allowGreekUpper)
 
-	if !n.IsAtomic() {
+	if !n.Check(isAtomic) {
 		logger.Print("must be atomic identity statement")
 		return false
 	}
 
-	if n.predicateLetter != "=" {
+	if n.Val.predicateLetter != "=" {
 		logger.Print("must be atomic statement")
 		return false
 	}
 
-	if len(n.Terms()) != 2 {
+	if len(n.Val.term) != 2 {
 		logger.Print("identity is a 2-place relation")
 		return false
 	}
 
-	if n.Terms()[0] != n.Terms()[1] {
+	if n.Val.term[0] != n.Val.term[1] {
 		logger.Print("must assert identity with self")
 		return false
 	}
@@ -58,26 +58,26 @@ func idE(d *derivNode) bool {
 
 	n := Parse(seq.succedent().String(), !allowGreekUpper)
 
-	if n.MainConnective() != Cond {
+	if n.Val.connective != Cond {
 		logger.Print("main connective must be conditional")
 		return false
 	}
 
-	if n.Child1Must().MainConnective() != Conj {
+	if n.Child(0).Val.connective != Conj {
 		logger.Print("antecedent must be conjunction")
 		return false
 	}
 
-	if !n.Child1Must().Child1Must().IsIdentity() {
+	if !n.Child(0).Child(0).Check(isIdentity) {
 		logger.Print("first conjunct must be identity")
 		return false
 	}
 
-	k1 := n.Child1Must().Child1Must().Terms()[0]
-	k2 := n.Child1Must().Child1Must().Terms()[1]
+	k1 := n.Child(0).Child(0).Val.term[0]
+	k2 := n.Child(0).Child(0).Val.term[1]
 
-	s1 := n.Child1Must().Child2Must()
-	s2 := n.Child2Must()
+	s1 := n.Child(0).Child(1)
+	s2 := n.Child(1)
 
 	s3 := replaceTerms(s2, k2, k1)
 

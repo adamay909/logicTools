@@ -13,17 +13,17 @@ func negE(d *derivNode) bool {
 	n1 := Parse(seq1.succedent().String(), !allowGreekUpper)
 	n2 := Parse(seq2.succedent().String(), !allowGreekUpper)
 
-	if n1.MainConnective() != Neg {
+	if n1.Val.connective != Neg {
 		logger.Print("premise must be double negation")
 		return false
 	}
 
-	if n1.Child1Must().MainConnective() != Neg {
+	if n1.Child(0).Val.connective != Neg {
 		logger.Print("premise must be double negation")
 		return false
 	}
 
-	if n1.Child1Must().Child1Must().Formula() != n2.Formula() {
+	if n1.Child(0).Child(0).String() != n2.String() {
 		logger.Print("conclusion is not the elimnation of double negation")
 		return false
 	}
@@ -50,27 +50,27 @@ func negI(d *derivNode) bool {
 	n2 := Parse(seq2.succedent().String(), !allowGreekUpper)
 	n3 := Parse(seq3.succedent().String(), !allowGreekUpper)
 
-	if n3.MainConnective() != Neg {
+	if n3.Val.connective != Neg {
 		logger.Print("conclusion must be negation")
 		return false
 	}
 
-	if lneg+n1.Formula() != n2.Formula() && n1.Formula() != lneg+n2.Formula() {
+	if lneg+n1.String() != n2.String() && n1.String() != lneg+n2.String() {
 		logger.Print("succedents of premises must be negations of each other")
 		return false
 	}
 
-	if !datumIncludes(seq2.datumSlice(), datum(n3.Child1Must().Formula())) {
+	if !datumIncludes(seq2.datumSlice(), datum(n3.Child(0).String())) {
 		logger.Print("conclusion's negation must be in datums of both premises")
 		return false
 	}
-	if !datumIncludes(seq1.datumSlice(), datum(n3.Child1Must().Formula())) {
+	if !datumIncludes(seq1.datumSlice(), datum(n3.Child(0).String())) {
 		logger.Print("conclusion's negation must be in datums of both premises")
 		return false
 	}
 
-	wantDatum1 := datumRm(seq1.datumSlice(), datum(n3.Child1Must().Formula()))
-	wantDatum2 := datumRm(seq2.datumSlice(), datum(n3.Child1Must().Formula()))
+	wantDatum1 := datumRm(seq1.datumSlice(), datum(n3.Child(0).String()))
+	wantDatum2 := datumRm(seq2.datumSlice(), datum(n3.Child(0).String()))
 
 	wantDatum := datumUnion(wantDatum1, wantDatum2)
 

@@ -20,26 +20,26 @@ func scopeReplacement(d *derivNode) bool {
 	s1 := d.supportingLines[0].line.seq
 	s2 := d.line.seq
 
-	m1 := Parse(s1.succedent(), !allowGreekUpper).MainConnective()
+	m1 := Parse(s1.succedent(), !allowGreekUpper).Val.connective
 	if m1 != Neg && m1 != Nec && m1 != Pos {
 		logger.Print("Scope Replacement only works for", lneg, ", ", lnec, ", ", lpos)
 		return false
 	}
 
-	if m1 != Parse(s2.succedent(), !allowGreekUpper).MainConnective() {
+	if m1 != Parse(s2.succedent(), !allowGreekUpper).Val.connective {
 		logger.Print("Main connective cannot change")
 		return false
 	}
 
-	sc1 := Parse(s1.succedent().String(), !allowGreekUpper).Child1Must().Formula()
-	sc2 := Parse(s2.succedent().String(), !allowGreekUpper).Child1Must().Formula()
+	sc1 := Parse(s1.succedent().String(), !allowGreekUpper).Child(0).String()
+	sc2 := Parse(s2.succedent().String(), !allowGreekUpper).Child(0).String()
 
-	if !Parse(sc1, !allowGreekUpper).IsPureSL() {
+	if !isPureSL(Parse(sc1, !allowGreekUpper)) {
 		logger.Print("formula inside scope must be sentence of pure Sentential Logic.")
 		return false
 	}
 
-	if !Parse(sc2, !allowGreekUpper).IsPureSL() {
+	if !isPureSL(Parse(sc2, !allowGreekUpper)) {
 		logger.Print("formula inside scope must be sentence of pure Sentential Logic.")
 		return false
 	}

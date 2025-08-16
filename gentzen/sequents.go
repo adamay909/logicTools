@@ -95,7 +95,7 @@ func mkSequent[dat datumSlice | datum | string, fml plshFormula | *Node | string
 	case isString(s):
 		seq.s = plshFormula(any(s).(string))
 	case isNode(s):
-		seq.s = plshFormula(any(s).(*Node).Formula())
+		seq.s = plshFormula(any(s).(*Node).String())
 	}
 
 	return seq
@@ -103,7 +103,7 @@ func mkSequent[dat datumSlice | datum | string, fml plshFormula | *Node | string
 
 func equalSequents(seq1, seq2 sequent) bool {
 
-	if Parse(seq1.succedent(), !allowGreekUpper).Formula() != Parse(seq2.succedent(), !allowGreekUpper).Formula() {
+	if Parse(seq1.succedent(), !allowGreekUpper).String() != Parse(seq2.succedent(), !allowGreekUpper).String() {
 		return false
 	}
 
@@ -113,7 +113,7 @@ func equalSequents(seq1, seq2 sequent) bool {
 
 func equivSequents(canonical, target sequent) bool {
 
-	if Parse(canonical.succedent(), !allowGreekUpper).Formula() != Parse(target.succedent(), !allowGreekUpper).Formula() {
+	if Parse(canonical.succedent(), !allowGreekUpper).String() != Parse(target.succedent(), !allowGreekUpper).String() {
 		return false
 	}
 

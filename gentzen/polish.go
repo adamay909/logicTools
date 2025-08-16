@@ -19,14 +19,13 @@ func IsWff(s string) bool {
 
 }
 
-/*
 // IsTautology returns whether s is a tautology.
 func IsTautology(s string) bool {
 
-	return isTautologyTableaux(s)
+	return isTautologyTableau(s)
 
 }
-*/
+
 // Class returns the (minimum) class number of s.
 func Class(s string) int {
 

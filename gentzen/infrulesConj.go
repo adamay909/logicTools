@@ -13,12 +13,12 @@ func conjE(d *derivNode) bool {
 	n1 := Parse(seq1.succedent().String(), !allowGreekUpper)
 	n2 := Parse(seq2.succedent().String(), !allowGreekUpper)
 
-	if n1.MainConnective() != Conj {
+	if n1.Val.connective != Conj {
 		logger.Print("must start with conjunction")
 		return false
 	}
 
-	if n2.Formula() != n1.Child1Must().Formula() && n2.Formula() != n1.Child2Must().Formula() {
+	if n2.String() != n1.Child(0).String() && n2.String() != n1.Child(1).String() {
 		logger.Print("conclusion not one of conjuncts")
 		return false
 	}
@@ -45,18 +45,18 @@ func conjI(d *derivNode) bool {
 	n2 := Parse(seq2.succedent().String(), !allowGreekUpper)
 	n3 := Parse(seq3.succedent().String(), !allowGreekUpper)
 
-	if n3.MainConnective() != Conj {
+	if n3.Val.connective != Conj {
 		logger.Print("conclusion must be a conjunction")
 		return false
 	}
 
-	if n1.Formula() != n3.Child1Must().Formula() && n1.Formula() != n3.Child2Must().Formula() {
+	if n1.String() != n3.Child(0).String() && n1.String() != n3.Child(1).String() {
 		logger.Print("succedent of conclusion must be conjunction of succedents of premises")
 
 		return false
 	}
 
-	if n2.Formula() != n3.Child1Must().Formula() && n2.Formula() != n3.Child2Must().Formula() {
+	if n2.String() != n3.Child(0).String() && n2.String() != n3.Child(1).String() {
 		logger.Print("succedent of conclusion must be conjunction of succedents of premises")
 		return false
 	}

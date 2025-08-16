@@ -129,7 +129,7 @@ func matchingTheorems(inf string) []string {
 func foundMatch(c string, tf []string) bool {
 
 	for _, thc := range tf {
-		Debug("<--Theorem check: ", c, " against: ", Parse(thc, !allowGreekUpper).StringF(O_PlainText))
+		Debug("<--Theorem check: ", c, " against: ", StringF(Parse(thc, !allowGreekUpper), O_PlainText))
 		if sameStructure(thc, c) {
 			Debug("ok")
 			Debug("--done theorem check-->")
