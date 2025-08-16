@@ -1,17 +1,15 @@
 package gentzen
 
 import (
+	"fmt"
 	"strings"
 )
 
-type interpretation map[string]bool
-
-// val must be a map from atomic sentences to truth values. rownum is the
-// row number given the standard way of ordering the rows of a truth table.
-// It assumes that interpretations are generated in order.
-func (n *Node) genInterpretation(val map[string]bool, rownum int, rowTotal int) {
+// val must be an interpretation in the form of a map from atomic sentences to truth values. Returns the truth value of n under that interpretation.
+func truthValue(n *Node, val map[string]bool) bool {
 
 	ingressFunc := func(e *Node) {
+		e.RmFlag(true) //make sure we don't have stale values lying around
 		return
 	}
 
@@ -22,52 +20,39 @@ func (n *Node) genInterpretation(val map[string]bool, rownum int, rowTotal int) 
 	egressFunc := func(e *Node) {
 
 		switch {
-		case e.IsAtomic():
-			e.tvalue = append(e.tvalue, val[e.String()])
+		case e.Check(isAtomic):
+			if val[e.String()] == true {
+				e.SetFlag(true)
+			}
+		case e.Check(isNegation):
+			if !e.Child(0).HasFlag(true) {
+				e.SetFlag(true)
+			}
 
-		case e.IsNegation():
-			e.tvalue = append(e.tvalue, !e.children[0].tvalue[rownum])
+		case e.Check(isConjunction):
+			if e.Child(0).HasFlag(true) && e.Child(1).HasFlag(true) {
+				e.SetFlag(true)
+			}
 
-		case e.IsConjunction():
-			e.tvalue = append(e.tvalue, e.children[0].tvalue[rownum] && e.children[1].tvalue[rownum])
+		case e.Check(isDisjunction):
+			if e.Child(0).HasFlag(true) || e.Child(1).HasFlag(true) {
+				e.SetFlag(true)
+			}
 
-		case e.IsDisjunction():
-			e.tvalue = append(e.tvalue, e.children[0].tvalue[rownum] || e.children[1].tvalue[rownum])
-
-		case e.IsConditional():
-			e.tvalue = append(e.tvalue, !e.children[0].tvalue[rownum] || e.children[1].tvalue[rownum])
+		case e.Check(isConditional):
+			if !e.Child(0).HasFlag(true) || e.Child(1).HasFlag(true) {
+				e.SetFlag(true)
+			}
 		}
 
 	}
 
-	Serialize(n, ingressFunc, pivotFunc, egressFunc)
+	n.Walk(ingressFunc, pivotFunc, egressFunc)
 
+	return n.HasFlag(true)
 }
 
-func (n *Node) assignTruthValues() {
-
-	ac := getAtomicColumns(getColumnTitles(n.String()))
-
-	atomicCount := len(ac)
-
-	value := make(map[string]bool, atomicCount)
-
-	rowTotal := 1 << atomicCount
-
-	for rownum := 0; rownum < rowTotal; rownum++ {
-
-		atomicValues, _ := valuation(rownum, atomicCount)
-
-		for i, a := range ac {
-
-			value[a] = atomicValues[i]
-		}
-
-		n.genInterpretation(value, rownum, rowTotal)
-
-	}
-}
-
+/*
 func constructTruthTableWide(s string) (tt TruthTable, err error) {
 
 	n, err := ParseStrict(s, !allowGreekUpper)
@@ -75,8 +60,6 @@ func constructTruthTableWide(s string) (tt TruthTable, err error) {
 	if err != nil {
 
 		return tt, err
-
-		return
 
 	}
 
@@ -87,8 +70,6 @@ func constructTruthTableWide(s string) (tt TruthTable, err error) {
 	donothing = func(*Node) {
 		return
 	}
-
-	n.assignTruthValues()
 
 	tt.ColumnTitles = getColumnTitles(s)
 
@@ -131,7 +112,7 @@ func constructTruthTableWide(s string) (tt TruthTable, err error) {
 
 	return
 }
-
+*/
 /*
 GenerateTruthTableNarrow return the truth table for s in narrow format.
 For wide format, use [GenerateTruthTable]. Here is a 'narrow' truth table
@@ -149,18 +130,11 @@ Note that the narrow table can only be presented using some version of the infix
 func GenerateTruthTableNarrow(s string) (tt TruthTable, err error) {
 
 	n, err := ParseStrict(s, !allowGreekUpper)
-
 	if err != nil {
-
 		return tt, err
-
-		return
-
 	}
 
 	tt.Formula = s
-
-	n.assignTruthValues()
 
 	tt.ColumnTitles = getColumnTitles(s)
 
@@ -181,27 +155,33 @@ func GenerateTruthTableNarrow(s string) (tt TruthTable, err error) {
 
 	v := make([]bool, tt.NumAtomic)
 
+	vmap := make(map[string]bool)
+
 	for rownum := 0; rownum < 1<<tt.NumAtomic; rownum++ {
 
 		row = make([]bool, 0, len(tt.ColumnTitles))
 
 		v, _ = valuation(rownum, tt.NumAtomic)
 
+		for i := range v {
+			vmap[tt.ColumnTitles[i]] = v[i]
+		}
+
 		row = append(row, v...)
 
 		ingressFunc = func(e *Node) {
-			if !e.IsBinary() {
-				row = append(row, e.tvalue[rownum])
-				if e.parent == nil {
+			if !e.Check(isBinary) {
+				row = append(row, truthValue(e, vmap))
+				if e.Parent() == nil {
 					tt.MainConnective = len(row) - 1
 				}
 			}
 		}
 
 		pivotFunc = func(e *Node) {
-			if e.IsBinary() {
-				row = append(row, e.tvalue[rownum])
-				if e.parent == nil {
+			if e.Check(isBinary) {
+				row = append(row, truthValue(e, vmap))
+				if e.Parent() == nil {
 					tt.MainConnective = len(row) - 1
 				}
 			}
@@ -210,12 +190,12 @@ func GenerateTruthTableNarrow(s string) (tt TruthTable, err error) {
 		egressFunc = func(e *Node) {
 		}
 
-		Serialize(n, ingressFunc, pivotFunc, egressFunc)
+		n.Walk(ingressFunc, pivotFunc, egressFunc)
 
 		tt.Rows = append(tt.Rows, row)
 	}
 
-	tks, _ := tokenizeInfix(n.StringF(O_PlainASCII), !allowGreekUpper)
+	tks, _ := tokenizeInfix(StringF(n, O_PlainASCII), !allowGreekUpper)
 
 	var t token
 
@@ -430,4 +410,23 @@ func printTruthTableNarrowLatex(tt *TruthTable, rowsep bool) string {
 	w.WriteString("\n")
 
 	return w.String()
+}
+
+func isTautologyNarrowTT(s string) bool {
+
+	tt, err := GenerateTruthTableNarrow(s)
+
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+
+	for _, r := range tt.Rows {
+
+		if r[tt.MainConnective] == false {
+			return false
+		}
+	}
+
+	return true
 }

@@ -120,7 +120,7 @@ func getColumnTitles(s string) []string {
 		panic(s + "is not well-formed")
 	}
 
-	nslice := linearizeBT(n)
+	nslice := n.LinearizeReverse()
 
 	var atomicCol []string
 
@@ -130,7 +130,7 @@ func getColumnTitles(s string) []string {
 
 		nstr := n.String()
 
-		if n.IsAtomic() {
+		if n.Check(isAtomic) {
 
 			if !slices.Contains(atomicCol, nstr) {
 				atomicCol = append(atomicCol, nstr)
@@ -159,7 +159,7 @@ func getAtomicColumns(column []string) []string {
 			panic(c + "is not well-formed")
 		}
 
-		if n.IsAtomic() {
+		if n.Check(isAtomic) {
 
 			resp = append(resp, c)
 
@@ -200,22 +200,22 @@ func rowValues(rownumber int, columns []string) []bool {
 
 		}
 
-		v1, ok = colval[n.children[0].String()]
+		v1, ok = colval[n.Child(0).String()]
 		if !ok {
-			panic("NEG. something wrong " + n.children[0].String())
+			panic("NEG. something wrong " + n.Child(0).String())
 		}
 
-		if n.IsBinary() {
+		if n.Check(isBinary) {
 
-			v2, ok = colval[n.children[1].String()]
+			v2, ok = colval[n.Child(1).String()]
 
 			if !ok {
-				panic("BINARY. something wrong " + n.children[1].String())
+				panic("BINARY. something wrong " + n.Child(1).String())
 			}
 
 		}
 
-		switch n.MainConnective() {
+		switch n.Val.connective {
 
 		case Neg:
 
@@ -264,7 +264,7 @@ func (tt *TruthTable) PrintTruthTable(mode PrintMode, rowsep bool) string {
 
 		n, _ := ParseStrict(f, !allowGreekUpper)
 
-		title := n.StringF(mode)
+		title := StringF(n, mode)
 
 		colWidths[i] = len([]rune(title))
 
@@ -363,7 +363,7 @@ func printTruthTableLatex(tt *TruthTable, rowsep bool) string {
 	out = out + "}" + "\n"
 
 	for i, f := range tt.ColumnTitles {
-		out = out + `\p{` + Parse(f, !allowGreekUpper).StringF(O_Latex) + `}`
+		out = out + `\p{` + StringF(Parse(f, !allowGreekUpper), O_Latex) + `}`
 		if i != len(tt.ColumnTitles)-1 {
 			out = out + ` & `
 		}
@@ -514,7 +514,7 @@ func isTautologySub(s string) bool {
 	return true
 }
 
-func truthValueOf(s string, val []bool) (bool, err) {
+func truthValueOf(s string, val []bool) (bool, error) {
 
 	var atomic []string
 
