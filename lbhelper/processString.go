@@ -89,10 +89,10 @@ func processString(input string) (output string, err error) {
 		output = tt.PrintTruthTable(mode, false)
 
 	case *stf:
-		output = n.SyntaxTree()
+		output = gentzen.SyntaxTree(n)
 
 	case *sts:
-		output = n.SyntaxTreeSimple()
+		output = gentzen.SyntaxTreeSimple(n)
 
 	case *seq:
 		output, err = sequentString(input, mode)
@@ -121,9 +121,9 @@ func processString(input string) (output string, err error) {
 
 	default:
 		if mode == gentzen.O_Latex {
-			output = encloseMath(n.StringF(mode), *m)
+			output = encloseMath(gentzen.StringF(n, mode), *m)
 		} else {
-			output = n.StringF(mode)
+			output = gentzen.StringF(n, mode)
 		}
 
 	}
@@ -167,7 +167,7 @@ func sequentString(s string, mode gentzen.PrintMode) (r string, err error) {
 			r = "**BAD Datum"
 			return
 		}
-		r = r + n.StringF(mode) + `,`
+		r = r + gentzen.StringF(n, mode) + `,`
 	}
 	r = strings.TrimRight(r, `,`)
 
@@ -177,7 +177,7 @@ func sequentString(s string, mode gentzen.PrintMode) (r string, err error) {
 		r = "**BAD Succedent"
 		return
 	}
-	r = r + n.StringF(mode) + `}`
+	r = r + gentzen.StringF(n, mode) + `}`
 
 	return
 }

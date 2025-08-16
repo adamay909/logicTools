@@ -1,8 +1,8 @@
 ## Overview
 
-Package ju provides basic generic definitions and methods for dealing with simple trees: each node has at most one parent, and zero or more child nodes, and each node holds a value of type T.
+Package ju provides basic generic definitions and methods for dealing with simple trees: each node has at most one parent, and zero or more child nodes, and each node holds a value of type \`T\`.
 
-Given a value type T, you can define a node type that holds values of type T as Node\[T]. A node of type Node\[T] has at most one parent and zero or more child nodes, as well at most one left-sibling and at most one right-sibling.  The easiest way to use this package is to import it and do something like
+Given a value type T, you can define a node type that holds values of type T as \`Node\[T]\`. A node of type Node\[T] has at most one parent and zero or more child nodes, as well at most one left-sibling and at most one right-sibling.  The easiest way to use this package is to import it and do something like
 
 	type mynodevalues struct {}
 	type mynode = ju.Node[mynodevalues]
