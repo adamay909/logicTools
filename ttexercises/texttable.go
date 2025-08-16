@@ -98,7 +98,7 @@ func tablehead(tt *ttable) string {
 	out = out + "}" + "\n"
 
 	for i, f := range tt.ColumnTitles {
-		out = out + `\p{` + gentzen.Parse(f, false).StringF(gentzen.O_Latex) + `}`
+		out = out + `\p{` + gentzen.StringF(gentzen.Parse(f, false), gentzen.O_Latex) + `}`
 		if i != len(tt.ColumnTitles)-1 {
 			out = out + ` & `
 		}

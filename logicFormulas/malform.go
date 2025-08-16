@@ -16,7 +16,7 @@ func generateMalform(n int, maxh, maxatomic int) {
 
 		if rand.Intn(2) == 1 {
 
-			outputDest.WriteString(gentzen.Parse(s, false).StringF(gentzen.O_Latex) + "\n")
+			outputDest.WriteString(gentzen.StringF(gentzen.Parse(s, false), gentzen.O_Latex) + "\n")
 
 			i++
 

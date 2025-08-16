@@ -90,7 +90,7 @@ func genRand(maxh, maxatomic int) string {
 
 	s := make([]string, 1000)
 
-	lastConn := len(logConn)
+	lastConn := len(logConn[:4])
 
 	if !oCOND {
 		lastConn = lastConn - 1
