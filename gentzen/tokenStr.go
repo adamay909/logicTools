@@ -197,7 +197,7 @@ func (tks tokenStr) index(t tokenID) int {
 
 }
 
-func (tks tokenStr) isWff() bool {
+func (tks tokenStr) _isWff() bool {
 
 	t := tks.wffAt(0)
 
@@ -212,16 +212,16 @@ func (tks tokenStr) isWff() bool {
 // ascending order.
 func (tks tokenStr) normalize(l ...string) {
 
+	if oPL {
+		tks.normalizePL(l...)
+	}
+
 	var v string
 
 	if len(l) == 0 {
 		v = "p_"
 	} else {
 		v = l[0] + "_"
-	}
-
-	if oPL {
-		return
 	}
 
 	atomicS := make([]string, 0, len(tks))
@@ -257,6 +257,128 @@ func (tks tokenStr) normalize(l ...string) {
 	}
 
 	return
+}
+
+func (tks tokenStr) normalizePL(l ...string) {
+
+	if !oPL {
+		panic("normalizePL can only be used in predicate logic mode")
+	}
+
+	defP := "F_"
+	defC := "c_"
+
+	if len(l) > 0 {
+		defP = l[0] + "_"
+	}
+
+	if len(l) > 1 {
+		defC = l[1] + "_"
+	}
+
+	for i := range tks {
+
+		if !tks[i].isQuantifier() {
+			continue
+		}
+
+		d := tks.quantifierDepth(i)
+
+		ov := tks[i+1].str
+
+		nv := "var_" + strconv.Itoa(d)
+
+		tks[i+1].str = nv
+
+		l := len(tks[i:].subFormulas()[0])
+
+		for j := i + 2; j < i+2+l; j++ {
+			if !tks[j].isTerm() {
+				continue
+			}
+
+			if tks[j-1].isQuantifier() {
+				continue
+			}
+
+			if tks[j].str == ov {
+				tks[j].str = nv
+			}
+		}
+	}
+
+	predS := make([]string, 0, len(tks))
+
+	constS := make([]string, 0, len(tks))
+
+	for i := range tks {
+
+		if tks[i].isPredicate() {
+			if slices.Contains(predS, tks[i].str) {
+				continue
+			}
+			predS = append(predS, tks[i].str)
+		}
+
+		if tks[i].isTerm() {
+			if strings.HasPrefix(tks[i].str, "var_") {
+				continue
+			}
+			if slices.Contains(constS, tks[i].str) {
+				continue
+			}
+			constS = append(constS, tks[i].str)
+		}
+	}
+
+	replP := make(map[string]string, len(predS))
+
+	for i, o := range predS {
+		replP[o] = defP + strconv.Itoa(i+1)
+	}
+
+	replC := make(map[string]string, len(constS))
+
+	for i, o := range constS {
+		replC[o] = defC + strconv.Itoa(i+1)
+	}
+
+	for i := range tks {
+
+		if tks[i].isPredicate() {
+			tks[i].str = replP[tks[i].str]
+		}
+
+		if tks[i].isTerm() {
+			if strings.HasPrefix(tks[i].str, "var_") {
+				tks[i].str = "x_" + strings.Split(tks[i].str, "_")[1]
+			} else {
+				tks[i].str = replC[tks[i].str]
+			}
+		}
+	}
+}
+
+// report the quantifier depth of quantifier token at i
+func (tks tokenStr) quantifierDepth(i int) int {
+
+	if !tks[i].isQuantifier() {
+		return 0
+	}
+
+	d := 1
+
+	j := i - 1
+	for ; j > -1; j-- {
+		if !tks[j].isQuantifier() {
+			continue
+		}
+		if len(tks.wffAt(j))+j > i {
+			d++
+		}
+	}
+
+	return d
 }
 
 func (tks tokenStr) negate() (tkn tokenStr) {

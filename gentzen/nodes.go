@@ -302,8 +302,13 @@ func sameStructure(s0, s1 string) bool {
 	t0, _ := tokenize(s0, !allowGreekUpper, !allowSpecial)
 	t1, _ := tokenize(s1, !allowGreekUpper, !allowSpecial)
 
-	t0.normalize("t")
-	t1.normalize("s")
+	if !oPL {
+		t0.normalize("t")
+		t1.normalize("s")
+	} else {
+		t0.normalize("F", "a")
+		t1.normalize("G", "b")
+	}
 
 	n0 := Parse(t0.String(), !allowGreekUpper)
 	n1 := Parse(t1.String(), !allowGreekUpper)
@@ -331,103 +336,13 @@ func sameStructure(s0, s1 string) bool {
 				r = nodes1[depth][j].String()
 				repl[nodes0[depth][j].String()] = r
 			}
+
 			nodes0[depth][j].ReplaceWith(Parse(r, !allowGreekUpper))
 		}
 		nodes0 = levelWalk(nodes0[0][0])
 	}
 
 	return nodes0[0][0].String() == nodes1[0][0].String()
-}
-
-func normalize(s ...string) []string {
-
-	var tks tokenStr
-
-	resp := make([]string, 0, len(s))
-
-	var err error
-
-	for _, e := range s {
-
-		tks, err = tokenize(e, !allowGreekUpper, !allowSpecial)
-		if err != nil {
-			logger.Print(s, "not wff!")
-			return resp
-		}
-		tks.normalize()
-
-		resp = append(resp, tks.String())
-	}
-
-	return resp
-}
-
-/*
-//display is for displaying the text of a node that might have
-//non-standard raw text
-
-func (n *Node) display() string {
-
-	return Parse(n.String(), !allowGreekUpper).StringF(O_PlainText)
-
-}
-*/
-/*
-func normalize(s ...string) []string {
-
-	var out []string
-
-	var allAtomic []string
-
-	// set up function for returning series of sentence/predicate letters
-	var nextatomic func() string
-
-	for _, e := range s {
-		allAtomic = append(allAtomic, Parse(e, !allowGreekUpper).AtomicSentences()...)
-	}
-	availLetters := []string{"P", "Q", "R", "S", "T", "F", "G", "H"}
-	var normal []string
-
-	for _, l := range availLetters {
-		for n := 0; n < 10; n++ {
-			normal = append(normal, l+"_"+strconv.Itoa(n))
-		}
-	}
-
-	count := -1
-	nextatomic = func() (ret string) {
-
-		count++
-		if count == len(normal) {
-			Debug("Too many atomic sentences/predicates")
-			return "K"
-		}
-		ret = normal[count]
-
-		if slicesContains(allAtomic, ret) {
-			return nextatomic()
-		}
-		return ret
-	}
-	// done setting things up
-
-	for _, e := range s {
-
-		atomic := Parse(e, !allowGreekUpper).AtomicSentences()
-
-		for _, a := range atomic {
-			if !oPL {
-				e = Parse(e, !allowGreekUpper).replaceAtomic(a, nextatomic()).String()
-			} else {
-				terms := strings.TrimPrefix(a, Parse(a, !allowGreekUpper).predicateLetter)
-				e = Parse(e, !allowGreekUpper).replaceAtomic(a, nextatomic()+terms).String()
-			}
-
-		}
-		out = append(out, e)
-	}
-	return out
-
 }
 
 /*

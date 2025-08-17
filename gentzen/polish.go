@@ -29,15 +29,11 @@ func IsTautology(s string) bool {
 // Class returns the (minimum) class number of s.
 func Class(s string) int {
 
-	tk, err := tokenize(s, !allowGreekUpper, !allowSpecial)
-
-	if err != nil {
+	if !IsWff(s) {
 		panic(s + " is not well formed")
 	}
 
-	if !tk.isWff() {
-		panic(s + " is not well formed")
-	}
+	tk, _ := tokenize(s, !allowGreekUpper, !allowSpecial)
 
 	class := 0
 	subclass := 0
@@ -67,10 +63,6 @@ func Class(s string) int {
 // Normalize normalizes s by assigning subscripted sentence letters to
 // each atomic sentence.
 func Normalize(s string) string {
-
-	if oPL {
-		return s
-	}
 
 	tk, err := tokenize(s, !allowGreekUpper, !allowSpecial)
 
