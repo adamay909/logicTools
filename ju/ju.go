@@ -212,29 +212,45 @@ func (n *Node[T]) Remove() {
 		nr.left = nl
 	}
 
+	if n.parent != nil {
+		if n.parent.firstChild == n {
+			n.parent.firstChild = nr
+		}
+	}
+
 	n.right = nil
 	n.left = nil
 	n.parent = nil
 }
 
-// Replace n with n2. n will be the root of a detached tree afterwards.
+// Replace tree rooted at n with tree rooted at n2. n will be the root of a detached tree afterwards.
 func (n *Node[T]) ReplaceWith(n2 *Node[T]) {
 
-	n2.parent = n.parent
-	n2.left = n.left
-	n2.right = n.right
+	n.Val = n2.Val
+	n.Flag = n2.Flag
+	n.firstChild = n2.firstChild
 
-	if n2.left != nil {
-		n2.left.right = n2
-	}
+	/*
+		n2.parent = n.parent
+		n2.left = n.left
+		n2.right = n.right
 
-	if n2.right != nil {
-		n2.right.left = n2
-	}
+		if n.parent.firstChild == n {
+			n.parent.firstChild = n2
+		}
 
-	n.parent = nil
-	n.left = nil
-	n.right = nil
+		if n2.left != nil {
+			n2.left.right = n2
+		}
+
+		if n2.right != nil {
+			n2.right.left = n2
+		}
+
+		n.parent = nil
+		n.left = nil
+		n.right = nil
+	*/
 }
 
 // RemoveChildren removes the children of n. All the child nodes of n will have no parent afterwards.
@@ -423,7 +439,7 @@ func (n *Node[T]) FindFunc(f func(*Node[T]) []*Node[T]) []*Node[T] {
 }
 
 // FindMatch returns all nodes that match the condition supplied by matchFunc.
-func (n *Node[T]) FindMatch(matchFunc func(a *Node[T]) bool) []*Node[T] {
+func (n *Node[T]) FindMatch(matchFunc func(*Node[T]) bool) []*Node[T] {
 
 	var resp []*Node[T]
 

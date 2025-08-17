@@ -28,7 +28,16 @@ func (tks tokenStr) StringF(m PrintMode) string {
 	return w.String()
 }
 
-func (tks tokenStr) wffAt(i int) (resp tokenStr) {
+func (tks tokenStr) wffAt(i int) tokenStr {
+
+	if !oPL {
+		return tks.wffAtSimple(i)
+	}
+
+	return tks.wffAtPL(i)
+}
+
+func (tks tokenStr) wffAtSimple(i int) (resp tokenStr) {
 
 	openNode := 1
 	j := i
@@ -42,6 +51,39 @@ func (tks tokenStr) wffAt(i int) (resp tokenStr) {
 			openNode--
 		}
 
+		if tks[j].isTerm() {
+			break
+		}
+
+		if tks[j].isPredicate() {
+			k := 1
+			for ; j+k < len(tks) && tks[j+k].isTerm(); k++ {
+			}
+			k--
+
+			if k == 0 { //handle special case of Greek lower case letter as function letter
+				ch, _ := getFirstChar(tks[j].str, !allowSubscr, !allowNumeral, !allowGreekUpper, !allowIdentity, !allowSpecial)
+				if !isGreekLower(ch) {
+					break
+				}
+				openNode--
+				break
+			}
+
+			j = j + k
+			openNode--
+		}
+
+		if tks[j].isQuantifier() {
+			if j == len(tks)-1 {
+				break
+			}
+			if !tks[j+1].isTerm() {
+				break
+			}
+			j++
+		}
+
 		if openNode == 0 {
 			break
 		}
@@ -53,13 +95,60 @@ func (tks tokenStr) wffAt(i int) (resp tokenStr) {
 	}
 
 	return tks[i : j+1]
+}
 
+func (tks tokenStr) wffAtPL(i int) tokenStr {
+
+	r := tks.wffAtSimple(i)
+
+	for i := range r {
+
+		e := r[i:]
+
+		if !e[0].isQuantifier() {
+			continue
+		}
+
+		v := r[i+1].str
+
+		scope := e.subFormulas()[0]
+
+		for j := range scope {
+
+			e2 := scope[j:]
+
+			if !e2[0].isQuantifier() {
+				continue
+			}
+			if e2[1].str == v {
+				return nil
+			}
+		}
+	}
+
+	return r
 }
 
 func (tks tokenStr) subFormulas() (resp []tokenStr) {
 
 	if tks[0].isAtomicSentence() {
 		return
+	}
+
+	if tks[0].isPredicate() {
+		return
+	}
+
+	if tks[0].isTerm() {
+		return
+	}
+
+	if tks[0].isQuantifier() {
+		sub1 := tks.wffAt(2)
+		if sub1 == nil {
+			return
+		}
+		return append(resp, sub1)
 	}
 
 	sub1 := tks.wffAt(1)

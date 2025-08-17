@@ -174,8 +174,8 @@ func findFormula(l []string) (string, int) {
 		txt := spaceyStringOf(ret[:i])
 		formula, err = gentzen.ParseInfix(txt, allowGreekUpper)
 		if err == nil {
-			debug("findFormula: returning ", formula.StringF(gentzen.O_Latex))
-			return formula.StringF(gentzen.O_Latex), len(ret[:i])
+			debug("findFormula: returning ", gentzen.StringF(formula, gentzen.O_Latex))
+			return gentzen.StringF(formula, gentzen.O_Latex), len(ret[:i])
 		}
 	}
 

@@ -261,47 +261,82 @@ func (c LogicalConstant) Stringf(m PrintMode) string {
 	return ""
 }
 
-// check if s1 is instance of s0
+func linearizeLevel(n *Node) []*Node {
+
+	var resp []*Node
+
+	inf := func(e *Node) {
+		resp = append(resp, e)
+	}
+
+	n.WalkLevelOrder(inf, func(*Node) {})
+
+	return resp
+}
+
+func levelWalk(n *Node) [][]*Node {
+
+	level := -1
+
+	levelNodes := make([][]*Node, n.Height()+1)
+
+	ingressFunc := func(e *Node) {
+		levelNodes[level] = append(levelNodes[level], e)
+	}
+
+	descendFunc := func(e *Node) {
+		level++
+	}
+
+	n.WalkLevelOrder(ingressFunc, descendFunc)
+
+	return levelNodes
+}
+
+// check if s0 can be turned into s1 through substitutions into atomic sentence letters into s0.
 func sameStructure(s0, s1 string) bool {
 
-	sn := normalize(s0, s1)
-	n0 := Parse(sn[0], !allowGreekUpper).Linearize()
-	n1 := Parse(sn[1], !allowGreekUpper).Linearize()
-
-	if len(n0) > len(n1) {
+	if !IsWff(s0) || !IsWff(s1) {
 		return false
 	}
+	t0, _ := tokenize(s0, !allowGreekUpper, !allowSpecial)
+	t1, _ := tokenize(s1, !allowGreekUpper, !allowSpecial)
 
-	atomic := atomicSentences(n0[0])
+	t0.normalize("t")
+	t1.normalize("s")
 
-	Debug("<--sameStructure*************************")
-	for k, a := range atomic {
+	n0 := Parse(t0.String(), !allowGreekUpper)
+	n1 := Parse(t1.String(), !allowGreekUpper)
 
-		Debug("Round", k, ": compare ", n0[0].String(), " against ", n1[0].String())
+	nodes0 := levelWalk(n0)
+	nodes1 := levelWalk(n1)
 
-		for i := range n0 {
-			if n0[i].String() == a {
-				repl := n1[i].String()
-				n1[i].Val.connective = None
-				for j := range n0 {
-					if n0[j].HasFlag("c") {
-						continue
-					}
-					if n0[j].String() == a {
-						n0[j].Val.raw = repl
-						n0[j].SetFlag("c")
-					}
-				}
-			}
-			n0 = n0[0].Linearize()
-			n1 = n1[0].Linearize()
+	repl := make(map[string]string)
+
+	for depth := range nodes0 {
+
+		if len(nodes0[depth]) != len(nodes1[depth]) {
+			return false
 		}
+
+		for j := range nodes1[depth] {
+			if nodes0[depth][j].Val.connective != None {
+				if nodes0[depth][j].Val.connective != nodes1[depth][j].Val.connective {
+					return false
+				}
+				continue
+			}
+			r := repl[nodes0[depth][j].String()]
+			if r == "" {
+				r = nodes1[depth][j].String()
+				repl[nodes0[depth][j].String()] = r
+			}
+			nodes0[depth][j].ReplaceWith(Parse(r, !allowGreekUpper))
+		}
+		nodes0 = levelWalk(nodes0[0][0])
 	}
-	Debug("Result: ", n0[0].String(), " against ", n1[0].String())
-	Debug("--done structure check-->")
 
-	return n0[0].String() == n1[0].String()
-
+	return nodes0[0][0].String() == nodes1[0][0].String()
 }
 
 func normalize(s ...string) []string {
