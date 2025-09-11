@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/adamay909/logicTools/gentzen"
@@ -14,43 +13,28 @@ var (
 	separator = `\ldots`
 )
 
-func getArglines(c []inputLine) (s []string, ok bool) {
+func getArglines(c []inputLine) (s []string) {
 
-	ok = true
-
-	if dsp.empty() {
-		gentzen.WriteLog("Nothing to do.", "")
-		return
+	w := new(strings.Builder)
+	for i := range c {
+		for j := range c[i] {
+			switch c[i][j] {
+			case `\vdash`:
+				w.WriteString(`:`)
+			case `\ldots`:
+				w.WriteString(".")
+			default:
+				w.WriteString(plainText(c[i][j]))
+			}
+		}
+		s = append(s, w.String())
+		w.Reset()
 	}
-	for i := 0; i <= dsp.lastLine(); i++ {
-		line := dsp.Input[i]
-		if len(line) == 0 || line == nil {
-			gentzen.WriteLog("You seem to have an empty line in the middle.", "line "+strconv.Itoa(i+1)+": ")
-			ok = false
-			return
-		}
-
-		err := isArgline(line)
-		if err != nil {
-			gentzen.WriteLog(err.Error(), "line "+strconv.Itoa(i+1)+": ")
-			ok = false
-			continue
-		}
-		raw := true
-		debug("parsing :", strings.Join(line, "; "))
-
-		datum, succ, annot, err := parseLine(line, raw)
-		if err != nil {
-			gentzen.WriteLog(err.Error(), "line "+strconv.Itoa(i+1)+": ")
-			ok = false
-		}
-
-		s = append(s, datum+";"+succ+";"+replaceInfrules(annot))
-
-		fmt.Println("got line: ", s[len(s)-1])
-
+	for i := range s {
+		s[i] = strings.ReplaceAll(s[i], `<sub>`, "_")
+		s[i] = strings.ReplaceAll(s[i], `</sub>`, "")
 	}
-	return
+	return s
 }
 
 func (d *console) lastLine() int {

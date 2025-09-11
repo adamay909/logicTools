@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"runtime"
 	"strconv"
 	"strings"
 
@@ -14,28 +16,29 @@ func checkDerivation() {
 	if dsp.empty() {
 		return
 	}
-
+	runtime.GC()
 	setAttributeByID("display", "class", "inactive-fail")
 	printMessage("", !clean)
 	show("messages")
 	gentzen.ClearLog()
-	arglines, ok := getArglines(dsp.Input)
-	if !ok {
-		printMessage(gentzen.ShowLog(), clean)
-		debug("error parsing derivation lines")
-		return
+	arglines := getArglines(dsp.Input)
+
+	for i := range arglines {
+		fmt.Println(arglines[i])
 	}
+	err := gentzen.CheckDerivation(arglines, gentzen.O_ProofChecker, dsp.Offset)
 
 	displayDerivation()
-
-	if gentzen.CheckDeriv(arglines, dsp.Offset) {
-		printMessage("OK", !clean)
-		showPrettyDeriv(dsp)
+	if err != nil {
+		printMessage(err.Error(), clean)
+	} else {
 		setAttributeByID("display", "class", "inactive-success")
-		return
+		//		showPrettyDeriv(dsp)
+		printMessage("OK", clean)
 	}
 
-	printMessage(gentzen.ShowLog(), clean)
+	//	return
+	//	}
 
 	return
 }
@@ -64,11 +67,8 @@ func showPrettyDeriv(d *console) {
 	d.html = nil
 
 	var lines []string
-	if arglines, ok := getArglines(dsp.Input); ok {
-		lines = strings.Split(gentzen.PrintDerivation(arglines, dsp.Offset, gentzen.O_ProofChecker), "\n")
-	} else {
-		return
-	}
+	arglines := getArglines(dsp.Input)
+	lines = strings.Split(gentzen.PrintDerivation(arglines, dsp.Offset, gentzen.O_ProofChecker), "\n")
 	offset, _ := strconv.Atoi(lines[0][:strings.Index(lines[0], ".")])
 	for i, l := range lines {
 
@@ -116,4 +116,5 @@ func prettyGreek(r string) string {
 	}
 
 	return strings.ReplaceAll(r2, "⊢", " ⊢ ")
+
 }

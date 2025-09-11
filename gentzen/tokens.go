@@ -35,6 +35,9 @@ const (
 	tCloseb
 	tIdent
 	tComma
+	tTurnstile
+	tLineSeparator
+	tSet
 	tNull tokenID = 0
 )
 
@@ -67,10 +70,7 @@ func (t token) isTerm() bool {
 }
 
 func (t token) isConnective() bool {
-	if oPL {
-		return (t.tokenType & tConnective) != 0
-	}
-	return t.tokenType != tAtomicSentence
+	return (t.tokenType&tConnective != 0)
 }
 
 func (t token) isAtomicSentence() bool {

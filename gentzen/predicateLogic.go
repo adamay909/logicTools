@@ -2,69 +2,12 @@ package gentzen
 
 import (
 	"errors"
-	"log"
+	"slices"
 	"strings"
 )
 
 // check if s1 is instance of s2; if yes, variable and term return which
 // variable was replaced by which term
-func isInstanceOf(s1, s2 string) (val bool, variable, term string) {
-
-	var v, r string
-
-	val = false
-
-	n1 := Parse(s1, !allowGreekUpper)
-	n2 := Parse(s2, !allowGreekUpper)
-
-	if !n2.Val.connective.isQuantifier() {
-		return
-	}
-
-	v = n2.Val.variable
-
-	have := n1.Linearize()
-
-	want := n2.Child(0).Linearize()
-
-	if len(have) != len(want) {
-		log.Println(have, " and ", want, "not same")
-		return
-	}
-
-	for i := range have {
-
-		if have[i].Val.connective != want[i].Val.connective {
-			log.Println(have, " and ", want, "not same2")
-
-			return
-		}
-
-		if have[i].Check(isAtomic) {
-			if len(have[i].Val.term) != len(want[i].Val.term) {
-				log.Println(have, " and ", want, "not same3")
-				return
-			}
-			if have[i].Val.predicateLetter != want[i].Val.predicateLetter {
-				log.Println(have, " and ", want, "not same4")
-				return
-			}
-			j := findPos(v, want[i].Val.term)
-			if j == -1 {
-				continue
-			}
-			r = have[i].Val.term[j]
-			break
-
-		}
-	}
-	if r == "" {
-		return
-	}
-	n3 := replaceTerms(want[0], v, r)
-
-	return n1.String() == n3.String(), v, r
-}
 
 func findPos(v string, list []string) int {
 
@@ -138,7 +81,7 @@ func hasTerm(n *Node, t string) bool {
 			continue
 		}
 
-		if slicesContains(i.Val.term, t) {
+		if slices.Contains(i.Val.term, t) {
 			return true
 		}
 	}

@@ -15,6 +15,7 @@ type syntaxNode struct {
 	variable        string
 	predicateLetter string
 	term            []string
+	tokenType       tokenID
 	index           int //vaule of .index of token on which Node is based
 	//tvassigned      []bool //whether truthvalue for given row has been assigned
 	//tvalue          []bool //map interpretation row number to truth value
@@ -29,7 +30,7 @@ func isAtomic(n *Node) bool {
 		return false
 	}
 
-	return n.Val.connective == None
+	return n.Val.tokenType == tAtomicSentence
 }
 
 // IsPredicate returns true if n is a predicate.
@@ -66,6 +67,24 @@ func isBinary(n *Node) bool {
 	}
 }
 
+func isSententialAtom(n *Node) bool {
+
+	if isSet(n) {
+		return false
+	}
+
+	if isAtomic(n) {
+		return true
+	}
+	if isPredicate(n) {
+		return true
+	}
+	if isQuantifier(n) {
+		return true
+	}
+	return false
+}
+
 // IsBasic returns true if n is atomic or negation of an
 // atomic formula.
 func isBasic(n *Node) bool {
@@ -84,7 +103,7 @@ func isBasic(n *Node) bool {
 // IsUnary returns true if n is a unary connective node.
 func isUnary(n *Node) bool {
 
-	return !isBinary(n) && !isAtomic(n)
+	return isConnective(n) && !isBinary(n)
 
 }
 
@@ -223,12 +242,6 @@ func stringFunc(n *Node) string {
 	return w.String()
 }
 
-func init() {
-
-	ju.SetStringFunc[syntaxNode](stringFunc)
-
-}
-
 // StringF returns the formula in the format specified by mode.
 func StringF(n *Node, mode PrintMode) string {
 
@@ -293,107 +306,6 @@ func levelWalk(n *Node) [][]*Node {
 	return levelNodes
 }
 
-// check if s0 can be turned into s1 through substitutions into atomic sentence letters into s0.
-func sameStructure(s0, s1 string) bool {
-
-	if !IsWff(s0) || !IsWff(s1) {
-		return false
-	}
-	t0, _ := tokenize(s0, !allowGreekUpper, !allowSpecial)
-	t1, _ := tokenize(s1, !allowGreekUpper, !allowSpecial)
-
-	if !oPL {
-		t0.normalize("t")
-		t1.normalize("s")
-	} else {
-		t0.normalize("F", "a")
-		t1.normalize("G", "b")
-	}
-
-	n0 := Parse(t0.String(), !allowGreekUpper)
-	n1 := Parse(t1.String(), !allowGreekUpper)
-
-	nodes0 := levelWalk(n0)
-	nodes1 := levelWalk(n1)
-
-	repl := make(map[string]string)
-
-	for depth := range nodes0 {
-
-		if len(nodes0[depth]) != len(nodes1[depth]) {
-			return false
-		}
-
-		for j := range nodes1[depth] {
-			if nodes0[depth][j].Val.connective != None {
-				if nodes0[depth][j].Val.connective != nodes1[depth][j].Val.connective {
-					return false
-				}
-				continue
-			}
-			r := repl[nodes0[depth][j].String()]
-			if r == "" {
-				r = nodes1[depth][j].String()
-				repl[nodes0[depth][j].String()] = r
-			}
-
-			nodes0[depth][j].ReplaceWith(Parse(r, !allowGreekUpper))
-		}
-		nodes0 = levelWalk(nodes0[0][0])
-	}
-
-	return nodes0[0][0].String() == nodes1[0][0].String()
-}
-
-/*
-func (n *Node) replaceAtomic(old, repl string) *Node {
-
-	n1 := getSubnodes(n)
-
-	for i := range n1 {
-		if !n1[i].IsAtomic() {
-			continue
-		}
-		if n1[i].String() == old {
-			n1[i].SetFormula(repl)
-		}
-	}
-	return n1[0]
-
-}
-*/
-
-// AtomicSentences returns a slice of the atomic sentences in the formula
-// represented by n.
-func atomicSentences(n *Node) []string {
-
-	var as []string
-
-	ns := n.Linearize()
-
-	for _, e := range ns {
-		if !e.Check(isAtomic) {
-			continue
-		}
-
-		if slicesContains(as, e.String()) {
-			continue
-		}
-
-		as = append(as, e.String())
-	}
-
-	return as
-}
-
-/*
-// AtomicCount returns the number of atomic sentences in n.
-func (n *Node) AtomicCount() int {
-
-	return len(n.AtomicSentences())
-
-}
-*/
 // IsPureSL returns true if the only logical constants are
 // those of sentential logic (plus identity).
 func isPureSL(n *Node) bool {
@@ -641,4 +553,18 @@ func isFunctionFormula(n *Node) bool {
 
 	return false
 
+}
+
+func isSet(n *Node) bool {
+	return n.Val.tokenType == tSet
+}
+
+func quantifierDepth(n *Node) int {
+	d := 0
+	for e := n; e != nil; e = e.Parent() {
+		if e.Check(isQuantifier) {
+			d++
+		}
+	}
+	return d
 }

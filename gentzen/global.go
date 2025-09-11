@@ -9,14 +9,12 @@ file.
 type LogicalConstant int
 
 var (
-	lneg   = "-"
-	lconj  = "^"
-	ldisj  = "V"
-	lcond  = ">"
+	lneg   = "N"
+	lconj  = "K"
+	ldisj  = "A"
+	lcond  = "C"
 	luni   = "U"
 	lex    = "X"
-	lnec   = "["
-	lpos   = "<"
 	lident = "="
 )
 
@@ -96,37 +94,38 @@ var plainBrackets = simpleBrackets[:2]
 
 var connectivesSL, connectivesPL, connectivesML [][7]string
 
-var infRules = [][]string{
-	{`a`, `A`, `A`, `A`},
-	{`m`, `M`, `M`, `M`},
-	{`ki`, `\conjI`, `\conjI`, "\u2227I"},
-	{`ke`, `\conjE`, `\conjE`, "\u2227E"},
-	{`di`, `\disjI`, `\disjI`, "\u2228I"},
-	{`de`, `\disjE`, `\disjE`, "\u2228E"},
-	{`ni`, `\negI`, `\negI`, "\u00acI"},
-	{`ne`, `\negE`, `\negE`, "\u00acE"},
-	{`ci`, `\condI`, `\condI`, "\u2283I"},
-	{`ce`, `\condE`, `\condE`, "\u2283E"},
-	{`ui`, `\uniI`, `\uniI`, "\u2200I"},
-	{`ue`, `\uniE`, `\uniE`, "\u2200E"},
-	{`ei`, `\exI`, `\exI`, "\u2203I"},
-	{`ee`, `\exE`, `\exE`, "\u2203E"},
-	{`=i`, `\iI`, `\iI`, `=I`},
-	{`=e`, `\iE`, `\iE`, `=E`},
-	{li, `\necI`, `\necI`, "\u25a1I"},
-	{mli, `S5\necI`, `S5\necI`, "S5\u25a1I"},
-	{pli, `S4\necI`, `S4\necI`, "S4\u25a1I"},
-	{tli, `T\necI`, `T\necI`, "T\u25a1I"},
-	{le, `\necE`, `\necE`, "\u25a1E"},
-	{mi, `\posI`, `\posI`, "\u25c7I"},
-	{me, `\posE`, `\posE`, "\u25c7E"},
-	{mme, `S5\posE`, `S5\posE`, "S5\u25c7E"},
-	{sc, "SC", "SC", "SC"},
-	{sl, "logic", "logic", "logic"},
-	{"rewrite", "", "", ""},
-	{`\lposDR`, `\lposDR`, `\lposDR`, "\u25c7DR"},
-}
-
+/*
+	var infRules = [][]string{
+		{`a`, `A`, `A`, `A`},
+		{`m`, `M`, `M`, `M`},
+		{`ki`, `\conjI`, `\conjI`, "\u2227I"},
+		{`ke`, `\conjE`, `\conjE`, "\u2227E"},
+		{`di`, `\disjI`, `\disjI`, "\u2228I"},
+		{`de`, `\disjE`, `\disjE`, "\u2228E"},
+		{`ni`, `\negI`, `\negI`, "\u00acI"},
+		{`ne`, `\negE`, `\negE`, "\u00acE"},
+		{`ci`, `\condI`, `\condI`, "\u2283I"},
+		{`ce`, `\condE`, `\condE`, "\u2283E"},
+		{`ui`, `\uniI`, `\uniI`, "\u2200I"},
+		{`ue`, `\uniE`, `\uniE`, "\u2200E"},
+		{`ei`, `\exI`, `\exI`, "\u2203I"},
+		{`ee`, `\exE`, `\exE`, "\u2203E"},
+		{`=i`, `\iI`, `\iI`, `=I`},
+		{`=e`, `\iE`, `\iE`, `=E`},
+		{li, `\necI`, `\necI`, "\u25a1I"},
+		{mli, `S5\necI`, `S5\necI`, "S5\u25a1I"},
+		{pli, `S4\necI`, `S4\necI`, "S4\u25a1I"},
+		{tli, `T\necI`, `T\necI`, "T\u25a1I"},
+		{le, `\necE`, `\necE`, "\u25a1E"},
+		{mi, `\posI`, `\posI`, "\u25c7I"},
+		{me, `\posE`, `\posE`, "\u25c7E"},
+		{mme, `S5\posE`, `S5\posE`, "S5\u25c7E"},
+		{sc, "SC", "SC", "SC"},
+		{sl, "logic", "logic", "logic"},
+		{"rewrite", "", "", ""},
+		{`\lposDR`, `\lposDR`, `\lposDR`, "\u25c7DR"},
+	}
+*/
 var greekUCBindings = [][3]string{
 	[3]string{`/G`, `\Gamma`, "\u0393"},
 	[3]string{`/D`, `\Delta`, "\u0394"},
@@ -229,29 +228,6 @@ func SetStandardPolish(v bool) {
 
 func setupConnectives() {
 
-	if !oSYMB {
-
-		lneg = "N"
-		lconj = "K"
-		ldisj = "A"
-		lcond = "C"
-		luni = "U"
-		lex = "X"
-		lnec = "[" //don't use L and M
-		lpos = "<"
-		lident = "="
-	} else {
-
-		lneg = "-"
-		lconj = "^"
-		ldisj = "V"
-		lcond = ">"
-		luni = "U"
-		lex = "X"
-		lnec = "["
-		lpos = "<"
-		lident = "="
-	}
 	/*
 		Neg = LogicalConstant(lneg)
 		Conj = LogicalConstant(lconj)
@@ -279,12 +255,6 @@ func setupConnectives() {
 		{luni, `\lforall `, `\forall `, "\u2200", "\u2200", " for all ", "U"},
 		{lex, `\lthereis `, `\exists `, "\u2203", "\u2203", " there is a ", "X"},
 		{lident, `\mathbin{=}`, `\mathbin{=}`, `=`, `=`, " equals ", "="},
-	}
-
-	connectivesML = [][7]string{
-		{lpos, `\lpos `, `\Diamond `, "\u25c7", "\u25c7", " possibly ",
-			"<"},
-		{lnec, `\lnec `, `\Box `, "\u25fb", "\u25fb", " necessarily ", "["},
 	}
 
 	if oCOND {
@@ -333,10 +303,6 @@ func codeOf(l LogicalConstant) string {
 		return luni
 	case Ex:
 		return lex
-	case Nec:
-		return lnec
-	case Pos:
-		return lpos
 	default:
 		return ""
 	}

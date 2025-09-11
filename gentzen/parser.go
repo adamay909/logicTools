@@ -2,7 +2,6 @@ package gentzen
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 	"strings"
 )
@@ -52,18 +51,18 @@ func ParseStrict[str ~string](s str, permitGreekUpper bool) (n *Node, err error)
 }
 
 func parse(tk tokenStr) (n *Node, err error) {
+	/*
+		defer func() {
 
-	defer func() {
+			r := recover()
 
-		r := recover()
+			if r != nil {
 
-		if r != nil {
+				err = errors.New("0\n" + fmt.Sprint(r))
 
-			err = errors.New("0\n" + fmt.Sprint(r))
-
-		}
-	}()
-
+			}
+		}()
+	*/
 	prevNode := new(Node)
 
 	currentNode := new(Node)
@@ -76,11 +75,13 @@ func parse(tk tokenStr) (n *Node, err error) {
 
 		currentNode = new(Node)
 		currentNode.Val.index = t.index
+		currentNode.Val.tokenType = t.tokenType
 		nc++
 
 		switch {
 
 		case t.isConnective() && !t.isQuantifier():
+
 			currentNode.Val.connective = t.tokenType.logicConstant()
 
 		case t.isQuantifier():
@@ -124,6 +125,10 @@ func parse(tk tokenStr) (n *Node, err error) {
 			err = errors.New(strconv.Itoa(t.index))
 			return
 
+		case t.tokenType == tSet:
+			currentNode.Val.raw = t.str
+			currentNode.Val.connective = None
+
 		default:
 			err = errors.New(strconv.Itoa(t.index))
 			return
@@ -161,6 +166,8 @@ func parse(tk tokenStr) (n *Node, err error) {
 
 func tokenize(s string, permitGreekUpper bool, permitSpecial bool) (t tokenStr, err error) {
 
+	hasGU := -1
+
 	t = make(tokenStr, 0, len(s))
 
 	for i := 0; i < len(s); i++ {
@@ -188,7 +195,12 @@ func tokenize(s string, permitGreekUpper bool, permitSpecial bool) (t tokenStr, 
 				err = errors.New(strconv.Itoa(i))
 				return t, err
 			}
+			if chb := strings.Split(ch, "_")[0]; isGreekUpper(chb) {
+				e.tokenType = tSet
+				hasGU = i
+			}
 			e.str = ch
+
 			i = i + len(ch) - 1
 
 		case oPL:
@@ -222,7 +234,8 @@ func tokenize(s string, permitGreekUpper bool, permitSpecial bool) (t tokenStr, 
 					e.tokenType = tPredicate
 
 				case isGreekUpper(chb):
-					e.tokenType = tAtomicSentence
+					hasGU = i
+					e.tokenType = tSet
 
 				case chb == "=":
 					e.tokenType = tPredicate
@@ -247,6 +260,12 @@ func tokenize(s string, permitGreekUpper bool, permitSpecial bool) (t tokenStr, 
 
 	if len(t) == 0 {
 		err = errors.New("no valid symbols found")
+	}
+
+	if permitGreekUpper {
+		if hasGU > -1 && len(t) > 1 {
+			err = errors.New("Greek Upper letter not allowedd as syntactic element of complex sentence")
+		}
 	}
 
 	return

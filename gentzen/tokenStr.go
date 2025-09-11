@@ -205,12 +205,22 @@ func (tks tokenStr) _isWff() bool {
 
 }
 
+func normalize(s string, l ...string) string {
+	tks, err := tokenize(s, !allowGreekUpper, !allowSpecial)
+	if err != nil {
+		panic(s + " is not wff")
+	}
+	tks.normalize(l...)
+
+	return tks.String()
+}
+
 // Replace atomic sentences with subscripted sentence variables. If
 // l is not supplied, p is used as the common sentence letter. Else the
 // the first letter in l is used (so just supply one argument at most).
 // The left most atomic sentence is p_1 and the others are named in
 // ascending order.
-func (tks tokenStr) normalize(l ...string) {
+func (tks tokenStr) normalize(l ...string) (reverse map[string]string) {
 
 	if oPL {
 		tks.normalizePL(l...)
@@ -256,10 +266,16 @@ func (tks tokenStr) normalize(l ...string) {
 
 	}
 
+	reverse = make(map[string]string)
+
+	for k, v := range repl {
+		reverse[v] = k
+	}
+
 	return
 }
 
-func (tks tokenStr) normalizePL(l ...string) {
+func (tks tokenStr) normalizePL(l ...string) (reverse map[string]string) {
 
 	if !oPL {
 		panic("normalizePL can only be used in predicate logic mode")
@@ -357,6 +373,17 @@ func (tks tokenStr) normalizePL(l ...string) {
 			}
 		}
 	}
+	reverse = make(map[string]string)
+
+	for k, v := range replP {
+		reverse[v] = k
+	}
+
+	for k, v := range replC {
+		reverse[v] = k
+	}
+
+	return
 }
 
 // report the quantifier depth of quantifier token at i

@@ -18,10 +18,9 @@ func plainTextDeriv(withTitle bool) string {
 		output = output + "[[TITLE:" + dsp.Title + "]]" + "\n"
 	}
 
-	if arglines, ok := getArglines(dsp.Input); ok {
-		output = output + gentzen.PrintDerivation(arglines, dsp.Offset, gentzen.O_ProofChecker)
-		return output
-	}
+	arglines := getArglines(dsp.Input)
+	output = output + gentzen.PrintDerivation(arglines, dsp.Offset, gentzen.O_ProofChecker)
+	return output
 
 	for i, l := range dsp.Input {
 		if len(l) == 0 {
@@ -131,14 +130,13 @@ func latexOutput() string {
 	output := ""
 	output = `%title:%` + dsp.Title + "\n"
 
-	if arglines, ok := getArglines(dsp.Input); ok {
-		for c, k := range arglines {
-			debug(c, ": ", k)
-		}
-
-		output = output + gentzen.PrintDerivation(arglines, dsp.Offset, gentzen.O_Latex)
-		return safeLtx(output)
+	arglines := getArglines(dsp.Input)
+	for c, k := range arglines {
+		debug(c, ": ", k)
 	}
+
+	output = output + gentzen.PrintDerivation(arglines, dsp.Offset, gentzen.O_Latex)
+	return safeLtx(output)
 
 	ln := strconv.Itoa(dsp.Offset - 1)
 	output = output + `\begin{enumerate}\setcounter{enumi}{` + ln + `}` + "\n"
@@ -262,15 +260,16 @@ func ltxof(e string) string {
 }
 
 func printTree() {
+	/*
+	   gentzen.ClearLog()
+	   arglines, ok := getArglines(dsp.Input)
 
-	gentzen.ClearLog()
-	arglines, ok := getArglines(dsp.Input)
-	if !ok {
-		printMessage(gentzen.ShowLog(), clean)
-		debug("error parsing derivation lines")
-		return
-	}
+	   	if !ok {
+	   		printMessage(gentzen.ShowLog(), clean)
+	   		debug("error parsing derivation lines")
+	   		return
+	   	}
 
-	copyToClipboard(gentzen.PrintDerivTree(arglines, dsp.Offset))
-
+	   //copyToClipboard(gentzen.PrintDerivTree(arglines, dsp.Offset))
+	*/
 }

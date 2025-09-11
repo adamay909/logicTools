@@ -17,6 +17,14 @@ func (n *Node[T]) Parent() *Node[T] {
 	return n.parent
 }
 
+func (n *Node[T]) IsRootNode() bool {
+	return n.parent == nil
+}
+
+func (n *Node[t]) IsLeafNode() bool {
+	return n.firstChild == nil
+}
+
 // Left returns left sibling (if any) of n
 func (n *Node[T]) Left() *Node[T] {
 
