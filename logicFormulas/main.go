@@ -37,7 +37,7 @@ func main() {
 
 	flag.Parse()
 	gentzen.SetPL(false)
-	gentzen.SetStandardPolish(true)
+	gentzen.SetSpecialConn(false)
 	gentzen.SetConditional(*withConditional)
 
 	if *dest == "" {

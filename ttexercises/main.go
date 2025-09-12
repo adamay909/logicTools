@@ -37,7 +37,7 @@ func main() {
 
 	flag.Parse()
 
-	gentzen.SetStandardPolish(true)
+	gentzen.SetSpecialConn(false)
 
 	gentzen.SetPL(false)
 
