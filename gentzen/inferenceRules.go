@@ -3,41 +3,45 @@ package gentzen
 import "fmt"
 
 type inferenceRule struct {
-	name       string
-	fullName   string
-	ruleType   uint8
-	premises   []sequent //the most significant comes first
-	conclusion []sequent // alternative conclusions
-	spec       string
+	name        string
+	displayName string
+	latexName   string
+	fullName    string
+	ruleType    uint8
+	premises    []sequent //the most significant comes first
+	conclusion  []sequent // alternative conclusions
+	spec        string
 }
 
 type InfRuleTemplate struct {
-	Name       string
-	FullName   string
-	ruleType   uint8
-	Premises   []string
-	Conclusion []string
-	Spec       string
+	Name        string //name of inference rule
+	DisplayName string // how the inference rule is to be displayed as text. Defaults to Name.
+	LatexName   string // latex commands for displaying the name. Defaults to DisplayName.
+	FullName    string //full, unabreviated name of rule. Defaults to Name.
+	RuleType    uint8
+	Premises    []string
+	Conclusion  []string
+	Spec        string
 }
 
 const (
-	predicatelogicrule uint8 = 1 << iota
-	introductionrule
-	frontmanipulationrule
+	RTpredicateLogic uint8 = 1 << iota
+	RTintroduction
+	RTfrontmanipulation
 )
 
 var infrule map[string]inferenceRule
 
 func (i inferenceRule) isPLrule() bool {
-	return i.ruleType&predicatelogicrule != 0
+	return i.ruleType&RTpredicateLogic != 0
 }
 
 func (i inferenceRule) isFrontManipulationRule() bool {
-	return i.ruleType&frontmanipulationrule != 0
+	return i.ruleType&RTfrontmanipulation != 0
 }
 
 func (i inferenceRule) isIntroductionRule() bool {
-	return i.ruleType&introductionrule != 0
+	return i.ruleType&RTintroduction != 0
 }
 
 func addTheoremRules(derived bool) {
@@ -124,9 +128,11 @@ func SetStandardInferenceRules() {
 		},
 
 		InfRuleTemplate{
-			Name:     "^I",
-			FullName: "Conjunction Introduction",
-			ruleType: introductionrule,
+			Name:        "^I",
+			FullName:    "Conjunction Introduction",
+			DisplayName: "∧I",
+			LatexName:   `\conjI`,
+			RuleType:    RTintroduction,
 			Premises: []string{
 				"/L_1:s_1",
 				"/L_2:s_2",
@@ -137,8 +143,10 @@ func SetStandardInferenceRules() {
 		},
 
 		InfRuleTemplate{
-			Name:     "^E",
-			FullName: "Conjunction Elimination",
+			Name:        "^E",
+			DisplayName: "∧E",
+			LatexName:   `\conjE`,
+			FullName:    "Conjunction Elimination",
 			Premises: []string{
 				"/L:Ks_1s_2",
 			},
@@ -149,9 +157,11 @@ func SetStandardInferenceRules() {
 		},
 
 		InfRuleTemplate{
-			Name:     "vI",
-			FullName: "Disjunction Introduction",
-			ruleType: introductionrule,
+			Name:        "vI",
+			DisplayName: "∨I",
+			LatexName:   `\disjI`,
+			FullName:    "Disjunction Introduction",
+			RuleType:    RTintroduction,
 			Premises: []string{
 				"/L_1:s_1",
 			},
@@ -162,8 +172,10 @@ func SetStandardInferenceRules() {
 		},
 
 		InfRuleTemplate{
-			Name:     "vE",
-			FullName: "Disjunction Elimination",
+			Name:        "vE",
+			DisplayName: "∨E",
+			LatexName:   `\disjE`,
+			FullName:    "Disjunction Elimination",
 			Premises: []string{
 				"/L_1:As_1s_2",
 				"s_1,/L_2:s_3",
@@ -175,9 +187,11 @@ func SetStandardInferenceRules() {
 		},
 
 		InfRuleTemplate{
-			Name:     ">I",
-			FullName: "Conditional Introduction",
-			ruleType: introductionrule,
+			Name:        ">I",
+			DisplayName: "⊃I",
+			LatexName:   `\condI`,
+			FullName:    "Conditional Introduction",
+			RuleType:    RTintroduction,
 			Premises: []string{
 				"s_1,/L:s_2",
 			},
@@ -187,8 +201,10 @@ func SetStandardInferenceRules() {
 		},
 
 		InfRuleTemplate{
-			Name:     ">E",
-			FullName: "Conditional Elimination",
+			Name:        ">E",
+			DisplayName: "⊃E",
+			LatexName:   `\condE`,
+			FullName:    "Conditional Elimination",
 			Premises: []string{
 				"/L_1:Cs_1s_2",
 				"/L_2:s_1",
@@ -199,9 +215,11 @@ func SetStandardInferenceRules() {
 		},
 
 		InfRuleTemplate{
-			Name:     "-I",
-			FullName: "Negation Introduction",
-			ruleType: introductionrule,
+			Name:        "-I",
+			DisplayName: "¬I",
+			LatexName:   `\negI`,
+			FullName:    "Negation Introduction",
+			RuleType:    RTintroduction,
 			Premises: []string{
 				"s_1,/L_1:s_2",
 				"s_1,/L_2:Ns_2",
@@ -212,8 +230,10 @@ func SetStandardInferenceRules() {
 		},
 
 		InfRuleTemplate{
-			Name:     "-E",
-			FullName: "Negation Elimination",
+			Name:        "-E",
+			DisplayName: "¬I",
+			LatexName:   `\negE`,
+			FullName:    "Negation Elimination",
 			Premises: []string{
 				"/L:NNs_1",
 			},
@@ -225,7 +245,7 @@ func SetStandardInferenceRules() {
 		InfRuleTemplate{
 			Name:     "M",
 			FullName: "Monotonicity",
-			ruleType: frontmanipulationrule,
+			RuleType: RTfrontmanipulation,
 			Premises: []string{
 				"/L_1:s_1",
 			},
@@ -235,15 +255,18 @@ func SetStandardInferenceRules() {
 		},
 
 		InfRuleTemplate{
-			Name:     "rewrite",
-			FullName: "Sequent Rewrite",
-			ruleType: frontmanipulationrule,
+			Name:        "rewrite",
+			DisplayName: " ",
+			FullName:    "Sequent Rewrite",
+			RuleType:    RTfrontmanipulation,
 		},
 
 		InfRuleTemplate{
-			Name:     "UE",
-			FullName: "Universal Quantifier Elimination",
-			ruleType: predicatelogicrule,
+			Name:        "UE",
+			DisplayName: "∀E",
+			LatexName:   `\uniE`,
+			FullName:    "Universal Quantifier Elimination",
+			RuleType:    RTpredicateLogic,
 			Premises: []string{
 				"/L_1:Ux_1Fx_1",
 			},
@@ -253,9 +276,11 @@ func SetStandardInferenceRules() {
 		},
 
 		InfRuleTemplate{
-			Name:     "UI",
-			FullName: "Universal Quantifier Introduction",
-			ruleType: predicatelogicrule | introductionrule,
+			Name:        "UI",
+			DisplayName: "∀I",
+			LatexName:   `\uniI`,
+			FullName:    "Universal Quantifier Introduction",
+			RuleType:    RTpredicateLogic | RTintroduction,
 			Premises: []string{
 				"/L_1:Fa",
 			},
@@ -266,9 +291,11 @@ func SetStandardInferenceRules() {
 		},
 
 		InfRuleTemplate{
-			Name:     "XI",
-			FullName: "Existential Quantifier Introduction",
-			ruleType: predicatelogicrule | introductionrule,
+			Name:        "XI",
+			DisplayName: "∃I",
+			LatexName:   `\exI`,
+			FullName:    "Existential Quantifier Introduction",
+			RuleType:    RTpredicateLogic | RTintroduction,
 			Premises: []string{
 				"/L_1:Fa",
 			},
@@ -278,9 +305,11 @@ func SetStandardInferenceRules() {
 		},
 
 		InfRuleTemplate{
-			Name:     "XE",
-			FullName: "Existential Quantifier Elimination",
-			ruleType: predicatelogicrule,
+			Name:        "XE",
+			DisplayName: "∃E",
+			LatexName:   `\exE`,
+			FullName:    "Existential Quantifier Elimination",
+			RuleType:    RTpredicateLogic,
 			Premises: []string{
 				"/L_1:XxFx",
 				"/L_2,Fa:Gb",
@@ -307,10 +336,21 @@ func DeclareInferenceRule(i InfRuleTemplate) {
 	ir := inferenceRule{
 		name:     i.Name,
 		fullName: i.FullName,
-		ruleType: i.ruleType,
+		ruleType: i.RuleType,
 		spec:     i.Spec,
 	}
 
+	if i.DisplayName == "" {
+		ir.displayName = i.Name
+	} else {
+		ir.displayName = i.DisplayName
+	}
+
+	if i.LatexName == "" {
+		ir.latexName = ir.displayName
+	} else {
+		ir.latexName = i.LatexName
+	}
 	if ir.isPLrule() {
 		SetPL(true)
 	} else {
@@ -336,4 +376,12 @@ func DeclareInferenceRule(i InfRuleTemplate) {
 	}
 
 	infrule[ir.name] = ir
+}
+
+func ClearInferenceRules() {
+	clear(infrule)
+}
+
+func DeleteInferenceRule(name string) {
+	delete(infrule, name)
 }

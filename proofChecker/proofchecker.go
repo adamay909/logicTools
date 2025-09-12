@@ -33,12 +33,9 @@ func checkDerivation() {
 		printMessage(err.Error(), clean)
 	} else {
 		setAttributeByID("display", "class", "inactive-success")
-		//		showPrettyDeriv(dsp)
+		showPrettyDeriv(dsp)
 		printMessage("OK", clean)
 	}
-
-	//	return
-	//	}
 
 	return
 }
@@ -68,7 +65,7 @@ func showPrettyDeriv(d *console) {
 
 	var lines []string
 	arglines := getArglines(dsp.Input)
-	lines = strings.Split(gentzen.PrintDerivation(arglines, dsp.Offset, gentzen.O_ProofChecker), "\n")
+	lines = strings.Split(gentzen.PrintDerivation(arglines, dsp.Offset, gentzen.O_ProofChecker, gentzen.O_ProofChecker), "\n")
 	offset, _ := strconv.Atoi(lines[0][:strings.Index(lines[0], ".")])
 	for i, l := range lines {
 

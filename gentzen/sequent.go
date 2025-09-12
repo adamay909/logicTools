@@ -195,3 +195,42 @@ func (s sequent) isReductionOf(s2 sequent) bool {
 	}
 	return true
 }
+
+func (s sequent) stringF(mode PrintMode) string {
+
+	w := new(strings.Builder)
+
+	for i, d := range s.front {
+		w.WriteString(StringF(Parse(d, allowGreekUpper), mode))
+		if i < len(s.front)-1 {
+			w.WriteString(`,`)
+		}
+	}
+	frontString := w.String()
+
+	w.Reset()
+
+	backString := StringF(Parse(s.back, !allowGreekUpper), mode)
+
+	if mode == O_Latex {
+		w.WriteString(`\seq{`)
+		w.WriteString(frontString)
+		w.WriteString(`}{`)
+		w.WriteString(backString)
+		w.WriteString(`}`)
+	}
+
+	if mode == O_PlainText || mode == O_ProofChecker {
+		w.WriteString(frontString)
+		w.WriteString(`⊢`)
+		w.WriteString(backString)
+	}
+
+	if mode == O_PlainASCII || mode == O_English || mode == O_Polish {
+		w.WriteString(frontString)
+		w.WriteString(":")
+		w.WriteString(backString)
+	}
+
+	return w.String()
+}

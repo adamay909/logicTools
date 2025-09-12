@@ -72,9 +72,10 @@ var dsp *console
 func main() {
 
 	initMessages()
-	gentzen.SetStandardPolish(false)
+	gentzen.SetSpecialConn(true)
 	gentzen.SetML(false)
 	gentzen.SetDR(false)
+	setInferenceRules()
 	setupJS()
 	resetDisplay()
 	hideExtra()

@@ -19,7 +19,7 @@ func plainTextDeriv(withTitle bool) string {
 	}
 
 	arglines := getArglines(dsp.Input)
-	output = output + gentzen.PrintDerivation(arglines, dsp.Offset, gentzen.O_ProofChecker)
+	output = output + gentzen.PrintDerivation(arglines, dsp.Offset, gentzen.O_ProofChecker, gentzen.O_PlainText)
 	return output
 
 	for i, l := range dsp.Input {
@@ -135,7 +135,7 @@ func latexOutput() string {
 		debug(c, ": ", k)
 	}
 
-	output = output + gentzen.PrintDerivation(arglines, dsp.Offset, gentzen.O_Latex)
+	output = output + gentzen.PrintDerivation(arglines, dsp.Offset, gentzen.O_ProofChecker, gentzen.O_Latex)
 	return safeLtx(output)
 
 	ln := strconv.Itoa(dsp.Offset - 1)
@@ -260,16 +260,16 @@ func ltxof(e string) string {
 }
 
 func printTree() {
-	/*
-	   gentzen.ClearLog()
-	   arglines, ok := getArglines(dsp.Input)
 
-	   	if !ok {
-	   		printMessage(gentzen.ShowLog(), clean)
-	   		debug("error parsing derivation lines")
-	   		return
-	   	}
+	gentzen.ClearLog()
+	arglines := getArglines(dsp.Input)
 
-	   //copyToClipboard(gentzen.PrintDerivTree(arglines, dsp.Offset))
-	*/
+	tree, err := gentzen.PrintDerivationTree(arglines, gentzen.O_ProofChecker, dsp.Offset)
+	if err != nil {
+		printMessage(gentzen.ShowLog(), clean)
+		debug("error parsing derivation lines")
+		return
+	}
+
+	copyToClipboard(tree)
 }

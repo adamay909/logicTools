@@ -308,3 +308,32 @@ func codeOf(l LogicalConstant) string {
 	}
 
 }
+
+/*
+use non-standard connectives for Polish notation to free some characters:
+negation: -
+conjunction: ^
+disjunction: v
+conditional: >
+*/
+func SetSpecialConn(v bool) {
+
+	if v {
+		lneg = "-"
+		lconj = "^"
+		ldisj = "v"
+		lcond = ">"
+		luni = "U"
+		lex = "X"
+		lident = "="
+	} else {
+		lneg = "N"
+		lconj = "K"
+		ldisj = "A"
+		lcond = "C"
+		luni = "U"
+		lex = "X"
+		lident = "="
+	}
+	setupConnectives()
+}
