@@ -7,30 +7,6 @@ import (
 	"strings"
 )
 
-// check if s0 can be turned into s1 through substitutions into atomic sentence letters into s0. If answer is yes, repl holds the map for needed replacements.
-func IsSubstitutionInstance(s0, s1 string) (ok bool, repl map[string]string) {
-
-	if !IsWff(s0) || !IsWff(s1) {
-		return false, repl
-	}
-	t0, _ := tokenize(s0, !allowGreekUpper, !allowSpecial)
-	t1, _ := tokenize(s1, !allowGreekUpper, !allowSpecial)
-
-	if !oPL {
-		t0.normalize("t")
-		t1.normalize("s")
-	} else {
-		t0.normalize("F", "a")
-		t1.normalize("G", "b")
-	}
-
-	repl = make(map[string]string)
-
-	ok = issubstitutioninstance(t0.String(), t1.String(), repl, []string{})
-
-	return ok, repl
-}
-
 // check if s0 and s1 have same structure. s0 is the template. Make sure s0 and s1 are already
 // appropriately normalized and are wff. If repl is non-empty, its mapping will be respected and
 // also appended.
@@ -89,11 +65,13 @@ func issubstitutioninstance(s0, s1 string, repl map[string]string, exclude []str
 				if f, ok := repl[nodes0[i][j].Val.predicateLetter+"x_1"]; ok {
 					//this is for the case we are looking for an instantiation of an open formula
 					//in the template formula.
-					if success, arg := findArg(f, nodes1[i][k].String(), exclude); !success {
+					var success bool
+					var arg string
+					if success, arg = findArg(f, nodes1[i][k].String(), exclude); !success {
 						return false
-					} else {
-						repl["const"] = arg
 					}
+					repl["const"] = arg
+
 				}
 				if _, ok := repl[nodes0[i][j].String()]; !ok {
 					repl[nodes0[i][j].String()] = nodes1[i][k].String()

@@ -53,67 +53,6 @@ func truthValue(n *Node, val map[string]bool) bool {
 }
 
 /*
-func constructTruthTableWide(s string) (tt TruthTable, err error) {
-
-	n, err := ParseStrict(s, !allowGreekUpper)
-
-	if err != nil {
-
-		return tt, err
-
-	}
-
-	tt.Formula = s
-
-	var egressFunc, donothing func(*Node)
-
-	donothing = func(*Node) {
-		return
-	}
-
-	tt.ColumnTitles = getColumnTitles(s)
-
-	tt.NumAtomic = len(getAtomicColumns(tt.ColumnTitles))
-
-	tt.Rows = make([][]bool, 0, 1<<tt.NumAtomic)
-
-	var row []bool
-
-	v := make([]bool, tt.NumAtomic)
-
-	appeared := make(map[string]bool)
-
-	for rownum := 0; rownum < 1<<tt.NumAtomic; rownum++ {
-
-		row = make([]bool, 0, len(tt.ColumnTitles))
-
-		v, _ = valuation(rownum, tt.NumAtomic)
-
-		row = append(row, v...)
-
-		clear(appeared)
-
-		egressFunc = func(e *Node) {
-
-			if e.IsAtomic() {
-				return
-			}
-
-			if !appeared[e.String()] {
-				row = append(row, e.tvalue[rownum])
-				appeared[e.String()] = true
-			}
-		}
-
-		Serialize(n, donothing, donothing, egressFunc)
-
-		tt.Rows = append(tt.Rows, row)
-	}
-
-	return
-}
-*/
-/*
 GenerateTruthTableNarrow return the truth table for s in narrow format.
 For wide format, use [GenerateTruthTable]. Here is a 'narrow' truth table
 presented in O_PlainText mode:

@@ -13,21 +13,23 @@ type inferenceRule struct {
 	spec        string
 }
 
+/*InfRuleTemplate is used to declare inference rules.*/
 type InfRuleTemplate struct {
-	Name        string //name of inference rule
-	DisplayName string // how the inference rule is to be displayed as text. Defaults to Name.
-	LatexName   string // latex commands for displaying the name. Defaults to DisplayName.
-	FullName    string //full, unabreviated name of rule. Defaults to Name.
-	RuleType    uint8
-	Premises    []string
-	Conclusion  []string
-	Spec        string
+	Name        string   //name of inference rule
+	DisplayName string   // how the inference rule is to be displayed as text. Defaults to Name.
+	LatexName   string   // latex commands for displaying the name. Defaults to DisplayName.
+	FullName    string   //full, unabreviated name of rule. Defaults to Name.
+	RuleType    uint8    //for available types, see below
+	Premises    []string //the premises in sequent form.
+	Conclusion  []string //the conclusion in sequent form. It's a slice to allow alternative conclusions.
+	Spec        string   //further specifications. Currently, only "unique constants" is supported that is used to restrict ∀I and ∃E.
 }
 
+// The following constants define available inference rule types.
 const (
-	RTpredicateLogic uint8 = 1 << iota
-	RTintroduction
-	RTfrontmanipulation
+	RTpredicateLogic    uint8 = 1 << iota //rule is predicate logic specific.
+	RTintroduction                        //rule is an introduction rule
+	RTfrontmanipulation                   //rule is for manipulating front formulas. NOTE: currently unsupported.
 )
 
 var infrule map[string]inferenceRule
@@ -109,6 +111,7 @@ func addTheoremRules(derived bool) {
 
 }
 
+/* SetStandardInferenceRules sets the inference rules to be those in the text book.*/
 func SetStandardInferenceRules() {
 	var infrules = []InfRuleTemplate{
 		InfRuleTemplate{
@@ -326,6 +329,7 @@ func SetStandardInferenceRules() {
 	}
 }
 
+/*DeclareInferenceRule makes the rule specified by i available to the proof checking backend.*/
 func DeclareInferenceRule(i InfRuleTemplate) {
 
 	rpl := oPL
@@ -378,10 +382,12 @@ func DeclareInferenceRule(i InfRuleTemplate) {
 	infrule[ir.name] = ir
 }
 
+/*ClearInferenceRules removes all inference rules.*/
 func ClearInferenceRules() {
 	clear(infrule)
 }
 
+/*DeleteInferenceRule removes the named inference rule.*/
 func DeleteInferenceRule(name string) {
 	delete(infrule, name)
 }

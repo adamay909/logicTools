@@ -8,7 +8,7 @@ import (
 	"github.com/adamay909/logicTools/ju"
 )
 
-// Node holds information about a node in the syntax tree of a formula
+// syntaxNode holds information about a node in the syntax tree of a formula
 type syntaxNode struct {
 	raw             string
 	connective      LogicalConstant
@@ -21,6 +21,7 @@ type syntaxNode struct {
 	//tvalue          []bool //map interpretation row number to truth value
 }
 
+// Node represents a node in a syntax tree of a formula
 type Node = ju.Node[syntaxNode]
 
 // IsAtomic returns true if n is an atomic formula.

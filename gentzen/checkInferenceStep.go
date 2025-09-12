@@ -528,7 +528,7 @@ func matchInfrulePL(series []sequent, ir inferenceRule) bool {
 	return false
 }
 
-/*PrinDerivation format lines a derivation. informat species how the input is formatted. O_PlainASCII, O_ProofChecker imply infix formatting of input. outputFormat species the formatting of the output.*/
+/*PrintDerivation formats lines a derivation. informat species how the input is formatted. O_PlainASCII, O_ProofChecker imply infix formatting of input. outputFormat species the formatting of the output.*/
 func PrintDerivation(lines []string, offset int, informat PrintMode, outputFormat PrintMode) string {
 
 	derivation, derr := toDerivation(lines, informat, offset)
@@ -659,6 +659,7 @@ func getDerivationTree(deriv []derivationLine, offset int) *derivationNode {
 	return d
 }
 
+// PrintDerivationTree outputs Latex code for representing the derivation given by s in tree form.
 func PrintDerivationTree(s []string, mode PrintMode, offset int) (string, error) {
 
 	w := new(strings.Builder)

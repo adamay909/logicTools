@@ -2,8 +2,6 @@ package gentzen
 
 import (
 	"log"
-	"math/rand"
-	"time"
 )
 
 type config struct {
@@ -28,9 +26,8 @@ var (
 
 func init() {
 
-	rand.Seed(int64(time.Now().Nanosecond()))
-	SetStandardPolish(true)
-	//connectives = append(connectivesSL, connectivesPL...)
+	SetSpecialConn(false)
+
 	logger = log.New(&checkLog, "", 0)
 	debug = log.New(&dLog, "gentzen: ", 0)
 
