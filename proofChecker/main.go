@@ -73,9 +73,8 @@ func main() {
 
 	initMessages()
 	gentzen.SetSpecialConn(true)
-	gentzen.SetML(false)
-	gentzen.SetDR(false)
-	setInferenceRules()
+	setBasicInferenceRules()
+	setupTheorems(oDR)
 	setupJS()
 	resetDisplay()
 	hideExtra()
@@ -391,7 +390,6 @@ func toggleTheorems() {
 		setTextByID("togglethm", "No Theorems")
 	}**/
 	dsp.Theorems = oTHM
-	gentzen.SetAllowTheorems(oTHM)
 	return
 }
 
@@ -423,7 +421,6 @@ func toggleDR() {
 		setTextByID("toggleDR", `Derived Rules`)
 	}
 	dsp.DerivedRules = oDR
-	gentzen.SetDR(oDR)
 }
 func toggleML() {
 	stopInput()
@@ -434,8 +431,8 @@ func toggleML() {
 		setTextByID("toggleML", `Modal Logic`)
 	}
 	dsp.SystemML = oML
-	gentzen.SetML(oML)
 }
+
 func toggleHelp() {
 	if oABOUT {
 		return

@@ -11,7 +11,7 @@ import (
 // syntaxNode holds information about a node in the syntax tree of a formula
 type syntaxNode struct {
 	raw             string
-	connective      LogicalConstant
+	connective      logicalConstant
 	variable        string
 	predicateLetter string
 	term            []string
@@ -260,12 +260,12 @@ func StringF(n *Node, mode PrintMode) string {
 }
 
 // PolishString returns Polish string for c.
-func (c LogicalConstant) PolishString() string {
+func (c logicalConstant) PolishString() string {
 	return c.Stringf(O_Polish)
 }
 
 // Stringf returns formatted string for c.
-func (c LogicalConstant) Stringf(m PrintMode) string {
+func (c logicalConstant) Stringf(m PrintMode) string {
 
 	for _, e := range connectives {
 		if codeOf(c) == e[0] {
@@ -314,8 +314,8 @@ func isPureSL(n *Node) bool {
 	return len(n.FindMatch(isQuantifier)) == 0
 }
 
-// Conjoin produces a Node that results by conjoining n1 and n1.
-func Conjoin(n1, n2 *Node) *Node {
+// conjoin produces a Node that results by conjoining n1 and n1.
+func conjoin(n1, n2 *Node) *Node {
 
 	e := new(Node)
 
@@ -326,8 +326,8 @@ func Conjoin(n1, n2 *Node) *Node {
 	return e
 }
 
-// Disjoin produces a node that results by disjoining n1 and n2.
-func Disjoin(n1, n2 *Node) *Node {
+// disjoin produces a node that results by disjoining n1 and n2.
+func disjoin(n1, n2 *Node) *Node {
 
 	e := new(Node)
 
@@ -338,8 +338,8 @@ func Disjoin(n1, n2 *Node) *Node {
 	return e
 }
 
-// Negate produces a node that results by negating n.
-func Negate(n *Node) *Node {
+// negate produces a node that results by negating n.
+func negate(n *Node) *Node {
 
 	e := new(Node)
 
@@ -349,9 +349,9 @@ func Negate(n *Node) *Node {
 	return e
 }
 
-// Conditionalize returns a conditional node that takes
+// conditionalize returns a conditional node that takes
 // n1 as the antecedent and n2 as cosequent.
-func Conditionalize(n1, n2 *Node) *Node {
+func conditionalize(n1, n2 *Node) *Node {
 
 	e := new(Node)
 

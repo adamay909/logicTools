@@ -1,0 +1,2 @@
+Some theorems that are strictly speaking distinct have the same name (e.g. DeMorgan). Since it is annoying to have different names for each variation, need a way to handle to different forms. The obvious solution is to have the Premises in the InferenceRule type to be a slice of slices of strings.
+

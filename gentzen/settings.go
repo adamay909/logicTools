@@ -50,23 +50,3 @@ func SetPL(v bool) {
 	oPL = v
 
 }
-
-// SetML specifies whether we allows modal logic
-func SetML(v bool) {
-
-	oML = v
-
-}
-
-// SetDR specifies whether we allow derived rules
-func SetDR(v bool) {
-
-	oDR = v
-
-}
-
-// SetAllowTheorems sets whether appeal to some standard theorems
-// is allowed. Default is false.
-func SetAllowTheorems(v bool) {
-	oTHM = v
-}

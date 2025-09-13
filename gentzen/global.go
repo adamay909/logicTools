@@ -5,8 +5,8 @@ The variables defined here should be treated as constants except by functions de
 file.
 *************************************/
 
-// LogicalConstant represents the logical constants.
-type LogicalConstant int
+// logicalConstant represents the logical constants.
+type logicalConstant int
 
 var (
 	lneg   = "N"
@@ -18,9 +18,9 @@ var (
 	lident = "="
 )
 
-//go:generate stringer -type LogicalConstant
+//go:generate stringer -type logicalConstant
 const (
-	None  LogicalConstant = iota //no connective
+	None  logicalConstant = iota //no connective
 	Neg                          //negation
 	Conj                         //conjunction
 	Disj                         //disjunction
@@ -245,7 +245,7 @@ func SetPrettyBrackets(v bool) {
 	prettifyBrackets = v
 }
 
-func codeOf(l LogicalConstant) string {
+func codeOf(l logicalConstant) string {
 
 	switch l {
 	case Neg:

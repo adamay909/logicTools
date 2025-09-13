@@ -170,7 +170,7 @@ func (t token) terms() []string {
 	return t.term
 }
 
-func (t tokenID) logicConstant() LogicalConstant {
+func (t tokenID) logicConstant() logicalConstant {
 	switch t {
 	case tNeg:
 		return Neg

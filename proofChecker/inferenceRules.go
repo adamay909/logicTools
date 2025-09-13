@@ -2,7 +2,7 @@ package main
 
 import "github.com/adamay909/logicTools/gentzen"
 
-func setInferenceRules() {
+func setBasicInferenceRules() {
 	var infrules = []gentzen.InfRuleTemplate{
 		gentzen.InfRuleTemplate{
 			Name:     "A",
@@ -218,5 +218,48 @@ func setInferenceRules() {
 
 	for i := range infrules {
 		gentzen.DeclareInferenceRule(infrules[i])
+	}
+}
+
+func setupTheorems(derived bool) {
+
+	var theorems = [][]string{
+		{"sl", "Identity", "ID", ">pp"},
+		{"sl", "NonContradiction", "NC", "-^p-p"},
+		{"sl", "Excluded Middle", "EM", "vp-p"},
+		{"sl", "Contraposition", "CP", ">>pq>-q-p"},
+		{"sl", "Implication", "IM", ">>pqv-pq"},
+		{"sl", "Elimination", "EL", ">vpq>-pq"},
+		{"sl", "DeMorgan", "DM", ">-vpq^-p-q", ">-^pqv-p-q", ">v-p-q-^pq", ">^-p-q-vpq"},
+		//		{"DeMorgan", "DM", ">-^pqv-p-q"},
+		//		{"DeMorgan", "DM", ">v-p-q-^pq"},
+		//		{"DeMorgan", "DM", ">^-p-q-vpq"},
+		{"sl", "Commutativity of Conjunction", "CC", ">^pq^qp"},
+		{"sl", "Commutatitivity of Disjunction", "CD", ">vpqvqp"},
+		{"sl", "Associativity of Conjunction", "AC", ">^^pqr^p^qr", ">^p^qr^^pqr"},
+		//		{"Associativity of Conjunction", "AC", ">^p^qr^^pqr"},
+		{"sl", "Associativity of Disjunction", "AD", ">vvpqrvpvqr", ">vpvqrvvpqr"},
+		//		{"Associativity of Disjunction", "AD", ">vpvqrvvpqr"},
+		{"sl", "Double Negation Introduction", "D-", ">p--p"},
+		{"pl", "Quantifier Exchange", "QE", ">UxFx-Xx-Fx", ">XxFx-Ux-Fx", ">-Ux-FxXxFx", ">-Xx-FxUxFx"},
+	}
+
+	for _, t := range theorems {
+
+		nr := gentzen.InfRuleTemplate{
+			Name:     t[2],
+			FullName: t[1],
+		}
+		if t[0] == "pl" {
+			nr.RuleType = gentzen.RTpredicateLogic
+		}
+
+		conclusions := t[3:]
+		for _, c := range conclusions {
+			nr.Conclusion = append(nr.Conclusion, ":"+c)
+		}
+
+		gentzen.DeclareInferenceRule(nr)
+
 	}
 }

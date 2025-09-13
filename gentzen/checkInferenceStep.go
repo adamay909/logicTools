@@ -251,6 +251,7 @@ func normalizeDerivation(series []sequent, l ...string) []sequent {
 	atoms := make(map[string]string)
 
 	for i := range series {
+		fmt.Println("check line:", i, series[i])
 		var nseq sequent
 		for _, d := range series[i].front {
 			n := Parse(d, allowGreekUpper)
@@ -275,6 +276,7 @@ func normalizeDerivation(series []sequent, l ...string) []sequent {
 			}
 		}
 		nseq.back = replaceAtomicWith(series[i].back, atoms)
+		fmt.Println("here")
 		resp = append(resp, nseq)
 	}
 
@@ -478,6 +480,13 @@ func inferenceStepSuccessfulPL(series []sequent, ir inferenceRule) error {
 
 	series = normalizeDerivationPL(series, "G", "c", "/G")
 
+	if len(series) == 1 {
+		if ok := matchInfrulePL(series, ir); ok {
+			return nil
+		}
+		return errors.New("step does not work")
+	}
+
 	//got through all possible permutations of the lines to be checked
 	for _, prem := range permutations(series[:len(series)-1]) {
 		deriv := make([]sequent, 0, len(series))
@@ -518,6 +527,7 @@ func matchInfrulePL(series []sequent, ir inferenceRule) bool {
 		//		fmt.Println("constants to exclude:", exclude)
 
 		canonical = normalizeDerivationPL(canonical, "F", "k", "/L")
+		fmt.Println("real canonical:\n", canonical)
 
 		if matchPattern(series, canonical, ir.isIntroductionRule(), exclude) {
 			return true

@@ -26,15 +26,15 @@ func printNodeInfix(n *Node, m PrintMode) string {
 	}
 }
 
-func (c LogicalConstant) isQuantifier() bool {
+func (c logicalConstant) isQuantifier() bool {
 	return c == Uni || c == Ex
 }
 
-func (c LogicalConstant) isModalOperator() bool {
+func (c logicalConstant) isModalOperator() bool {
 	return c == Nec || c == Pos
 }
 
-func (c LogicalConstant) isNegation() bool {
+func (c logicalConstant) isNegation() bool {
 	return c == Neg
 }
 
