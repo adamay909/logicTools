@@ -20,9 +20,9 @@ func _() {
 	_ = x[pos-9]
 }
 
-const _logicalConstant_name = "NoneNegConjDisjCondUniExIdentNecPos"
+const _logicalConstant_name = "noConstantnegconjdisjconduniexidentnecpos"
 
-var _logicalConstant_index = [...]uint8{0, 4, 7, 11, 15, 19, 22, 24, 29, 32, 35}
+var _logicalConstant_index = [...]uint8{0, 10, 13, 17, 21, 25, 28, 30, 35, 38, 41}
 
 func (i logicalConstant) String() string {
 	if i < 0 || i >= logicalConstant(len(_logicalConstant_index)-1) {
