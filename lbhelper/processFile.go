@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/adamay909/logicTools/fileops"
+	"github.com/adamay909/logicTools/internal/fileops"
 )
 
 func processFile() {

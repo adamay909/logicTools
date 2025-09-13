@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/adamay909/logicTools/fileops"
 	"github.com/adamay909/logicTools/gentzen"
+	"github.com/adamay909/logicTools/internal/fileops"
 )
 
 var outputDest *os.File
