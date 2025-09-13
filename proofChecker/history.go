@@ -141,11 +141,14 @@ func moveInHistory() {
 	dsp.xpos, dsp.ypos = 0, 0
 	dsp.overhang = false
 	dsp.modifier = ""
-	if dsp.SystemPL != oPL {
-		togglePL()
-	}
-	if dsp.Theorems != oTHM {
+
+	setBasicInferenceRules()
+	if oTHM != dsp.Theorems {
 		toggleTheorems()
+	}
+
+	if dsp.SystemPL != oPL { //need to do this after setting up inference rules
+		togglePL()
 	}
 
 	setTextByID("messages", "")
@@ -186,7 +189,9 @@ func reloadStash() {
 	if dsp.SystemPL != oPL {
 		togglePL()
 	}
-	if dsp.Theorems != oTHM {
+	setBasicInferenceRules()
+	if dsp.Theorems {
+		oTHM = false
 		toggleTheorems()
 	}
 
@@ -208,7 +213,9 @@ func recoverState() {
 	if dsp.SystemPL != oPL {
 		togglePL()
 	}
-	if dsp.Theorems != oTHM {
+	setBasicInferenceRules()
+	if dsp.Theorems {
+		oTHM = false
 		toggleTheorems()
 	}
 

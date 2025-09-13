@@ -38,7 +38,7 @@ var (
 
 	oDR = false
 
-	oTHM = true
+	oTHM = false
 
 	oHELP = false
 
@@ -74,12 +74,12 @@ func main() {
 	initMessages()
 	gentzen.SetSpecialConn(true)
 	setBasicInferenceRules()
-	setupTheorems(oDR)
 	setupJS()
 	resetDisplay()
 	hideExtra()
 	//	hide("menuButton")
 	loadHistory()
+	//toggleTheorems()
 	stopInput()
 
 	<-make(chan bool)
@@ -194,6 +194,8 @@ func onClick() {
 		togglePL()
 	case "setOffset":
 		setOffset()
+	case "toggleTheorem":
+		toggleTheorems()
 	case "toggleDR":
 		toggleDR()
 	case "toggleML":
@@ -367,7 +369,7 @@ func resetDisplay() {
 	//finalize stuff
 	display()
 	toggleClipboardType()
-	toggleTheorems()
+	//toggleTheorems()
 	//	toggleDR()
 	//	toggleML()
 	togglePL()
@@ -381,15 +383,18 @@ func resetDisplay() {
 
 func toggleTheorems() {
 	stopInput()
-	oTHM = true
-	/**
+
 	oTHM = !oTHM
-	if oTHM {
-		setTextByID("togglethm", "With Theorems")
-	} else {
-		setTextByID("togglethm", "No Theorems")
-	}**/
+
 	dsp.Theorems = oTHM
+
+	setBasicInferenceRules()
+	setTextByID("toggleTheorem", "Theorems")
+	if oTHM {
+		setupTheorems(oDR)
+		setTextByID("toggleTheorem", "Theorems ✓")
+	}
+
 	return
 }
 

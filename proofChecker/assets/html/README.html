@@ -1,6 +1,7 @@
-<h2>In-Browser Proof Checker</h2>
+<h2>Online proof checker</h2>
 <h3>The proof system</h3>
-<p>This proof checker is designed for working with the proof system Gerhard Gentzen presents in his &quot;Die Wiederspruchsfreiheit der reinen Zahlentheorie&quot; (1936) that I use in my introductory formal logic course. A proof is stated as a series of sequents where each sequent must have exactly one formula as its succedent. It can be trivially converted to proofs in the style of Lemmon's <em>Beginning Logic</em> as well as others influenced by him (e.g., Allen and Hand, <em>Logic Primer</em>). E.g., the following proof:</p>
+<p>This proof checker is designed for working with the proof system Gentzen uses in his &quot;Die Wiederspruchsfreiheit der reinen Zahlentheorie&quot; (1936) that I use in my introductory formal logic course. The instruction material is available at <a href="https://github.com/adamay909/logicbook">https://github.com/adamay909/logicbook</a>.</p>
+<p>Here is the short version of the system. A proof is stated as a series of sequents where each sequent must have exactly one formula as its succedent. It can be trivially converted to proofs in the style of Lemmon's <em>Beginning Logic</em> as well others influenced by him (e.g., Allen and Hand, <em>Logic Primer</em>). E.g., the following proof:</p>
 <ol>
 <li>P ⊢ P</li>
 <li>Q ⊢ Q</li>
@@ -10,7 +11,7 @@
 <p>1 (1) P<br>
 2 (2) Q<br>
 1,2 (3) P and Q</p>
-<p>What we do is replace the turnstile with the line  number, and replace formulas on the antecedent side of each sequent with the appropriate line numbers (of course, you need to add appropriate annotations). One thing Gentzen's system allows is the use of placeholders on the antecedent side of a sequent which can be useful (there is an example of that below).</p>
+<p>What we do is replace the turnstile with the line  number, and replace formulas on the antecedent side of each sequent with the appropriate line numbers (of course, you need to add appropriate annotations). One thing Gentzen's allows is the use of placeholders on the antecedent side of a sequent which can be useful (there is an example of that below).</p>
 <p>The proof system has 9 inference rules for sentential logic. In the system, you may:</p>
 <ul>
 <li><strong>Assumption Introduction (A)</strong> Infer s ⊢ s.</li>
@@ -35,16 +36,22 @@ in Γ .</li>
 <li><strong>Universal Quantifier Elimination (∀E)</strong> From Γ ⊢ ∀υφ(υ), infer Γ ⊢ φ(κ ),
 for any constant κ.</li>
 <li><strong>Existential Quantifier Introduction (∃I)</strong> Given a constant κ , infer from
-Γ ⊢ φ(κ) to Γ ⊢ ∃υφ*(υ).  (φ*(υ) is φ(κ) with one or more inistance of κ replaced with  υ.)</li>
+Γ ⊢ φ( κ) to Γ ⊢ ∃υφ(υ).</li>
 <li><strong>Existential Quantifier Elimination (∃E)</strong> From Γ ⊢ ∃υφ(υ) and ∆, φ (κ) ⊢ ψ,
 infer Γ, ∆ ⊢ ψ , provided κ does not appear in any of Γ, ∆ , and ψ.</li>
 </ul>
-<p>There are two rules for identity:</p>
+<p>Finally, we have axioms and a rule for using axioms:</p>
 <ul>
-<li><strong>Identity Introduction (=I)</strong> For any constant κ, infer ⊢ κ=κ.</li>
-<li><strong>Identity Elimination (=E)</strong> For any constants κ1 and κ2 , infer
-⊢ (κ1=κ2 ∧ φ(κ1)) ⊃ φ*(κ2) (φ*(κ2) is φ(κ1) with one or more inistance of κ1 replaced with  κ2.)</li>
+<li><p>All sentences of the following forms are axioms:</p>
+<ul>
+<li>x=x</li>
+<li>(x=y ∧ φ(x)) ⊃ φ(y)</li>
 </ul>
+</li>
+<li><p><strong>Axiom (Ax)</strong> If α is an axiom, infer ⊢ α.</p>
+</li>
+</ul>
+<p>Notice the <em>lower case</em> x in the abbreviation for Axiom.</p>
 <p>For annotations, the proof checker requires you to use the abbreviations given in parentheses.</p>
 <p>There are three more rules for rewriting the antecedent side of sequents:</p>
 <ul>
@@ -52,7 +59,7 @@ infer Γ, ∆ ⊢ ψ , provided κ does not appear in any of Γ, ∆ , and ψ.</
 <li>You may delete duplicate items within the antecedent of a sequent.</li>
 <li>You may add arbitrary items to the antecedent of a sequent.</li>
 </ul>
-<p>These sequent rewrite rules have no names. When you use them, just give the  number of the line being rewritten in the annotation. The proof checker allows you to use the first two silently. E.g., instead of:</p>
+<p>These sequent rewrite rules have no names. When you use them, just give the relevant line numbers in the annotations. The proof checker allows you to use the first two silently. E.g., instead of:</p>
 <ol>
 <li>P ⊢ P...A</li>
 <li>Q ⊢ Q...A</li>
@@ -80,7 +87,8 @@ infer Γ, ∆ ⊢ ψ , provided κ does not appear in any of Γ, ∆ , and ψ.</
 </ol>
 <p>Notice the use of the keyword &quot;premise&quot; in the annotation. That is what you must use for a premise that is not an assumption (an assumption must take the form s ⊢ s).</p>
 <h3>Theorems</h3>
-<p>To make life easier, the proof checker allows appeal to a limited number of theorems. They are:</p>
+<p>To make life easier, you can choose to allow the use of a few theorems by clicking on the gear icon on the top left and then clicking the button that says &quot;Theorems&quot;. If theorems are allowed, it will show a check mark next to &quot;Theorems&quot;. You can disable theorems by clicking on the button again.</p>
+<p>If you do use theorems, you must use their abbreviations in the annotations. The theorems are:</p>
 <h4>Theorems of Sentential Logic</h4>
 <ul>
 <li><strong>Identity (ID)</strong> ⊢ p ⊃ p</li>
@@ -112,7 +120,7 @@ infer Γ, ∆ ⊢ ψ , provided κ does not appear in any of Γ, ∆ , and ψ.</
 <li><strong>Quantifier Exchange (QE)</strong> ⊢ ∀x¬Fx ⊃ ¬∃xFx</li>
 <li><strong>Quantifier Exchange (QE)</strong> ⊢ ¬∃xFx ⊃ ∀x¬Fx</li>
 </ul>
-<p>If you use a theorem in a derivation, you must use its abbreviation in the annotation. The proof checker will recognize instances of theorems (and axioms). Here is an example of a use of EM:</p>
+<p>The proof checker will recognize instances of theorems. Here is an example of a use of EM:</p>
 <ol>
 <li>Γ ⊢ P⊃Q...premise</li>
 <li>⊢ P∨¬P...EM</li>
@@ -124,14 +132,16 @@ infer Γ, ∆ ⊢ ψ , provided κ does not appear in any of Γ, ∆ , and ψ.</
 <li>Γ ⊢ ¬P∨Q...2,5,7,∨E</li>
 </ol>
 <h3>The Proof Checker</h3>
-<p>The proof checker checks whether  each line is in accordance with the proof system. But it does not check whether you have managed to show what you set out to show. You'll have to check that yourself---usually a matter of inspecting the last line of your derivation, possibly in combination with the premises.</p>
-<p>You may have to go through several rounds of checking and fixing a derivation because the proof checker does not always list all the problems at once.</p>
+<p>The proof checker checks you whether each line is in accordance with the proof system. But it does not check whether you have managed to show what you set out to show. You'll have to check that yourself---usually a matter of inspecting the last line of your derivation, possibly in combination with the premises.</p>
+<p>You may have to go through several rounds of checking and fixing a derivation because the proof checker stops checking at the first error it encounters.</p>
 <h3>The Editor</h3>
-<p>The editor is very primitive with limited functionality. It works like an old-school, keyboard-only editor. You can move the cursor around with the arrow keys, home and end for moving to the start or end of line, and delete and backspace should work more or less normally (sometimes more, sometimes less...). But no more advanced navigation around the input area, no positioning the cursor with your mouse,  and no copying and pasting and the like. Given the intended use, it should be enough (it works for me...).  You will need a physical keyboard.</p>
-<p>Apart from the above limitations, The editor is designed to be as transparent as possible: symbols should be easy to type and students should not have to worry about how what's on the screen corresponds to what they see in the course material. Some special key combinations are used to facilitate typing symbols. Check the help on how to input symbols.</p>
+<p>The editor is very primitive with limited functionality. It works like an old-school, keyboard-only editor. You can move the cursor around with the arrow keys, home and end for moving to the start or end of line, and delete and backspace should work more or less normally (sometimes more, sometimes less...). But no more advanced navigation around the input area, no positioning the cursor with your mouse,  and no copying and pasting and the like. Given the intended use, it should be enough (it works for me...). You do need a physical keyboard.</p>
+<p>Apart from the above limitations, The editor is designed to be as transparent as possible: symbols should be easy to type and you should not have to worry about how what's on the screen corresponds to what you see in the course material. Some special key combinations are used for typing symbol like Greek characters and the turnstile. Check the help on how to input symbols.</p>
 <h3>Preservation of History</h3>
-<p>The proof checker will attempt to store the current state of the editor so that when you open the proof checker again, you will be presented with the last state of things before you quit (or the program crashed). The proof checker will also store a series of snapshots of the editor. This last happens whenever you clear the screen or make edits in the history. All history is stored in the browser as off-line data so how much history is stored for how long depends on your browser settings and the like.</p>
-<p>You can go back and forth in history using the 'back' and 'forward' buttons.</p>
+<p>The proof checker will attempt to store the current state of the editor so that when you open the proof checker again, you will be presented with the last state of things before you quit (or the program crashed). The proof checker will also store a series of snapshots of the editor. This last happens whenever you clear the screen or move to the next exercise. All history is stored in the browser's local cache so how much history is stored for how long depends on your browser settings and the like.</p>
+<p>You can go back and forth in history using 'back' and 'forward' buttons above the input area. You can see where you are in the lower right corner.</p>
+<h3>Installation</h3>
+<p>This proof-checker is designed to run completely inside the browser so it is easy to host yourself so long as you are able to host static websites. The docs folder of the GitHub repository contains all the files you need.</p>
 <h3>Copyright</h3>
 <p>The Go, HTML, and CSS sources for this proof checker written by Masahiro Yamada. Licensed under the MIT License. You can get the source code at:
-<a href="https://github.com/adamay909/logicBook/tools/proofChecker">https://github.com/adamay909/logicTools</a></p>
+<a href="https://github.com/adamay909/logicTools">https://github.com/adamay909/logicTools</a></p>

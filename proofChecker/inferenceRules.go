@@ -224,7 +224,7 @@ func setBasicInferenceRules() {
 			RuleType: gentzen.RTpredicateLogic,
 			Patterns: [][]string{
 				[]string{":=cc"},
-				[]string{":CK=cdFcFd"},
+				[]string{":>^=cdFcFd"},
 			},
 		},
 	}
@@ -251,7 +251,7 @@ func setupTheorems(derived bool) {
 		{"sl", "Associativity of Conjunction", "AC", ">^^pqr^p^qr", ">^p^qr^^pqr"},
 		{"sl", "Associativity of Disjunction", "AD", ">vvpqrvpvqr", ">vpvqrvvpqr"},
 		{"sl", "Double Negation Introduction", "D-", ">p--p"},
-		{"pl", "Quantifier Exchange", "QE", ">UxFx-Xx-Fx", ">XxFx-Ux-Fx", ">-Ux-FxXxFx", ">-Xx-FxUxFx"},
+		{"pl", "Quantifier Exchange", "QE", ">UxFx-Xx-Fx", ">XxFx-Ux-Fx", ">-Ux-FxXxFx", ">-Xx-FxUxFx", ">Ux-Fx-XxFx", ">-XxFxUx-Fx", ">Xx-Fx-UxFx", ">-UxFxXx-Fx"},
 	}
 
 	for _, t := range theorems {
