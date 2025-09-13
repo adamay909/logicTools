@@ -108,7 +108,7 @@ func parse(tk tokenStr) (n *Node, err error) {
 			currentNode.Val.variable = t.str
 
 		case t.isPredicate():
-			currentNode.Val.connective = None
+			currentNode.Val.connective = noConstant
 			currentNode.Val.predicateLetter = t.str
 			for c++; c < len(tk); c++ {
 				t = tk[c]
@@ -128,7 +128,7 @@ func parse(tk tokenStr) (n *Node, err error) {
 
 		case t.tokenType == tAtomicSentence:
 			currentNode.Val.raw = t.str
-			currentNode.Val.connective = None
+			currentNode.Val.connective = noConstant
 
 		case t.tokenType == tTerm:
 			err = errors.New(strconv.Itoa(t.index))
@@ -136,7 +136,7 @@ func parse(tk tokenStr) (n *Node, err error) {
 
 		case t.tokenType == tSet:
 			currentNode.Val.raw = t.str
-			currentNode.Val.connective = None
+			currentNode.Val.connective = noConstant
 
 		default:
 			err = errors.New(strconv.Itoa(t.index))

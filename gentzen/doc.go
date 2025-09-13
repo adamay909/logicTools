@@ -1,22 +1,9 @@
 /*
 Package gentzen provides some tools for parsing, serializing, and checking proofs (both porpositional logic and first order predicate logic with identity), printing truth tables, syntax trees (propositional logic), semantic tableaux, and a few other things.
 
-You need the commands defined in logic_commands.sty (included with the source files for the textbook available at [https://github.com/adamay909/logicbook].
+To compile the LaTeX output you need the commands defined in logic_commands.sty (included with the source files for the textbook available at [https://github.com/adamay909/logicbook].
 
-The main entry points expect inputs as plain strings in the Polish notation. For historical reasons, the default for the logical constants is non-standard:
-
-   negation: -
-   conjunction: ^
-   disjunction: v
-   conditional: >
-   universal quantifier: U
-   existential quantifier X
-
-You can switch to a more standard Polish notation with
-
-	SetStandardPolish(true)
-
-which will switch the notation to:
+The main entry points expect inputs as plain strings in the Polish notation. The characters used for the connectives are:
 
    negation: N
    conjunction: K
@@ -25,7 +12,7 @@ which will switch the notation to:
    universal quantifier: U
    existential quantifier X
 
-Either way, some letters are reserved for logical constants and are therefore not allowed for use as sentence or predicate letters.
+These letters are reserved for logical constants and are therefore not allowed for use as sentence or predicate letters.
 
 If you need a bit more information on the Polish notation, see the [SEP entry on the Polish notation]. Once you get used to it, your quality of life will improve massively when it comes to typing material on logic.
 

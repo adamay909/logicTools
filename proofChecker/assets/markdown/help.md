@@ -12,7 +12,7 @@ and end; delete and backspace). For editing title, deletion  only works with bac
 How to input logical symbols:
 - &#x00AC; : &emsp; - (the minus sign)
 -  &#x2227; : &emsp; ^ (shift-6 on US keyboard)
--  &#x2228; : &emsp; v or V (alphabet letter v--lower or upper case)
+-  &#x2228; : &emsp; v (alphabet letter v--lower case)
 -  &#x2283; : &emsp; &gt; (greater than symbol)
 -  ⊢ : &emsp; | followed by - (vertical line--shift-backslash on US keyboards--followed by the minus sign)
 -  ... : &emsp; the dots for separating sequent from annotation. Type a single . (period) 
@@ -38,5 +38,5 @@ Theorems and Axioms  must be specified by abbreviations used in the course mater
 You can add subscripts by typing _ (underscore) followed by a single character (WARNING: debugging for use of subscripts is incomplete)
 
 <div>
-<button class="button" id="togglereadme" tabindex="0">Click here for README</button>
+<button class="button" id="togglereadme" tabindex="0">README</button>
 </div>

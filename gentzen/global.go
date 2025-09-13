@@ -20,16 +20,16 @@ var (
 
 //go:generate stringer -type logicalConstant
 const (
-	None  logicalConstant = iota //no connective
-	Neg                          //negation
-	Conj                         //conjunction
-	Disj                         //disjunction
-	Cond                         //conditional
-	Uni                          //universal quantifier
-	Ex                           //existential quantifier
-	Ident                        //identity
-	Nec                          //necessity
-	Pos                          //possibility
+	noConstant logicalConstant = iota //no connective
+	neg                               //negation
+	conj                              //conjunction
+	disj                              //disjunction
+	cond                              //conditional
+	uni                               //universal quantifier
+	ex                                //existential quantifier
+	ident                             //identity
+	nec                               //necessity
+	pos                               //possibility
 )
 
 //go:generate stringer -type=PrintMode
@@ -41,7 +41,7 @@ const (
 	O_Simple                        //unused
 	O_English                       //plain English
 	O_PlainASCII                    //plain text restricted to ASCII
-	O_ProofChecker                  //for proof checker
+	O_ProofChecker                  //for proof checker [../proofChecker]
 )
 
 var brackets = [][2]string{
@@ -185,19 +185,6 @@ var connectives [][7]string
 
 func setupConnectives() {
 
-	/*
-		Neg = LogicalConstant(lneg)
-		Conj = LogicalConstant(lconj)
-		Disj = LogicalConstant(ldisj)
-		Cond = LogicalConstant(lcond)
-		Uni = LogicalConstant(luni)
-		Ex = LogicalConstant(lex)
-		Nec = LogicalConstant(lnec)
-		Pos = LogicalConstant(lpos)
-		Ident = LogicalConstant("=")
-		None = LogicalConstant(`*`)
-	*/
-
 	connectivesSL = nil
 	connectivesPL = nil
 	connectivesML = nil
@@ -248,17 +235,17 @@ func SetPrettyBrackets(v bool) {
 func codeOf(l logicalConstant) string {
 
 	switch l {
-	case Neg:
+	case neg:
 		return lneg
-	case Conj:
+	case conj:
 		return lconj
-	case Disj:
+	case disj:
 		return ldisj
-	case Cond:
+	case cond:
 		return lcond
-	case Uni:
+	case uni:
 		return luni
-	case Ex:
+	case ex:
 		return lex
 	default:
 		return ""
@@ -274,7 +261,8 @@ conjunction: ^
 disjunction: v
 conditional: >
 
-This also affects the processing of inference rules so that ou cannot use the standard rule declared through [SetStandardInferenceRules].
+This also affects the processing of inference rules so that you cannot use the standard rule declared through [SetStandardInferenceRules].
+You will have to redefine the inference rules.
 */
 func SetSpecialConn(v bool) {
 

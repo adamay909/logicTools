@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// ParseInfix is like [ParseStrict] but parses a formula given in infix form. The input must be what you would get through n.StringF(O_PlainASCII).
+// ParseInfix is like [ParseStrict] but parses a formula given in infix form. The input must be what you would get through [StringF](n, O_PlainASCII).
 func ParseInfix(s string, permitGreekUpper bool) (n *Node, err error) {
 
 	tk, err := tokenizeInfix(s, permitGreekUpper)
@@ -29,7 +29,7 @@ func ParseInfix(s string, permitGreekUpper bool) (n *Node, err error) {
 }
 
 // ParseLatex parses a formula given in LaTeX. The LaTeX must be code
-// you would get through n.StringF(O_Latex).
+// you would get through [StringF](n, O_Latex).
 func ParseLatex(s string, permitGreekUpper bool) (n *Node, err error) {
 
 	s = latex2plaintxt(s, permitGreekUpper)
@@ -394,7 +394,7 @@ func parseInfix(tk tokenStr) (n *Node, err error) {
 			n = new(Node)
 			n.Val.index = t.index
 
-			n.Val.connective = None
+			n.Val.connective = noConstant
 
 			n.Val.predicateLetter = t.str
 
@@ -428,7 +428,7 @@ func parseInfix(tk tokenStr) (n *Node, err error) {
 			if t.str == "/=" {
 				n2 := new(Node)
 				n.Val.index = t.index
-				n2.Val.connective = Neg
+				n2.Val.connective = neg
 				n2.AddChild(n)
 				n = n2
 			}
@@ -457,7 +457,7 @@ func parseInfix(tk tokenStr) (n *Node, err error) {
 
 			expect = tTerm
 
-		case t.tokenType == tTerm && prevNode.Val.connective == None:
+		case t.tokenType == tTerm && prevNode.Val.connective == noConstant:
 
 			prevNode.Val.term = append(prevNode.Val.term, t.str)
 

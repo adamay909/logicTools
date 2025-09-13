@@ -173,23 +173,23 @@ func (t token) terms() []string {
 func (t tokenID) logicConstant() logicalConstant {
 	switch t {
 	case tNeg:
-		return Neg
+		return neg
 	case tConj:
-		return Conj
+		return conj
 	case tDisj:
-		return Disj
+		return disj
 	case tCond:
-		return Cond
+		return cond
 	case tUni:
-		return Uni
+		return uni
 	case tEx:
-		return Ex
+		return ex
 	case tNec:
-		return Nec
+		return nec
 	case tPos:
-		return Pos
+		return pos
 	default:
-		return None
+		return noConstant
 	}
 }
 

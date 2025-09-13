@@ -21,7 +21,8 @@ type syntaxNode struct {
 	//tvalue          []bool //map interpretation row number to truth value
 }
 
-// Node represents a node in a syntax tree of a formula
+// Node represents a node in a syntax tree of a formula. See documentation for [ju.Node] for
+// generic methods defined for Node.
 type Node = ju.Node[syntaxNode]
 
 // IsAtomic returns true if n is an atomic formula.
@@ -51,17 +52,17 @@ func isConnective(n *Node) bool {
 		return false
 	}
 
-	return n.Val.connective != None
+	return n.Val.connective != noConstant
 }
 
 // IsBinary returns true if n is a binary node.
 func isBinary(n *Node) bool {
 	switch n.Val.connective {
-	case Conj:
+	case conj:
 		return true
-	case Cond:
+	case cond:
 		return true
-	case Disj:
+	case disj:
 		return true
 	default:
 		return false
@@ -115,7 +116,7 @@ func isQuantifier(n *Node) bool {
 		return false
 	}
 
-	return n.Val.connective == Uni || n.Val.connective == Ex
+	return n.Val.connective == uni || n.Val.connective == ex
 }
 
 // IsNegation returns true if n is a negation node.
@@ -125,7 +126,7 @@ func isNegation(n *Node) bool {
 		return false
 	}
 
-	return n.Val.connective == Neg
+	return n.Val.connective == neg
 }
 
 // IsConditional returns true if n is a conditional node.
@@ -135,7 +136,7 @@ func isConditional(n *Node) bool {
 		return false
 	}
 
-	return n.Val.connective == Cond
+	return n.Val.connective == cond
 
 }
 
@@ -146,7 +147,7 @@ func isConjunction(n *Node) bool {
 		return false
 	}
 
-	return n.Val.connective == Conj
+	return n.Val.connective == conj
 }
 
 // IsDisjunction returhs true if n is a disjunction node.
@@ -156,7 +157,7 @@ func isDisjunction(n *Node) bool {
 		return false
 	}
 
-	return n.Val.connective == Disj
+	return n.Val.connective == disj
 }
 
 // IsModal returns true if n is a modal operator node.
@@ -166,7 +167,7 @@ func isModal(n *Node) bool {
 		return false
 	}
 
-	return n.Val.connective == Nec || n.Val.connective == Pos
+	return n.Val.connective == nec || n.Val.connective == pos
 }
 
 // IsIdentity returns true if n is an identity node.
@@ -319,7 +320,7 @@ func conjoin(n1, n2 *Node) *Node {
 
 	e := new(Node)
 
-	e.Val.connective = Conj
+	e.Val.connective = conj
 	e.AddChild(n1)
 	e.AddChild(n2)
 
@@ -331,7 +332,7 @@ func disjoin(n1, n2 *Node) *Node {
 
 	e := new(Node)
 
-	e.Val.connective = Disj
+	e.Val.connective = disj
 	e.AddChild(n1)
 	e.AddChild(n2)
 
@@ -343,7 +344,7 @@ func negate(n *Node) *Node {
 
 	e := new(Node)
 
-	e.Val.connective = Neg
+	e.Val.connective = neg
 	e.AddChild(n)
 
 	return e
@@ -355,7 +356,7 @@ func conditionalize(n1, n2 *Node) *Node {
 
 	e := new(Node)
 
-	e.Val.connective = Cond
+	e.Val.connective = cond
 	e.AddChild(n1)
 	e.AddChild(n2)
 

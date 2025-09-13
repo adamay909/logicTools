@@ -218,6 +218,15 @@ func setBasicInferenceRules() {
 			},
 			Spec: "constants unique",
 		},
+		gentzen.InfRuleTemplate{
+			Name:     "Ax",
+			FullName: "Axiom",
+			RuleType: gentzen.RTpredicateLogic,
+			Patterns: [][]string{
+				[]string{":=cc"},
+				[]string{":CK=cdFcFd"},
+			},
+		},
 	}
 
 	gentzen.ClearInferenceRules()

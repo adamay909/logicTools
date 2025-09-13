@@ -6,7 +6,7 @@ import (
 
 func polishIngressFunc(n *Node, w *strings.Builder) {
 
-	if n.Val.connective != None {
+	if n.Val.connective != noConstant {
 		w.WriteString(codeOf(n.Val.connective))
 		if n.Val.connective.isQuantifier() {
 			w.WriteString(n.Val.variable)
@@ -28,7 +28,7 @@ func polishEgressFunc(n *Node, w *strings.Builder) {
 
 func latexIngressFunc(n *Node, w *strings.Builder) {
 
-	if n.Val.connective == None {
+	if n.Val.connective == noConstant {
 		w.WriteString(predicateString(n, O_Latex))
 		return
 	}
@@ -132,7 +132,7 @@ func predicateString(n *Node, mode PrintMode) string {
 		mode = O_PlainText
 	}
 
-	if n.Val.connective != None {
+	if n.Val.connective != noConstant {
 		return ""
 	}
 
@@ -243,7 +243,7 @@ func encodeString(s string, m PrintMode) string {
 
 func nomarkupIngressFunc(n *Node, w *strings.Builder, mode PrintMode) {
 
-	if n.Val.connective == None {
+	if n.Val.connective == noConstant {
 		w.WriteString(predicateString(n, O_PlainText))
 		return
 	}

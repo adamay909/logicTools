@@ -217,19 +217,19 @@ func rowValues(rownumber int, columns []string) []bool {
 
 		switch n.Val.connective {
 
-		case Neg:
+		case neg:
 
 			colval[n.String()] = !v1
 
-		case Conj:
+		case conj:
 
 			colval[n.String()] = v1 && v2
 
-		case Disj:
+		case disj:
 
 			colval[n.String()] = v1 || v2
 
-		case Cond:
+		case cond:
 
 			colval[n.String()] = !v1 || v2
 

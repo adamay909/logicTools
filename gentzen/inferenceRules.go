@@ -23,7 +23,7 @@ type InfRuleTemplate struct {
 	Spec        string     //further specifications. Currently, only "unique constants" is supported that is used to restrict ∀I and ∃E.
 }
 
-// The following constants define available inference rule types.
+// These constants define available inference rule types.
 const (
 	RTpredicateLogic    uint8 = 1 << iota //rule is predicate logic specific.
 	RTintroduction                        //rule is an introduction rule

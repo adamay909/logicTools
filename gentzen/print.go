@@ -27,15 +27,15 @@ func printNodeInfix(n *Node, m PrintMode) string {
 }
 
 func (c logicalConstant) isQuantifier() bool {
-	return c == Uni || c == Ex
+	return c == uni || c == ex
 }
 
 func (c logicalConstant) isModalOperator() bool {
-	return c == Nec || c == Pos
+	return c == nec || c == pos
 }
 
 func (c logicalConstant) isNegation() bool {
-	return c == Neg
+	return c == neg
 }
 
 func connectiveDisplay(n *Node, m PrintMode) string {

@@ -5,7 +5,7 @@ import "strings"
 func ltree(n *Node, simple bool) string {
 
 	disp := func(k *Node) string {
-		if k.Val.connective == None {
+		if k.Val.connective == noConstant {
 			return StringF(k, O_Latex)
 		}
 		return k.Val.connective.Stringf(O_Latex)

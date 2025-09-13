@@ -8,16 +8,16 @@ func _() {
 	// An "invalid array index" compiler error signifies that the constant values have changed.
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
-	_ = x[None-0]
-	_ = x[Neg-1]
-	_ = x[Conj-2]
-	_ = x[Disj-3]
-	_ = x[Cond-4]
-	_ = x[Uni-5]
-	_ = x[Ex-6]
-	_ = x[Ident-7]
-	_ = x[Nec-8]
-	_ = x[Pos-9]
+	_ = x[noConstant-0]
+	_ = x[neg-1]
+	_ = x[conj-2]
+	_ = x[disj-3]
+	_ = x[cond-4]
+	_ = x[uni-5]
+	_ = x[ex-6]
+	_ = x[ident-7]
+	_ = x[nec-8]
+	_ = x[pos-9]
 }
 
 const _logicalConstant_name = "NoneNegConjDisjCondUniExIdentNecPos"
