@@ -7,16 +7,20 @@ func setBasicInferenceRules() {
 		gentzen.InfRuleTemplate{
 			Name:     "A",
 			FullName: "Assumption",
-			Conclusion: []string{
-				"s_1:s_1",
+			Patterns: [][]string{
+				[]string{
+					"s_1:s_1",
+				},
 			},
 		},
 
 		gentzen.InfRuleTemplate{
 			Name:     "premise",
 			FullName: "Premise",
-			Conclusion: []string{
-				"/L:s_1",
+			Patterns: [][]string{
+				[]string{
+					"/L:s_1",
+				},
 			},
 		},
 
@@ -26,12 +30,12 @@ func setBasicInferenceRules() {
 			DisplayName: "∧I",
 			LatexName:   `\conjI`,
 			RuleType:    gentzen.RTintroduction,
-			Premises: []string{
-				"/L_1:s_1",
-				"/L_2:s_2",
-			},
-			Conclusion: []string{
-				"/L_1,/L_2:^s_1s_2",
+			Patterns: [][]string{
+				[]string{
+					"/L_1:s_1",
+					"/L_2:s_2",
+					"/L_1,/L_2:^s_1s_2",
+				},
 			},
 		},
 
@@ -40,12 +44,12 @@ func setBasicInferenceRules() {
 			DisplayName: "∧E",
 			LatexName:   `\conjE`,
 			FullName:    "Conjunction Elimination",
-			Premises: []string{
-				"/L:^s_1s_2",
-			},
-			Conclusion: []string{
-				"/L:s_1",
-				"/L:s_2",
+			Patterns: [][]string{
+				[]string{
+					"/L:^s_1s_2",
+					"/L:s_1",
+					"/L:s_2",
+				},
 			},
 		},
 
@@ -55,12 +59,14 @@ func setBasicInferenceRules() {
 			LatexName:   `\disjI`,
 			FullName:    "Disjunction Introduction",
 			RuleType:    gentzen.RTintroduction,
-			Premises: []string{
-				"/L_1:s_1",
-			},
-			Conclusion: []string{
-				"/L_1:vs_1s_2",
-				"/L_1:vs_2s_1",
+			Patterns: [][]string{
+				[]string{
+					"/L_1:s_1",
+					"/L_1:vs_1s_2",
+				},
+				[]string{
+					"/L_1:vs_2s_1",
+				},
 			},
 		},
 
@@ -69,13 +75,13 @@ func setBasicInferenceRules() {
 			DisplayName: "∨E",
 			LatexName:   `\disjE`,
 			FullName:    "Disjunction Elimination",
-			Premises: []string{
-				"/L_1:vs_1s_2",
-				"s_1,/L_2:s_3",
-				"s_2,/L_3:s_3",
-			},
-			Conclusion: []string{
-				"/L_1,/L_2,/L_3:s_3",
+			Patterns: [][]string{
+				[]string{
+					"/L_1:vs_1s_2",
+					"s_1,/L_2:s_3",
+					"s_2,/L_3:s_3",
+					"/L_1,/L_2,/L_3:s_3",
+				},
 			},
 		},
 
@@ -85,11 +91,11 @@ func setBasicInferenceRules() {
 			LatexName:   `\condI`,
 			FullName:    "Conditional Introduction",
 			RuleType:    gentzen.RTintroduction,
-			Premises: []string{
-				"s_1,/L:s_2",
-			},
-			Conclusion: []string{
-				"/L:>s_1s_2",
+			Patterns: [][]string{
+				[]string{
+					"s_1,/L:s_2",
+					"/L:>s_1s_2",
+				},
 			},
 		},
 
@@ -98,12 +104,12 @@ func setBasicInferenceRules() {
 			DisplayName: "⊃E",
 			LatexName:   `\condE`,
 			FullName:    "Conditional Elimination",
-			Premises: []string{
-				"/L_1:>s_1s_2",
-				"/L_2:s_1",
-			},
-			Conclusion: []string{
-				"/L_1,/L_2:s_2",
+			Patterns: [][]string{
+				[]string{
+					"/L_1:>s_1s_2",
+					"/L_2:s_1",
+					"/L_1,/L_2:s_2",
+				},
 			},
 		},
 
@@ -113,12 +119,12 @@ func setBasicInferenceRules() {
 			LatexName:   `\negI`,
 			FullName:    "Negation Introduction",
 			RuleType:    gentzen.RTintroduction,
-			Premises: []string{
-				"s_1,/L_1:s_2",
-				"s_1,/L_2:-s_2",
-			},
-			Conclusion: []string{
-				"/L_1,/L_2:-s_1",
+			Patterns: [][]string{
+				[]string{
+					"s_1,/L_1:s_2",
+					"s_1,/L_2:-s_2",
+					"/L_1,/L_2:-s_1",
+				},
 			},
 		},
 
@@ -127,11 +133,11 @@ func setBasicInferenceRules() {
 			DisplayName: "¬I",
 			LatexName:   `\negE`,
 			FullName:    "Negation Elimination",
-			Premises: []string{
-				"/L:--s_1",
-			},
-			Conclusion: []string{
-				"/L:s_1",
+			Patterns: [][]string{
+				[]string{
+					"/L:--s_1",
+					"/L:s_1",
+				},
 			},
 		},
 
@@ -139,11 +145,11 @@ func setBasicInferenceRules() {
 			Name:     "M",
 			FullName: "Monotonicity",
 			RuleType: gentzen.RTfrontmanipulation,
-			Premises: []string{
-				"/L_1:s_1",
-			},
-			Conclusion: []string{
-				"/L_1,/L_2:s_1",
+			Patterns: [][]string{
+				[]string{
+					"/L_1:s_1",
+					"/L_1,/L_2:s_1",
+				},
 			},
 		},
 
@@ -160,11 +166,11 @@ func setBasicInferenceRules() {
 			LatexName:   `\uniE`,
 			FullName:    "Universal Quantifier Elimination",
 			RuleType:    gentzen.RTpredicateLogic,
-			Premises: []string{
-				"/L_1:Ux_1Fx_1",
-			},
-			Conclusion: []string{
-				"/L_1:Fa",
+			Patterns: [][]string{
+				[]string{
+					"/L_1:Ux_1Fx_1",
+					"/L_1:Fa",
+				},
 			},
 		},
 
@@ -174,11 +180,11 @@ func setBasicInferenceRules() {
 			LatexName:   `\uniI`,
 			FullName:    "Universal Quantifier Introduction",
 			RuleType:    gentzen.RTpredicateLogic | gentzen.RTintroduction,
-			Premises: []string{
-				"/L_1:Fa",
-			},
-			Conclusion: []string{
-				"/L_1:UxFx",
+			Patterns: [][]string{
+				[]string{
+					"/L_1:Fa",
+					"/L_1:UxFx",
+				},
 			},
 			Spec: "constants unique",
 		},
@@ -189,11 +195,11 @@ func setBasicInferenceRules() {
 			LatexName:   `\exI`,
 			FullName:    "Existential Quantifier Introduction",
 			RuleType:    gentzen.RTpredicateLogic | gentzen.RTintroduction,
-			Premises: []string{
-				"/L_1:Fa",
-			},
-			Conclusion: []string{
-				"/L_1:XxFx",
+			Patterns: [][]string{
+				[]string{
+					"/L_1:Fa",
+					"/L_1:XxFx",
+				},
 			},
 		},
 
@@ -203,12 +209,12 @@ func setBasicInferenceRules() {
 			LatexName:   `\exE`,
 			FullName:    "Existential Quantifier Elimination",
 			RuleType:    gentzen.RTpredicateLogic,
-			Premises: []string{
-				"/L_1:XxFx",
-				"/L_2,Fa:Gb",
-			},
-			Conclusion: []string{
-				"/L_1,/L_2:Gb",
+			Patterns: [][]string{
+				[]string{
+					"/L_1:XxFx",
+					"/L_2,Fa:Gb",
+					"/L_1,/L_2:Gb",
+				},
 			},
 			Spec: "constants unique",
 		},
@@ -231,15 +237,10 @@ func setupTheorems(derived bool) {
 		{"sl", "Implication", "IM", ">>pqv-pq"},
 		{"sl", "Elimination", "EL", ">vpq>-pq"},
 		{"sl", "DeMorgan", "DM", ">-vpq^-p-q", ">-^pqv-p-q", ">v-p-q-^pq", ">^-p-q-vpq"},
-		//		{"DeMorgan", "DM", ">-^pqv-p-q"},
-		//		{"DeMorgan", "DM", ">v-p-q-^pq"},
-		//		{"DeMorgan", "DM", ">^-p-q-vpq"},
 		{"sl", "Commutativity of Conjunction", "CC", ">^pq^qp"},
 		{"sl", "Commutatitivity of Disjunction", "CD", ">vpqvqp"},
 		{"sl", "Associativity of Conjunction", "AC", ">^^pqr^p^qr", ">^p^qr^^pqr"},
-		//		{"Associativity of Conjunction", "AC", ">^p^qr^^pqr"},
 		{"sl", "Associativity of Disjunction", "AD", ">vvpqrvpvqr", ">vpvqrvvpqr"},
-		//		{"Associativity of Disjunction", "AD", ">vpvqrvvpqr"},
 		{"sl", "Double Negation Introduction", "D-", ">p--p"},
 		{"pl", "Quantifier Exchange", "QE", ">UxFx-Xx-Fx", ">XxFx-Ux-Fx", ">-Ux-FxXxFx", ">-Xx-FxUxFx"},
 	}
@@ -256,10 +257,39 @@ func setupTheorems(derived bool) {
 
 		conclusions := t[3:]
 		for _, c := range conclusions {
-			nr.Conclusion = append(nr.Conclusion, ":"+c)
+			nr.Patterns = append(nr.Patterns, []string{":" + c})
 		}
 
 		gentzen.DeclareInferenceRule(nr)
 
+	}
+
+	if derived == false {
+		return
+	}
+
+	for _, t := range theorems {
+
+		if t[3][0] != '>' {
+			continue
+		}
+
+		nr := gentzen.InfRuleTemplate{
+			Name:     t[2] + "R",
+			FullName: t[1] + "(derived rule)",
+		}
+		if t[0] == "pl" {
+			nr.RuleType = gentzen.RTpredicateLogic
+		}
+		if nr.RuleType == gentzen.RTpredicateLogic {
+			gentzen.SetPL(true)
+		} else {
+			gentzen.SetPL(false)
+		}
+		for _, th := range t[3:] {
+			n := gentzen.Parse(th, false)
+			nr.Patterns = append(nr.Patterns, []string{"/L:" + n.Child(0).String(), "/L:" + n.Child(1).String()})
+		}
+		gentzen.DeclareInferenceRule(nr)
 	}
 }

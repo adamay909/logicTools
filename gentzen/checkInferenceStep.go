@@ -105,8 +105,8 @@ func inferenceStepSuccessful(series []sequent, ir inferenceRule) error {
 		return isRewriteStep(series)
 	}
 
-	if len(series) != len(ir.premises)+1 {
-		err = errors.New(ir.fullName + " depends on " + strconv.Itoa(len(ir.premises)) + " lines")
+	if len(series) != len(ir.patterns[0]) {
+		err = errors.New(ir.fullName + " depends on " + strconv.Itoa(len(ir.patterns[0])-1) + " lines")
 		return err
 	}
 
@@ -298,12 +298,11 @@ func matchInfrule(series []sequent, ir inferenceRule) bool {
 	}()
 	SetPL(false)
 
-	for _, c := range ir.conclusion {
+	for _, c := range ir.patterns {
 
 		var canonical []sequent
 
-		canonical = append(canonical, ir.premises...)
-		canonical = append(canonical, c)
+		canonical = append(canonical, c...)
 
 		canonical = normalizeDerivation(canonical, "t", "/L")
 		fmt.Println("canonical:\n", printSequentSeries(canonical))
@@ -510,12 +509,11 @@ func matchInfrulePL(series []sequent, ir inferenceRule) bool {
 		panic("do not call matchinfrulePL directly!")
 	}
 
-	for _, c := range ir.conclusion {
+	for _, c := range ir.patterns {
 
 		var canonical []sequent
 
-		canonical = append(canonical, ir.premises...)
-		canonical = append(canonical, c)
+		canonical = append(canonical, c...)
 
 		var exclude []string
 

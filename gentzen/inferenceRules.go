@@ -8,21 +8,19 @@ type inferenceRule struct {
 	latexName   string
 	fullName    string
 	ruleType    uint8
-	premises    []sequent //the most significant comes first
-	conclusion  []sequent // alternative conclusions
+	patterns    [][]sequent //the most significant comes first
 	spec        string
 }
 
 /*InfRuleTemplate is used to declare inference rules.*/
 type InfRuleTemplate struct {
-	Name        string   //name of inference rule
-	DisplayName string   // how the inference rule is to be displayed as text. Defaults to Name.
-	LatexName   string   // latex commands for displaying the name. Defaults to DisplayName.
-	FullName    string   //full, unabreviated name of rule. Defaults to Name.
-	RuleType    uint8    //for available types, see below
-	Premises    []string //the premises in sequent form.
-	Conclusion  []string //the conclusion in sequent form. It's a slice to allow alternative conclusions.
-	Spec        string   //further specifications. Currently, only "unique constants" is supported that is used to restrict ∀I and ∃E.
+	Name        string     //name of inference rule
+	DisplayName string     // how the inference rule is to be displayed as text. Defaults to Name.
+	LatexName   string     // latex commands for displaying the name. Defaults to DisplayName.
+	FullName    string     //full, unabreviated name of rule. Defaults to Name.
+	RuleType    uint8      //for available types, see below
+	Patterns    [][]string //the premises in sequent form.
+	Spec        string     //further specifications. Currently, only "unique constants" is supported that is used to restrict ∀I and ∃E.
 }
 
 // The following constants define available inference rule types.
@@ -46,87 +44,26 @@ func (i inferenceRule) isIntroductionRule() bool {
 	return i.ruleType&RTintroduction != 0
 }
 
-func addTheoremRules(derived bool) {
-
-	var theorems = [][]string{
-		{"Identity", "ID", "Cpp"},
-		{"NonContradiction", "NC", "NKpNp"},
-		{"Excluded Middle", "EM", "ApNp"},
-		{"Contraposition", "CP", "CCpqCNqNp"},
-		{"Implication", "IM", "CCpqANpq"},
-		{"Elimination", "EL", "CApqCNpq"},
-		{"DeMorgan", "DM", "CNApqKNpNq"},
-		{"DeMorgan", "DM", "CNKpqANpNq"},
-		{"DeMorgan", "DM", "CANpNqNKpq"},
-		{"DeMorgan", "DM", "CKNpNqNApq"},
-		{"Commutativity of Conjunction", "CC", "CKpqKqp"},
-		{"Commutatitivity of Disjunction", "CD", "CApqAqp"},
-		{"Associativity of Conjunction", "AC", "CKKpqrKpKqr"},
-		{"Associativity of Conjunction", "AC", "CKpKqrKKpqr"},
-		{"Associativity of Disjunction", "AD", "CAApqrApAqr"},
-		{"Associativity of Disjunction", "AD", "CApAqrAApqr"},
-		{"Double Negation Introduction", "DN", "CpNNp"},
-	}
-
-	for _, t := range theorems {
-
-		nr := inferenceRule{
-			name:     t[1],
-			fullName: t[0],
-			premises: nil,
-		}
-
-		c, err := mkSequent(":"+t[2], O_Polish)
-		if err != nil {
-			panic("definition of theorem " + t[0] + " is bad")
-		}
-		nr.conclusion = []sequent{c}
-
-		infrule[nr.name] = nr
-	}
-
-	if !derived {
-		return
-	}
-
-	for _, t := range theorems {
-		n := Parse(t[2], !allowGreekUpper)
-		if n.Val.connective != Cond {
-			continue
-		}
-
-		nr := inferenceRule{
-			name:     t[1] + "R",
-			fullName: t[0] + " (derived rule)",
-		}
-
-		p, _ := mkSequent("/L_1:"+n.Child(0).String(), O_Polish)
-		c, _ := mkSequent("/L_1:"+n.Child(1).String(), O_Polish)
-
-		nr.premises = []sequent{p}
-		nr.conclusion = []sequent{c}
-
-		infrule[nr.name] = nr
-	}
-
-}
-
 /* SetStandardInferenceRules sets the inference rules to be those in the text book.*/
 func SetStandardInferenceRules() {
 	var infrules = []InfRuleTemplate{
 		InfRuleTemplate{
 			Name:     "A",
 			FullName: "Assumption",
-			Conclusion: []string{
-				"s_1:s_1",
+			Patterns: [][]string{
+				[]string{
+					"s_1:s_1",
+				},
 			},
 		},
 
 		InfRuleTemplate{
 			Name:     "premise",
 			FullName: "Premise",
-			Conclusion: []string{
-				"/L:s_1",
+			Patterns: [][]string{
+				[]string{
+					"/L:s_1",
+				},
 			},
 		},
 
@@ -136,12 +73,12 @@ func SetStandardInferenceRules() {
 			DisplayName: "∧I",
 			LatexName:   `\conjI`,
 			RuleType:    RTintroduction,
-			Premises: []string{
-				"/L_1:s_1",
-				"/L_2:s_2",
-			},
-			Conclusion: []string{
-				"/L_1,/L_2:Ks_1s_2",
+			Patterns: [][]string{
+				[]string{
+					"/L_1:s_1",
+					"/L_2:s_2",
+					"/L_1,/L_2:Ks_1s_2",
+				},
 			},
 		},
 
@@ -150,12 +87,12 @@ func SetStandardInferenceRules() {
 			DisplayName: "∧E",
 			LatexName:   `\conjE`,
 			FullName:    "Conjunction Elimination",
-			Premises: []string{
-				"/L:Ks_1s_2",
-			},
-			Conclusion: []string{
-				"/L:s_1",
-				"/L:s_2",
+			Patterns: [][]string{
+				[]string{
+					"/L:Ks_1s_2",
+					"/L:s_1",
+					"/L:s_2",
+				},
 			},
 		},
 
@@ -165,12 +102,15 @@ func SetStandardInferenceRules() {
 			LatexName:   `\disjI`,
 			FullName:    "Disjunction Introduction",
 			RuleType:    RTintroduction,
-			Premises: []string{
-				"/L_1:s_1",
-			},
-			Conclusion: []string{
-				"/L_1:As_1s_2",
-				"/L_1:As_2s_1",
+			Patterns: [][]string{
+				[]string{
+					"/L_1:s_1",
+					"/L_1:As_1s_2",
+				},
+				[]string{
+					"/L_1:s_1",
+					"/L_1:As_2s_1",
+				},
 			},
 		},
 
@@ -179,13 +119,13 @@ func SetStandardInferenceRules() {
 			DisplayName: "∨E",
 			LatexName:   `\disjE`,
 			FullName:    "Disjunction Elimination",
-			Premises: []string{
-				"/L_1:As_1s_2",
-				"s_1,/L_2:s_3",
-				"s_2,/L_3:s_3",
-			},
-			Conclusion: []string{
-				"/L_1,/L_2,/L_3:s_3",
+			Patterns: [][]string{
+				[]string{
+					"/L_1:As_1s_2",
+					"s_1,/L_2:s_3",
+					"s_2,/L_3:s_3",
+					"/L_1,/L_2,/L_3:s_3",
+				},
 			},
 		},
 
@@ -195,11 +135,11 @@ func SetStandardInferenceRules() {
 			LatexName:   `\condI`,
 			FullName:    "Conditional Introduction",
 			RuleType:    RTintroduction,
-			Premises: []string{
-				"s_1,/L:s_2",
-			},
-			Conclusion: []string{
-				"/L:Cs_1s_2",
+			Patterns: [][]string{
+				[]string{
+					"s_1,/L:s_2",
+					"/L:Cs_1s_2",
+				},
 			},
 		},
 
@@ -208,12 +148,12 @@ func SetStandardInferenceRules() {
 			DisplayName: "⊃E",
 			LatexName:   `\condE`,
 			FullName:    "Conditional Elimination",
-			Premises: []string{
-				"/L_1:Cs_1s_2",
-				"/L_2:s_1",
-			},
-			Conclusion: []string{
-				"/L_1,/L_2:s_2",
+			Patterns: [][]string{
+				[]string{
+					"/L_1:Cs_1s_2",
+					"/L_2:s_1",
+					"/L_1,/L_2:s_2",
+				},
 			},
 		},
 
@@ -223,12 +163,12 @@ func SetStandardInferenceRules() {
 			LatexName:   `\negI`,
 			FullName:    "Negation Introduction",
 			RuleType:    RTintroduction,
-			Premises: []string{
-				"s_1,/L_1:s_2",
-				"s_1,/L_2:Ns_2",
-			},
-			Conclusion: []string{
-				"/L_1,/L_2:Ns_1",
+			Patterns: [][]string{
+				[]string{
+					"s_1,/L_1:s_2",
+					"s_1,/L_2:Ns_2",
+					"/L_1,/L_2:Ns_1",
+				},
 			},
 		},
 
@@ -237,11 +177,11 @@ func SetStandardInferenceRules() {
 			DisplayName: "¬I",
 			LatexName:   `\negE`,
 			FullName:    "Negation Elimination",
-			Premises: []string{
-				"/L:NNs_1",
-			},
-			Conclusion: []string{
-				"/L:s_1",
+			Patterns: [][]string{
+				[]string{
+					"/L:NNs_1",
+					"/L:s_1",
+				},
 			},
 		},
 
@@ -249,11 +189,11 @@ func SetStandardInferenceRules() {
 			Name:     "M",
 			FullName: "Monotonicity",
 			RuleType: RTfrontmanipulation,
-			Premises: []string{
-				"/L_1:s_1",
-			},
-			Conclusion: []string{
-				"/L_1,/L_2:s_1",
+			Patterns: [][]string{
+				[]string{
+					"/L_1:s_1",
+					"/L_1,/L_2:s_1",
+				},
 			},
 		},
 
@@ -270,11 +210,11 @@ func SetStandardInferenceRules() {
 			LatexName:   `\uniE`,
 			FullName:    "Universal Quantifier Elimination",
 			RuleType:    RTpredicateLogic,
-			Premises: []string{
-				"/L_1:Ux_1Fx_1",
-			},
-			Conclusion: []string{
-				"/L_1:Fa",
+			Patterns: [][]string{
+				[]string{
+					"/L_1:Ux_1Fx_1",
+					"/L_1:Fa",
+				},
 			},
 		},
 
@@ -284,11 +224,11 @@ func SetStandardInferenceRules() {
 			LatexName:   `\uniI`,
 			FullName:    "Universal Quantifier Introduction",
 			RuleType:    RTpredicateLogic | RTintroduction,
-			Premises: []string{
-				"/L_1:Fa",
-			},
-			Conclusion: []string{
-				"/L_1:UxFx",
+			Patterns: [][]string{
+				[]string{
+					"/L_1:Fa",
+					"/L_1:UxFx",
+				},
 			},
 			Spec: "constants unique",
 		},
@@ -299,11 +239,11 @@ func SetStandardInferenceRules() {
 			LatexName:   `\exI`,
 			FullName:    "Existential Quantifier Introduction",
 			RuleType:    RTpredicateLogic | RTintroduction,
-			Premises: []string{
-				"/L_1:Fa",
-			},
-			Conclusion: []string{
-				"/L_1:XxFx",
+			Patterns: [][]string{
+				[]string{
+					"/L_1:Fa",
+					"/L_1:XxFx",
+				},
 			},
 		},
 
@@ -313,12 +253,12 @@ func SetStandardInferenceRules() {
 			LatexName:   `\exE`,
 			FullName:    "Existential Quantifier Elimination",
 			RuleType:    RTpredicateLogic,
-			Premises: []string{
-				"/L_1:XxFx",
-				"/L_2,Fa:Gb",
-			},
-			Conclusion: []string{
-				"/L_1,/L_2:Gb",
+			Patterns: [][]string{
+				[]string{
+					"/L_1:XxFx",
+					"/L_2,Fa:Gb",
+					"/L_1,/L_2:Gb",
+				},
 			},
 			Spec: "constants unique",
 		},
@@ -355,28 +295,31 @@ func DeclareInferenceRule(i InfRuleTemplate) {
 	} else {
 		ir.latexName = i.LatexName
 	}
+
+	rPL := oPL
+
+	defer func() {
+		SetPL(rPL)
+	}()
+
 	if ir.isPLrule() {
 		SetPL(true)
 	} else {
 		SetPL(false)
 	}
 
-	for _, p := range i.Premises {
-		seq, err := mkSequent(p, O_Polish)
-		if err != nil {
-			fmt.Println(err)
-			panic("defintitions of inference rule " + i.FullName + " is bad")
-		}
-		ir.premises = append(ir.premises, seq)
-	}
+	for _, pattern := range i.Patterns {
 
-	for _, c := range i.Conclusion {
-		seq, err := mkSequent(c, O_Polish)
-		if err != nil {
-			fmt.Println(err)
-			panic("defintitions of inference rule " + i.FullName + " is bad")
+		var irpattern []sequent
+		for _, p := range pattern {
+			seq, err := mkSequent(p, O_Polish)
+			if err != nil {
+				fmt.Println(err)
+				panic("defintitions of inference rule " + i.FullName + " is bad")
+			}
+			irpattern = append(irpattern, seq)
 		}
-		ir.conclusion = append(ir.conclusion, seq)
+		ir.patterns = append(ir.patterns, irpattern)
 	}
 
 	infrule[ir.name] = ir
