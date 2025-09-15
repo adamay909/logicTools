@@ -202,14 +202,6 @@ func onClick() {
 		toggleML()
 	case "togglereadme":
 		toggleReadme()
-
-	case "imp-export":
-		exportHistory()
-
-	case "loadExercise":
-		toggleExercises()
-	case "loadSamples":
-		toggleSamples()
 	case "reset":
 		resetDisplay()
 
@@ -219,8 +211,6 @@ func onClick() {
 		toggleClipboardType()
 	case "textInput":
 		inputFromText()
-	case "showCursorKeys":
-		showArrowKeys()
 	case "backHistory":
 		backHistory()
 	case "forwardHistory":
@@ -253,14 +243,6 @@ func onClick() {
 			case "quitExercise":
 				endRandomExercise()
 		*/
-	case "arrowUp":
-		handleInput("ArrowUp")
-	case "arrowDown":
-		handleInput("ArrowDown")
-	case "arrowLeft":
-		handleInput("ArrowLeft")
-	case "arrowRight":
-		handleInput("ArrowRight")
 	case "delete":
 		handleInput("Delete")
 
