@@ -48,6 +48,9 @@ func setBasicInferenceRules() {
 				[]string{
 					"/L:^s_1s_2",
 					"/L:s_1",
+				},
+				[]string{
+					"/L:^s_1s_2",
 					"/L:s_2",
 				},
 			},
@@ -65,6 +68,7 @@ func setBasicInferenceRules() {
 					"/L_1:vs_1s_2",
 				},
 				[]string{
+					"/L_1:s_1",
 					"/L_1:vs_2s_1",
 				},
 			},
