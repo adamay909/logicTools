@@ -91,6 +91,9 @@ func SetStandardInferenceRules() {
 				[]string{
 					"/L:Ks_1s_2",
 					"/L:s_1",
+				},
+				[]string{
+					"/L:Ks_1s_2",
 					"/L:s_2",
 				},
 			},
