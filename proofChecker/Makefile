@@ -8,8 +8,11 @@ build:
 	let i++ &&\
 	echo $$i>version &&\
 	cd ../.. &&\
+	cd assets &&\
+	./genHTML.lua &&\
+	cd .. &&\
 	GOOS=js GOARCH=wasm go build  -o ../docs/assets/proofchecker.wasm &&\
-	cp assets/html/* ../docs/ &&\
-	cp /usr/lib/go/lib/wasm/wasm_exec.js ../docs/
+	mv assets/html/index.html ../docs/ &&\
+	cp /usr/lib/go/lib/wasm/wasm_exec.js ../docs/assets/
 
 

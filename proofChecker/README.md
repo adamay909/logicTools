@@ -162,20 +162,8 @@ It's in the subdirectory named proofChecker.
 
 This proof-checker is designed to run completely inside the browser so it is easy to host yourself so long as you are able to host static websites. The docs directory of the GitHub repository contains all the files you need.
 
-To compile from sources, you could run the following bash script in the directory containing the source files for the proof checker:
-```
-	cp README.md assets/markdown/README.md 
-	cd assets/markdown
-	for i in *.md; do md2html -o ../html/$${i%.md}.html $$i; done 
-	cd ../.. 
-	cd assets/html 
-	i=`cat version` 
-	let i++ 
-	echo $$i>version 
-	cd ../.. 
-	GOOS=js GOARCH=wasm go build  -o proofchecker.wasm 
-```
-and then copy the wasm binary, the index.html in assets/html subdirectory, and the wasm_exec.js (on my system, it's currently in /usr/lib/go/wasm/wasm_exec.js, but the location seems to change from time to time and system to system) to the directory you want to serve.
+There is also a Makefile with the source code that you can use to make life easier. The files needed for the proofchecker to work will be copied to ../docs/.
+
 ### Copyright
 
 The Go, HTML, and CSS sources for this proof checker written by Masahiro Yamada. Licensed under the MIT License. 

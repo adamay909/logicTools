@@ -14,8 +14,9 @@
          const go = new Go();
          WebAssembly.instantiateStreaming(fetch("assets/proofchecker.wasm"), go.importObject).then((result) => {go.run(result.instance);});
       </script>
-	  <script>
    </head>
-   <body></body>
+ <body>
+#BODY#
+ </body>
 </html>
 

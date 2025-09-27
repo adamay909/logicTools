@@ -1,7 +1,90 @@
-<style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Math&display=swap');
-</style>
 
+body {
+  font-family: "Noto Sans Math", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+#description{
+ display: none;
+ margin-top: 3em;
+}
+
+#proofChecker{
+ display: block;
+}
+
+#navbar{
+ display: flex;
+	width: 100%;
+}
+
+#console{
+ display: flex;
+ width: 100%;
+ height: 80vh;
+} 
+
+#settingsMenu{
+ display: none;
+ width: 10em;
+}
+
+
+#editorWindow{
+ display: inline-block;
+ flex-grow: 1;
+ overflow: hidden;
+ outline: 2px solid grey;
+ margin: 0.5em;
+ font-size: 120%;
+}
+
+#editorWindow:focus-within {
+ outline: 2px solid blue;
+}
+
+#title {
+ width: 100%;
+ min-height: 2em;
+ font-size: 120%;
+ font-weight: bold;
+ background-color: rgb(187 210 244 / 0.3);
+ margin-bottom: 0.2em;
+ padding-top: 0.2em;
+ padding-left: 0.2em;
+}
+
+#editor{
+ width: 100%;
+ height: 100%;
+ overflow: scroll;
+}
+
+#help{
+ display:none;
+ width: 15em;
+ overflow: scroll;
+}
+
+#info {
+ font-size: 0.8em;
+ float: right;
+}
+
+div#messages{
+ width: 80%;
+ overflow-y: auto;
+ margin: 0.5em;
+ margin-top:0em;
+ margin-bottom: 0em;
+ padding-left: 0.5em;
+ padding-top: 0em;
+ border-color: red;
+ border: ridge;
+ border-radius: 30px;
+}
 
 p.message {
  padding: 0em;
@@ -12,10 +95,6 @@ div#messages>p {
 padding: 0em;
 margin:0.2em;}
 
-#info {
- font-size: 0.8em;
- float: right;
-}
 
 #versionnumber {
  color: grey;
@@ -26,32 +105,7 @@ img {
   height: auto;
 }
 
-body {
-  font-family: "Noto Sans Math", sans-serif;
-  font-weight: 400;
-  font-style: normal;
-}
 
-.greek {
- font-family: serif;
- font-size: 1.08em;
-}
-
-div#navbar{
- display: flex;
-	width: 100%;
-}
-
-div#controls {
-    display: inline-flex;
-	width: 100%;
-    margin-left:1em;
-}
-
-div#cursorControls{
- display: none;
- margin-left: auto;
- }
 
  .button{
  display: inline-block;
@@ -83,44 +137,6 @@ div#cursorControls{
  border-radius: 50%;
 }
 
-
-button#toggleSettings {
-  background-color: white;
-}
-
-button#toggleSettings:hover {
-  background-color: lightgreen;
-}
-
-div#console{
-    width: 100%;
-}
-div#mainArea {
- position: relative;
- display: grid;
-}
-
-div#settingsMenu {
- display: inline;
-}
-
-div.buttongrounp > .button {
-width: 100%;
-font-size: 1em;
-margin-top: 0.25em;
-}
-
-div#buttongroup >.button:hover{
- display: inline-block;
- color: black;
- background-color: lightgreen;
-}
-div#editor {
- position: relative;
- display: inline-block;
- width: 100%;
-}
-
 button.systemButton {
  border: none;
 font-size:1em;
@@ -138,193 +154,22 @@ font-weight:bold;
 width: 2em;
 background-color: white;
 }
-div#display {
- position: relative;
- height: 40rem;
- border: solid;
- border-width:2px;
-    margin-left: 0.5em;
- overflow-y: hidden;
-}
 
-div#display.active {
- border-color: blue;
-}
-
-div#display.inactive {
- border-color: lightgrey;
-}
-
-div#display.inactive-fail {
- border-color: red;
-}
-
-div#display.inactive-success {
- border-color: lightgreen;
-}
-
-div#dummy{
- position: absolute;
- left: 0;
- top: 0;
- width: 100%;
- height: 31em;
- z-index: 5;
- opacity: 0;
-}
-
-div#messages{
- display: none;
- width: 80%;
- overflow-y: auto;
- margin: 0.5em;
- margin-top:0em;
- margin-bottom: 0em;
- padding-left: 0.5em;
- padding-top: 0em;
- border-color: red;
- border: ridge;
- border-radius: 30px;
-}
-
-div#controls2{
- display: none;
- width: 80%;
-    margin: 0.5em;
-    padding-left: 0.5em;
-}
-
-
-button.controls{
- display: inline-block;
- font-size: 1.2em;
- text-align: center;
- background-color: lightgrey;
- border: double;
- border-radius: 20px;
- border-width: 1px;
- margin-left: 5em;
- margin-right: 5em;
- padding: 0em 1em;
-}
-
-button.controls:hover{
- display: inline-block;
- color: black;
- background-color: lightgreen;
-}
-
-div#cursor{ 
+button.linklike {
+ border: none;
  display: inline;
- animation:blinker 0.75s linear infinite;
+ color: blue;
+ text-decoration: underline;
+background-color: white;
 }
 
-div#cursor2{ 
- display: inline;
- animation:blinker 0.75s linear infinite;
-}
-
-div#cursor.inactive {
- display: none;
-}
-
-@keyframes blinker {
-     0%{
-        background-color: black;
-    }
-     100%{
-        background-color: white;
-    }
-}
- div#deriv {
-     display:grid;
-     width: 100%;
-     grid-template-columns: 3em minmax(40px, max-content) 3em minmax(40px, max-content) minmax(40px, max-content) 1fr;
-}
- div#help{
-     display: inline-block;
-     padding: 0.5em 1em 0.5em 1em;
-}
- div#about{
-     display: inline-block;
-     padding: 0.5em 1em 0.5em 1em;
-}
- div.ln{
-     display: inline;
-	 margin-left: 0.5em;
-}
- div.ddat {
-     display: inline;
-}
- div.dtstl {
-     display: inline;
-     text-align: center;
-}
- div.dsucc {
-     display: inline;
-}
- div.dsep{
-     display: inline;
-     text-align: center;
-}
- div.dannot {
-     display: inline;
-}
-
-div#exerciseList {
- display: none;
- margin-left: 10em;
- margin-top: 2em;
-}
-
-button.fileLink {
- display: inline-block;
- width: 8em;
-    margin:0.5em;
-    padding: 0.2em;
-    padding-left:1em;
- border: ridge;
-}
-
-button.fileLink:hover {
- background: lightgreen;
- color: black;
-}
-
-button#randomExercise {
- display: inline-block;
- width: 8em;
-    margin:0.5em;
-    padding: 0.2em;
-    padding-left:1em;
- border: ridge;
-}
-
-button#randomExercise:hover {
- background: lightgreen;
- color: black;
-}
-
-button.sampleLink {
- display: inline-block;
- width: 8em;
-    margin:0.5em;
-    padding: 0.2em;
-    padding-left:1em;
- border: ridge;
-}
-
-button.sampleLink:hover {
- background: lightgreen;
- color: black;
-}
 div#extra {
  display: none;
  margin: 2em;
 }
 
 button#backButton { 
-display: none;
+ display: block; 
  font-size: 1.5em; 
  background: lightcyan;
  position: fixed;
@@ -347,42 +192,11 @@ div.buttongroup {
 }
 
 div.buttongroup > button {
-    width: 100%;
+    width: 80%;
     margin: 0.2em;
     border-radius: 30px;
 }
 
-div#settingsMenu > button#toggleSystem{
-}
-
-
-div#settingsMenu > button#loadExercise{
-}
-
-div#settingsMenu > button#toggleadvanced {
-   color: red;
-    background-color: white;
-    font-size: 0.8em;
-}
-
-div#settingsMenu > button#toggleadvanced:hover {
-   color: red;
-    background-color: pink;
-    font-size: 0.8em;
-}
-
-
-div#advancedstuff {
-    display: none;
-    font-size: 0.6em;
-}
-div#advancedstuff >button{
-    width: 100%;
-}
-
-div#textinput {
- display: none;
-}
 
 h3 {
 width: 100%;
@@ -410,5 +224,60 @@ margin-top:0em;
 
 .biggg {
  font-size: 1.3em;
+}
+
+
+div:focus {
+ outline: none;
+}
+
+
+ div.derivation {
+     display:grid;
+     width: 100%;
+     grid-template-columns: 3em minmax(40px, max-content) 3em minmax(40px, max-content) 3em minmax(40px, max-content);
+	 counter-reset: linecounter;
+}
+
+div.row {
+ display:grid;
+     grid-template-columns: subgrid;
+	 grid-column: 1/7;
+     width: 100%;
+	 height: 1.4em;
+	}
+
+
+.row::before{
+	 counter-increment: linecounter;
+	 content: counter(linecounter) ".\2003";
+	 color: black;
+	 text-align: right;
+
+}
+
+div.ddat {
+     display: inline-block;
+	 height: 1.2em;
+}
+
+
+ div.dtstl {
+     display: inline-block;
+     text-align: center;
+	 height: 1.2em;
+}
+ div.dsucc {
+     display: inline-block;
+	 height: 1.2em;
+}
+ div.dsep{
+     display: inline-block;
+     text-align: center;
+	 height: 1.2em;
+}
+ div.dannot {
+     display: inline-block;
+	 height: 1.2em;
 }
 

@@ -31,13 +31,10 @@ v, V, U, and X.
 
 The editor will format your derivation on the fly. It is not possible to control the formatting.
 
-Inference rules must be specified by abbreviations used in the course material (see README).
+Inference rules must be specified by abbreviations used in the course material (see <button class="button linklike togglereadme" tabindex="0">README</button>).
 
-Theorems and Axioms  must be specified by abbreviations used in the course material (see README).
+Theorems and Axioms  must be specified by abbreviations used in the course material (see <button class="button linklike togglereadme" tabindex="0">README</button>).
 
 You can add subscripts by typing _ (underscore) followed by a single character (WARNING: debugging for use of subscripts is incomplete)
 
-See README for more:
-<div>
-<button class="button" id="togglereadme" tabindex="0">README</button>
-</div>
+See <button class="button linklike togglereadme" tabindex="0">README</button> for more.

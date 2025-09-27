@@ -1,15 +1,23 @@
- <div id="description" style="display: none">
-    <button id="backButton">Go Back</button>
-	<div>	
-#README#	
-	</div>
-  </div>
-<div id="proofChecker" style="display: block;"> 
+<!DOCTYPE html>
+<html>
+   <head>
+	<meta http-equiv='cache-control' content='no-cache'>
+	<title>Proof checker</title>
+      <meta charset="utf-8" />
+      <meta name="description" content="Proof checker" />
+      <meta name="author" content="Masahiro Yamada" />
+      <meta name="copyright" content="© Masahiro Yamada" />
+	  <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon" />
+	  <link rel="stylesheet" href="main.css" />
+      <style></style>
+   </head>
+   <body>
+<div id="main"> 
     <div id="navbar">
-	    <button class="button menuButton" id="toggleSettings" tabindex="0" >&#x2699;</button>
+	    <input type="checkbox" id="toggleSettings"><label for="toggleSettings">&#x2699;</label>
 	    <button class="button systemButton" id="toggleSystem" tabindex="0">Sentential Logic</button>
         <button class="button" id="check" tabindex="0">Check Derivation</button>
-        <button class="button" id="newPage" tabindex="0" style="margin-left: 1em">New</button>
+        <button class="button" id="clearInput" tabindex="0" style="margin-left: 1em">New</button>
         <button class="button" id="duplicateScreen" tabindex="0" style="margin-left: 1em">Duplicate</button>
         <button class="button" id="backHistory" tabindex="0" style="margin-left: 2em">back</button>
         <button class="button" id="forwardHistory" tabindex="0" style="margin-right: 1em">forward</button> 
@@ -19,9 +27,9 @@
     </div>
 
 	<div id="console">
-	 <div id="settingsMenu" style="display: none">
+      <div id="settingsMenu">
         <div class="buttongroup">
-<!--		  <button class="button" id="setOffset" tabindex="0">First Line: 1</button> --!>
+		  <button class="button" id="setOffset" tabindex="0">First Line: 1</button>
 		  <button class="button" id="toggleTheorem" tabindex="0">Theorems</button>
 		  </div>
 		<div class="buttongroup">
@@ -31,24 +39,21 @@
           <button class="button" id="toLatex" tabindex="0">copy LaTeX</button>
           <button class="button" id="printTree" tabindex="0">copy derivation Tree</button>
 		</div>
-		<div class="buttongroup">
-          <button class="button" id="clearHistory" tabindex="0">clear history</button>
-		</div>
       </div>
-	  <div id="editorWindow">
-	  <div id="consoleState" style="display: none">
-	  </div>
-	  <div id="title" contenteditable="plaintext-only">
-	  </div>
 	  <div id="editor">
 	  </div>
-	  </div>
-	  <div id="help" style="display: none">
-	  #HELP#
+	  <div id="help">
 	  </div>
 	</div>
 	
 	<div id="info"><span id="versionnumber"></span><span id="pagenumber"></span></div>
-    <div id="messages" style="display: none"></div>
+    <div id="messages"></div>
 </div>  
+
+  <div id="extra">
+    <button id="backButton">Go Back</button>
+    <div id="readme"></div>
+  </div>
+	</body>
+	</html>
 

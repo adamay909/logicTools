@@ -3,14 +3,13 @@ package main
 import (
 	"embed"
 	_ "embed"
-	"encoding/json"
 	"os"
-	"sort"
 	"strconv"
 	"strings"
 	"syscall/js"
 
 	"github.com/adamay909/logicTools/gentzen"
+	"github.com/adamay909/logicTools/proofChecker/internal/editor"
 	"honnef.co/go/js/dom/v2"
 )
 
@@ -24,41 +23,30 @@ var assets embed.FS
 
 var oPRIVATE = true
 
-var mainEditorFunc,
+var inputFunc,
+	mainEditorFunc,
 	titleEditorFunc,
 	clickFunc,
+	snapshotFunc,
 	loadFunc js.Value
 
 var indexHtml, helpHtml, styleCSS string
 
 var (
-	oPL = true
-
-	oML = false
-
-	oDR = false
-
-	oTHM = false
-
-	oHELP = false
-
-	oMENU = false
-
-	oABOUT = false
-
-	oEXTHM = false
-
-	oDEBUG = false
-
-	oExercises = false
-
-	oClipboard = 0
-
-	oAdvanced = false
-
+	oPL              = false
+	oML              = false
+	oDR              = false
+	oTHM             = false
+	oHELP            = false
+	oMENU            = false
+	oABOUT           = false
+	oEXTHM           = false
+	oDEBUG           = false
+	oExercises       = false
+	oClipboard       = 0
+	oAdvanced        = false
 	logConstBindings [][3]string
-
-	acceptInput = true
+	acceptInput      = true
 )
 
 const (
@@ -70,18 +58,20 @@ const (
 var dsp *console
 
 func main() {
-
+	dsp = new(console)
 	initMessages()
 	gentzen.SetSpecialConn(true)
 	setBasicInferenceRules()
+	setupPage()
 	setupJS()
-	resetDisplay()
-	hideExtra()
-	//	hide("menuButton")
-	loadHistory()
-	//toggleTheorems()
-	stopInput()
 
+	//**********
+	//clearHistory()
+	//**********
+	loadHistory()
+	updatePageNumber()
+	//writeStateToHTML()
+	//	loadHistory()
 	<-make(chan bool)
 }
 
@@ -117,78 +107,36 @@ func setupPage() {
 
 	dom.GetWindow().Document().GetElementsByTagName("style")[0].SetInnerHTML(string(d))
 
-	//Populate the page
-	d, _ = assets.ReadFile("assets/html/body.html")
-
-	dom.GetWindow().Document().GetElementsByTagName("body")[0].SetInnerHTML(string(d))
-
-	d, _ = assets.ReadFile("assets/html/help.html")
-
-	setTextByID("help", string(d))
-	dom.GetWindow().Document().GetElementByID("help").SetAttribute("style", "display: none")
-
-	d, _ = assets.ReadFile("assets/html/README.html")
-
-	setTextByID("readme", string(d))
-	dom.GetWindow().Document().GetElementByID("readme").SetAttribute("style", "display: none")
-
 	d, _ = assets.ReadFile("assets/html/version")
 	setTextByID("versionnumber", "v"+string(d)+"&emsp;&emsp;")
 
-	if !oPRIVATE {
-		setAttributeByID("loadExercise", "style", "display:none")
-	}
-
-	h := int(0.8 * float64(js.Global().Get("innerHeight").Int()))
-	setAttributeByID("display", `style`, `height: `+strconv.Itoa(h)+`px`)
-
-	dsp.fontSize = 120
-	setAttributeByID("editor", `style`, `font-size:`+strconv.Itoa(dsp.fontSize)+`%;`)
-
-	//Stuff for simplifying display
-	hide("menuButton")
-	hide("print")
 }
 
 func setupJS() {
-
-	mainEditorFunc = js.FuncOf(jsWrap(typeformula)).Value
-	titleEditorFunc = js.FuncOf(jsWrap(typetitle)).Value
 	clickFunc = js.FuncOf(jsWrap(onClick)).Value
-
-	js.Global().Call("addEventListener", "keydown", mainEditorFunc, true)
 	js.Global().Call("addEventListener", "click", clickFunc, true)
+	dsp.editor = editor.NewDerivationEditor("editor")
+	dsp.title = editor.NewSimpleEditor("title")
+	addEventListener(domDocument.Call("querySelector", "#editorWindow"), "editorinput", jsFuncSaveSnapshot)
 }
 
 func onClick() {
 
 	target := js.Global().Get("event").Get("target")
 	switch target.Get("id").String() {
-	case "dummy":
-		endEditTitle()
-		startInput()
-	case "title":
-		editTitle()
 
 	case "toggleSettings":
-		toggleSettings()
+		toggleSettingsMenu()
 	case "check":
 		checkDeriv()
-	case "clearInput":
-		clearInput()
 	case "toClipboard":
 		toClipboard()
 	case "toLatex":
 		toClipboardLatex()
 	case "printTree":
-		printTree()
-	case "print":
-		toPrinter()
+		//printTree()
 	case "toggleHelp":
 		toggleHelp()
-
-	case "setTitle":
-		editTitle()
 
 	case "toggleSystem":
 		togglePL()
@@ -196,299 +144,77 @@ func onClick() {
 		setOffset()
 	case "toggleTheorem":
 		toggleTheorems()
-	case "toggleDR":
-		toggleDR()
-	case "toggleML":
-		toggleML()
-	case "togglereadme":
-		toggleReadme()
-	case "reset":
-		resetDisplay()
-
-	case "toggleadvanced":
-		toggleAdvanced()
-	case "cliptype":
-		toggleClipboardType()
-	case "textInput":
-		inputFromText()
+	case "newPage":
+		newpage()
 	case "backHistory":
-		backHistory()
+		moveBackInHistory()
 	case "forwardHistory":
-		forwardHistory()
+		moveForwardInHistory()
 	case "removeFromHistory":
-		rmFromHistory()
-	case "exportHistory":
-		exportHistory()
-	case "importHistory":
-		rewriteHistory()
+		//		rmFromHistory()
 	case "duplicateScreen":
-		duplicateHistoryItem()
-	case "deleteAllHistory":
+		//		duplicateHistoryItem()
+	case "clearHistory":
 		clearHistory()
-
 	case "backButton":
-		backToNormal()
-
-	case "submitInput":
-		getInput()
-		/*
-			case "randomTheorem":
-				oEXTHM = true
-				nextProblem()
-
-			case "nextExercise":
-				nextProblem()
-			case "prevExercise":
-				prevProblem()
-			case "quitExercise":
-				endRandomExercise()
-		*/
-	case "delete":
-		handleInput("Delete")
+		toggleReadme()
 
 	case "sizeUp":
 		sizeUp()
 	case "sizeDown":
 		sizeDown()
-
-	case "loadExamples":
-		loadSamples()
-
-	default:
-		if target.Get("className").String() == "fileLink" {
-			loadFile(target.Get("innerHTML").String(), "exercises")
-		}
-		if target.Get("className").String() == "sampleLink" {
-			loadFile(target.Get("innerHTML").String(), "samples")
-		}
 	}
-}
-
-func display() {
-	dsp.format()
-	setTextByID("display", dsp.typeset())
-	setTextByID("dummy", `<h3 id="title">`+prettyGreek(dsp.Title)+`</h3>`)
-	setTextByID("pagenumber", "page: "+strconv.Itoa(historyPosition+1)+"/"+strconv.Itoa(len(history)))
-
-	// setTextByID("dummy", "")
-}
-
-func displayDerivation() {
-	dsp.formatDerivation()
-	setTextByID("display", dsp.typeset())
-	setTextByID("dummy", "")
-
-}
-
-func typeformula() {
-	if !acceptInput {
-		return
+	if target.Get("classList").Call("contains", "togglereadme").Bool() {
+		toggleReadme()
 	}
-	input := js.Global().Get("event").Get("key")
-
-	handleInput(input.String())
-	saveState()
-}
-
-func handleInput(s string) {
-
-	dsp.handleInput(s)
-	dsp.format()
-	setTextByID("display", dsp.typeset())
-	focusInput()
-	setTextByID("dummy", "")
-	scrollDisplay()
-	return
-}
-
-func focusInput() {
-	js.Global().Get("dummy").Call("focus")
-}
-
-func clearInput() {
-	saveHistory()
-	insertEmptyHistoryItem()
-	clearScreen()
-	saveState()
-	focusInput()
-	stopInput()
-}
-
-func clearScreen() {
-	dsp.clear()
-	setTextByID("setOffset", "First Line: "+strconv.Itoa(dsp.Offset))
-	display()
-	printMessage("", !clean)
-	hide("messages")
-}
-
-func resetDisplay() {
-
-	oEXTHM = false
-	oPL = true
-	oDR = false
-	oML = false
-	oHELP = false
-	oMENU = true
-	oABOUT = false
-	oExercises = false
-	oClipboard = 0
-	oAdvanced = false
-
-	var cons console
-
-	dsp = &cons
-
-	setupPage()
-
-	dsp.SystemPL = oPL
-	dsp.SystemML = oML
-	dsp.Theorems = oTHM
-	dsp.overhang = false
-	dsp.Offset = 1
-	dsp.viewTop = 0
-	dsp.viewBottom = 20
-	//finalize stuff
-	display()
-	toggleClipboardType()
-	//toggleTheorems()
-	//	toggleDR()
-	//	toggleML()
-	togglePL()
-	toggleSettings()
-	toggleMenuButton()
-	setDisplay()
-	focusInput()
-	//exercises = nil
-	//expos = 0
+	writeStateToHTML()
+	saveSnapshot()
 }
 
 func toggleTheorems() {
-	stopInput()
 
 	oTHM = !oTHM
 
-	dsp.Theorems = oTHM
-
 	setBasicInferenceRules()
-	setTextByID("toggleTheorem", "Theorems")
 	if oTHM {
 		setupTheorems(oDR)
-		setTextByID("toggleTheorem", "Theorems ✓")
 	}
-
 	return
 }
 
 func togglePL() {
-	stopInput()
 	oPL = !oPL
 	logConstBindings = nil
 	if oPL {
 		logConstBindings = append(connBindings, plBindings...)
-		setTextByID("toggleSystem", "Predicate Logic")
 	} else {
 		logConstBindings = connBindings
-		setTextByID("toggleSystem", "Sentential Logic")
 	}
-	if oML {
-		logConstBindings = append(logConstBindings, mlBindings...)
-	}
-	dsp.SystemPL = oPL
 	gentzen.SetPL(oPL)
 	return
 }
 
-func toggleDR() {
-	stopInput()
-	oDR = !oDR
-	if oDR {
-		setTextByID("toggleDR", `Derived Rules&emsp; &#x2713;`)
+func setupButtonLabels() {
+	if oPL {
+		setTextByID("toggleSystem", "Predicate Logic")
 	} else {
-		setTextByID("toggleDR", `Derived Rules`)
+		setTextByID("toggleSystem", "Sentential Logic")
 	}
-	dsp.DerivedRules = oDR
-}
-func toggleML() {
-	stopInput()
-	oML = !oML
-	if oML {
-		setTextByID("toggleML", `Modal Logic&emsp; &#x2713;`)
+	if oTHM {
+		setupTheorems(oDR)
+		setTextByID("toggleTheorem", "Theorems ✓")
 	} else {
-		setTextByID("toggleML", `Modal Logic`)
+		setTextByID("toggleTheorem", "Theorems")
 	}
-	dsp.SystemML = oML
 }
 
 func toggleHelp() {
-	if oABOUT {
-		return
-	}
-
-	oHELP = !oHELP
-	stopInput()
-	if !oHELP {
-		setTextByID("toggleHelp", "Show Help")
-		hide("help")
-	} else {
-		setTextByID("toggleHelp", "Hide Help")
-		show("help")
-	}
-	setDisplay()
-	return
-}
-
-func toggleSettings() {
-	if oABOUT {
-		toggleReadme()
-	}
-	stopInput()
-	oMENU = !oMENU
-	if !oMENU {
-		hide("settingsMenu")
-	} else {
-		show("settingsMenu")
-	}
-	setDisplay()
-	return
+	toggleVisibilityInline("help")
 }
 
 func toggleReadme() {
-	stopInput()
-	hide("console")
-	show("extra")
-	show("readme")
-	show("backButton")
-	return
-}
-
-func backToNormal() {
-	stopInput()
-	dom.GetWindow().Document().GetElementByID("textinputarea").(*dom.HTMLTextAreaElement).SetValue("")
-	hideExtra()
-	show("console")
-	show("dummy")
-}
-
-func toggleClipboardType() {
-	stopInput()
-	oClipboard = oTextOutput
-	return
-
-	if oPRIVATE {
-		oClipboard = (oClipboard + 1) % 3
-	} else {
-		oClipboard = (oClipboard + 1) % 2
-	}
-	switch oClipboard {
-	case oTextOutput:
-		setTextByID("cliptype", "Clipboard: text")
-	case oLatexOutput:
-		setTextByID("cliptype", "Clipboard: LaTeX")
-	case oJsonOutput:
-		setTextByID("cliptype", "Clipboard: JSON")
-	}
-	return
+	toggleVisibility("description")
+	toggleVisibility("proofChecker")
 }
 
 func setDisplay() {
@@ -521,28 +247,25 @@ func checkDeriv() {
 	if oABOUT {
 		return
 	}
-	stopInput()
-	checkDerivation()
+	//checkDerivation()
 	return
 }
 
 func setOffset() {
+	/*
+	   		n, err := strconv.Atoi(js.Global().Call("prompt", "Number of first line", strconv.Itoa(dsp.offset)).String())
+	   		if err != nil {
+	   			return
+	   		}
+	   		dsp.setOffset(n)
+	   		setTextByID("setOffset", "First Line: "+strconv.Itoa(dsp.offset))
+	   	}
 
-	n, err := strconv.Atoi(js.Global().Call("prompt", "Number of first line", strconv.Itoa(dsp.Offset)).String())
-	if err != nil {
-		return
-	}
-	dsp.setOffset(n)
-	setTextByID("setOffset", "First Line: "+strconv.Itoa(dsp.Offset))
-	display()
-}
+	   func setTitle() {
 
-func setTitle() {
-
-	title := js.Global().Call("prompt", "Title:").String()
-	dsp.Title = convert(title)
-
-	display()
+	   	title := js.Global().Call("prompt", "Title:").String()
+	   	dsp.title = convert(title)
+	*/
 }
 
 func convert(s string) string {
@@ -574,18 +297,11 @@ func toClipboard() {
 	if oABOUT {
 		return
 	}
-	stopInput()
 	switch oClipboard {
 
 	case oLatexOutput:
-		copyToClipboard(latexOutput())
+		//	copyToClipboard(latexOutput())
 
-	case oTextOutput:
-		withTitle := true
-		copyToClipboard(plainTextDeriv(withTitle))
-
-	case oJsonOutput:
-		copyToClipboard(dsp.marshalJson())
 	}
 
 	return
@@ -594,28 +310,10 @@ func toClipboardLatex() {
 	if oABOUT {
 		return
 	}
-	stopInput()
 
-	copyToClipboard(latexOutput())
+	//	copyToClipboard(latexOutput())
 
 	return
-}
-func startInput() {
-
-	acceptInput = true
-	display()
-	setAttributeByID("cursor", "class", "active")
-	setAttributeByID("display", "class", "active")
-
-}
-
-func stopInput() {
-
-	acceptInput = false
-	display()
-	setAttributeByID("cursor", "class", "inactive")
-	setAttributeByID("display", "class", "inactive")
-
 }
 
 func setTextByID(elem string, content string) {
@@ -682,188 +380,26 @@ func hideExtra() {
 	hide("extra")
 }
 
-func toggleExercises() {
-	stopInput()
-	hide("console")
-	hide("dummy")
-	show("extra")
-	show("exerciseList")
-	show("backButton")
-	files, err := assets.ReadDir("assets/files")
-	if err != nil {
-		//fmt.Println(err)
-		return
-	}
-
-	if len(files) == 0 {
-		return
-	}
-	h := "<h3>Pick one to load</h3>"
-	for _, e := range files {
-		h = h + `<button class="fileLink" tabindex=0>` + e.Name() + `</button>`
-	}
-	h = h + `<p><button class="fileLink" id="nextExercise" tabindex=0>Random Exercises (Derivations)</button></p>`
-	h = h + `<p><button class="fileLink" id="randomTheorem" tabindex=0>Random Exercises (Theorems)</button></p>`
-
-	setTextByID("exerciseList", h)
-}
-
-func toggleSamples() {
-	stopInput()
-	hide("console")
-	hide("controls2")
-	show("extra")
-	show("exerciseList")
-	show("backButton")
-	files, err := assets.ReadDir("assets/samples")
-	if err != nil {
-		//		fmt.Println(err)
-		return
-	}
-
-	if len(files) == 0 {
-		return
-	}
-
-	order := func(i, j int) bool {
-		return sort.StringsAreSorted([]string{files[i].Name(), files[j].Name()})
-	}
-
-	sort.Slice(files, order)
-
-	h := "<h3>Pick one to load</h3>"
-	for _, e := range files {
-		//fmt.Println(e.Name())
-		h = h + `<button class="sampleLink" tabindex=0>` + e.Name() + `</button>`
-	}
-	setTextByID("exerciseList", h)
-}
-
-func loadSamples() {
-	stopInput()
-	d, err := assets.ReadFile("assets/samples/samples.txt")
-	if err != nil {
-		panic(err)
-	}
-	json := string(d)
-	history = strings.Split(json, "\n")
-	historyPosition = 0
-	moveInHistory()
-	display()
-
-}
-
-func loadFile(name string, t string) {
-	stopInput()
-	if t == "exercises" {
-		name = "assets/files/" + name
-	}
-	if t == "samples" {
-		name = "assets/samples/" + name
-	}
-
-	d, err := assets.ReadFile(name)
-
-	if err != nil {
-		panic(err)
-	}
-
-	dsp.clear()
-
-	json.Unmarshal(d, dsp)
-	dsp.xpos, dsp.ypos = 0, 0
-	dsp.overhang = false
-	dsp.modifier = ""
-	if dsp.SystemPL != oPL {
-		togglePL()
-	}
-	if dsp.Theorems != oTHM {
-		toggleTheorems()
-	}
-	show("console")
-	show("dummy")
-	hide("backButton")
-	hide("exerciseList")
-	hide("extra")
-	printMessage("", !clean)
-	hide("messages")
-	display()
-	stopInput()
-}
-
-func inputFromText() {
-
-	stopInput()
-	hide("console")
-	show("extra")
-	show("txtinput")
-	show("backButton")
-
-}
-
-func getInput() {
-	stopInput()
-	s := dom.GetWindow().Document().GetElementByID("textinputarea").(*dom.HTMLTextAreaElement).Value()
-	lines, title, err := text2data(s)
-	if err != nil {
-		js.Global().Call("alert", err.Error())
-		return
-	}
-	dom.GetWindow().Document().GetElementByID("textinputarea").(*dom.HTMLTextAreaElement).SetValue("")
-	dsp.clear()
-	dsp.Title = title
-	dsp.Input = lines
-	display()
-	printMessage("", !clean)
-	hide("messages")
-	hide("textinput")
-	hide("extra")
-	hide("backButton")
-	show("console")
-	stopInput()
-
-}
-
-func toggleAdvanced() {
-
-	stopInput()
-	oAdvanced = !oAdvanced
-
-	if oAdvanced {
-		show("advancedstuff")
-	} else {
-		hide("advancedstuff")
-	}
-	return
-}
-
-func showArrowKeys() {
-	show("cursorControls")
-}
-
 func sizeUp() {
-	dsp.fontSize = dsp.fontSize + 20
-	setAttributeByID("editor", `style`, `font-size:`+strconv.Itoa(dsp.fontSize)+`%;`)
+	s := domDocument.Call("querySelector", "#editorWindow").Get("style")
+	v := strings.TrimSuffix(s.Call("getPropertyValue", "font-size").String(), "%")
+	iv, err := strconv.Atoi(v)
+	if err != nil {
+		iv = 120
+	}
+	v = strconv.Itoa(iv+20) + "%"
+	s.Call("setProperty", "font-size", v)
 }
 
 func sizeDown() {
-	dsp.fontSize = dsp.fontSize - 20
-	setAttributeByID("editor", `style`, `font-size:`+strconv.Itoa(dsp.fontSize)+`%;`)
-}
-
-func toPrinter() {
-
-	checkDeriv()
-
-	stashScreen()
-
-	message := dom.GetWindow().Document().GetElementByID("messages").OuterHTML()
-
-	dom.GetWindow().Document().GetElementsByTagName("body")[0].SetInnerHTML(dsp.typeset() + message)
-
-	js.Global().Call("print", "")
-
-	restoreScreen()
+	s := domDocument.Call("querySelector", "#editorWindow").Get("style")
+	v := strings.TrimSuffix(s.Call("getPropertyValue", "font-size").String(), "%")
+	iv, err := strconv.Atoi(v)
+	if err != nil {
+		iv = 120
+	}
+	v = strconv.Itoa(iv-20) + "%"
+	s.Call("setProperty", "font-size", v)
 }
 
 var screenStash string
@@ -878,4 +414,26 @@ func restoreScreen() {
 
 	dom.GetWindow().Document().GetElementsByTagName("body")[0].SetInnerHTML(screenStash)
 
+}
+
+func toggleSettingsMenu() {
+	toggleVisibilityInline("settingsMenu")
+}
+
+func toggleVisibilityInline(id string) {
+	s := domDocument.Call("querySelector", "#"+id).Get("style")
+	if s.Call("getPropertyValue", "display").String() == "inline-block" {
+		s.Call("setProperty", "display", "none")
+	} else {
+		s.Call("setProperty", "display", "inline-block")
+	}
+}
+
+func toggleVisibility(id string) {
+	s := domDocument.Call("querySelector", "#"+id).Get("style")
+	if s.Call("getPropertyValue", "display").String() == "block" {
+		s.Call("setProperty", "display", "none")
+	} else {
+		s.Call("setProperty", "display", "block")
+	}
 }
