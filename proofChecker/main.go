@@ -34,19 +34,10 @@ var indexHtml, helpHtml, styleCSS string
 
 var (
 	oPL              = false
-	oML              = false
 	oDR              = false
 	oTHM             = false
-	oHELP            = false
-	oMENU            = false
-	oABOUT           = false
-	oEXTHM           = false
 	oDEBUG           = false
-	oExercises       = false
-	oClipboard       = 0
-	oAdvanced        = false
 	logConstBindings [][3]string
-	acceptInput      = true
 )
 
 const (
@@ -129,8 +120,6 @@ func onClick() {
 		toggleSettingsMenu()
 	case "check":
 		checkDeriv()
-	case "toClipboard":
-		toClipboard()
 	case "toLatex":
 		toClipboardLatex()
 	case "printTree":
@@ -153,7 +142,7 @@ func onClick() {
 	case "removeFromHistory":
 		//		rmFromHistory()
 	case "duplicateScreen":
-		//		duplicateHistoryItem()
+		duplicateHistoryItem()
 	case "clearHistory":
 		clearHistory()
 	case "backButton":
@@ -217,36 +206,7 @@ func toggleReadme() {
 	toggleVisibility("proofChecker")
 }
 
-func setDisplay() {
-
-	if oABOUT {
-		setAttributeByID("mainArea", "style", "grid-template-columns: 1fr 10fr")
-		return
-	}
-
-	if oMENU && oHELP {
-		setAttributeByID("mainArea", "style", "grid-template-columns: 1fr 6fr 4fr")
-		return
-	}
-
-	if oMENU && !oHELP {
-		setAttributeByID("mainArea", "style", "grid-template-columns: 1fr 10fr")
-		return
-	}
-
-	if !oMENU && oHELP {
-		setAttributeByID("mainArea", "style", "grid-template-columns: 6fr 4fr")
-		return
-	}
-
-	setAttributeByID("mainArea", "style", "grid-template-columns: 100%")
-	return
-}
-
 func checkDeriv() {
-	if oABOUT {
-		return
-	}
 	//checkDerivation()
 	return
 }
@@ -293,23 +253,7 @@ func convert(s string) string {
 
 }
 
-func toClipboard() {
-	if oABOUT {
-		return
-	}
-	switch oClipboard {
-
-	case oLatexOutput:
-		//	copyToClipboard(latexOutput())
-
-	}
-
-	return
-}
 func toClipboardLatex() {
-	if oABOUT {
-		return
-	}
 
 	//	copyToClipboard(latexOutput())
 

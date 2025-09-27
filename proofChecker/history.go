@@ -160,6 +160,15 @@ func newpage() {
 	updatePageNumber()
 }
 
+func duplicateHistoryItem() {
+	p1 := dsp.editor.GetInnerHTML()
+	p2 := dsp.title.GetInnerHTML()
+	newpage()
+	dsp.editor.SetInnerHTML(p1)
+	dsp.title.SetInnerHTML(p2)
+	saveSnapshot()
+}
+
 func clearHistory() {
 	js.Global().Get("localStorage").Call("clear")
 	dsp.editor.Clear()
