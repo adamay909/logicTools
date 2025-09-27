@@ -94,7 +94,8 @@ func setupJSderivationEditor(e *Editor) {
 
 	addEventListener(e.elem, "click", clickHandler, e)
 	addEventListener(e.elem, "focusout", focusOutHandler, e)
-	addEventListener(domDocument, "selectionchange", caretHandler, e)
+	addEventListener(e.elem, "selectionchange", caretHandler, e)
+	addEventListener(e.elem, "customselectionchange", caretHandler, e)
 	addEventListener(e.elem, "beforeinput", beforeInputHandler, e)
 	addEventListener(e.elem, "keydown", keyHandler, e)
 	addEventListener(e.elem, "paste", pasteHandler, e)
@@ -110,29 +111,30 @@ var modifier string
 
 func keyHandler(this js.Value, args ...any) {
 	ed := args[0].(*Editor)
+	focusElement := domDocument.Get("activeElement")
 	switch this.Get("key").String() {
 
 	case "ArrowUp":
 		ed.key = "up"
 		this.Call("preventDefault")
-		ed.elem.Call("dispatchEvent", js.Global().Get("Event").New("selectionchange"))
+		focusElement.Call("dispatchEvent", js.Global().Get("CustomEvent").New("customselectionchange", map[string]any{"bubbles": true}))
 
 	case "ArrowDown":
 		ed.key = "down"
 		this.Call("preventDefault")
-		ed.elem.Call("dispatchEvent", js.Global().Get("Event").New("selectionchange"))
+		focusElement.Call("dispatchEvent", js.Global().Get("CustomEvent").New("customselectionchange", map[string]any{"bubbles": true}))
 
 	case "ArrowRight":
 		if caretAtEndOfCell() {
 			ed.key = "right"
 			this.Call("preventDefault")
-			ed.elem.Call("dispatchEvent", js.Global().Get("Event").New("selectionchange"))
+			focusElement.Call("dispatchEvent", js.Global().Get("CustomEvent").New("customselectionchange", map[string]any{"bubbles": true}))
 		}
 	case "ArrowLeft":
 		if caretAtStartOfCell() {
 			ed.key = "left"
 			this.Call("preventDefault")
-			ed.elem.Call("dispatchEvent", js.Global().Get("Event").New("selectionchange"))
+			focusElement.Call("dispatchEvent", js.Global().Get("CustomEvent").New("customselectionchange", map[string]any{"bubbles": true}))
 		}
 
 	}

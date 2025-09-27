@@ -45,6 +45,14 @@ body {
  outline: 2px solid blue;
 }
 
+#editorWindow.success {
+ outline: 2px solid lightgreen;
+}
+
+#editorWindow.fail {
+ outline: 2px solid red;
+}
+
 #title {
  width: 100%;
  min-height: 2em;

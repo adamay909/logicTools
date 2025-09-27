@@ -183,3 +183,9 @@ func saveSnapshot() {
 func jsFuncSaveSnapshot(this js.Value, args ...any) {
 	saveSnapshot()
 }
+
+func cleanupEditorWindow(this js.Value, args ...any) {
+	s := domDocument.Call("querySelector", "#editorWindow").Get("classList")
+	s.Call("remove", "fail")
+	s.Call("remove", "success")
+}

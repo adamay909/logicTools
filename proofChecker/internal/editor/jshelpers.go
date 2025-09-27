@@ -393,6 +393,9 @@ func previousElement(e js.Value) js.Value {
 
 func rejectSelection() {
 	selection := domWindow.Call("getSelection")
+	if selection.Get("rangeCount").Int() == 0 {
+		return
+	}
 	srange := selection.Call("getRangeAt", 0)
 	if selection.Get("direction").String() == "forward" {
 		srange.Call("collapse")

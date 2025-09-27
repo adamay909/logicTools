@@ -28,8 +28,10 @@ func simpleInputHandler(this js.Value, args ...any) {
 	char := this.Get("data").String()
 
 	if char == `\` || char == `|` {
-		simpleModifier = char
-		return
+		if simpleModifier == "" {
+			simpleModifier = char
+			return
+		}
 	}
 	char = simpleModifier + char
 	insertChar(simpleModCharOf(char))

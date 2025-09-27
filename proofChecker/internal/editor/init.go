@@ -1,6 +1,7 @@
 package editor
 
 var charMap map[string]string
+var revMap map[string]string
 var extraMap map[string]string
 
 var permittedChars []string
@@ -9,7 +10,7 @@ const turnstile = "\u22a2"
 const ldots = "\u2026"
 
 func init() {
-	s := `0123456789()^>,|-\=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ` + "\n"
+	s := `0123456789()^>,-\=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ` + "\n"
 
 	for _, r := range s {
 		permittedChars = append(permittedChars, string(r))
@@ -64,8 +65,10 @@ func init() {
 		[2]string{`,`, ",\u00a0"},
 	}
 	charMap = make(map[string]string)
+	revMap = make(map[string]string)
 	for _, g := range bindings {
 		charMap[g[0]] = g[1]
+		revMap[g[1]] = g[0]
 	}
 
 	extrabindings := [][2]string{
@@ -76,8 +79,8 @@ func init() {
 		[2]string{"|v", "v"},
 		[2]string{`|-`, "\u22a2"},
 		[2]string{`|>`, ">"},
-		//		[2]string{`|>`, "&gt;"},
-		//	[2]string{`&`, "&amp;"},
+		[2]string{`||`, "|"},
+		[2]string{`\\`, `\`},
 	}
 	extraMap = make(map[string]string)
 	for _, g := range extrabindings {

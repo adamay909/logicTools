@@ -55,10 +55,6 @@ func main() {
 	setBasicInferenceRules()
 	setupPage()
 	setupJS()
-
-	//**********
-	//clearHistory()
-	//**********
 	loadHistory()
 	updatePageNumber()
 	//writeStateToHTML()
@@ -109,6 +105,7 @@ func setupJS() {
 	dsp.editor = editor.NewDerivationEditor("editor")
 	dsp.title = editor.NewSimpleEditor("title")
 	addEventListener(domDocument.Call("querySelector", "#editorWindow"), "editorinput", jsFuncSaveSnapshot)
+	addEventListener(domDocument.Call("querySelector", "#editorWindow"), "focus", cleanupEditorWindow)
 }
 
 func onClick() {
@@ -207,7 +204,7 @@ func toggleReadme() {
 }
 
 func checkDeriv() {
-	//checkDerivation()
+	checkDerivation()
 	return
 }
 
@@ -277,17 +274,6 @@ func jsWrap(f func()) (fn func(this js.Value, args []js.Value) any) {
 	}
 
 	return fn
-}
-
-func show(elem string) {
-	setAttributeByID(elem, "style", "display: inline-block")
-	//removeClass(elem, "hide")
-	//addClass(elem, "show")
-}
-
-func hide(elem string) {
-	setAttributeByID(elem, "style", "display: none")
-	// addClass(elem, "hide")
 }
 
 func addClass(elem string, nc string) {
@@ -380,4 +366,13 @@ func toggleVisibility(id string) {
 	} else {
 		s.Call("setProperty", "display", "block")
 	}
+}
+func makeVisible(id string) {
+	s := domDocument.Call("querySelector", "#"+id).Get("style")
+	s.Call("setProperty", "display", "block")
+}
+
+func hide(id string) {
+	s := domDocument.Call("querySelector", "#"+id).Get("style")
+	s.Call("setProperty", "display", "none")
 }

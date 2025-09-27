@@ -21,9 +21,6 @@ func caretHandler(this js.Value, args ...any) {
 	ed := args[0].(*Editor)
 
 	focusElement := domDocument.Get("activeElement")
-	if !ed.elem.Call("contains", focusElement).Bool() {
-		return
-	}
 	rejectSelection()
 	this.Call("preventDefault")
 
@@ -163,7 +160,7 @@ func caretAtStartOfCell() bool {
 func caretAtEndOfCell() bool {
 	cellrange := domDocument.Call("createRange")
 	cellrange.Call("selectNodeContents", cellAtCaret())
-	return textToCaret() == cellrange.Call("toString").String()
+	return textToCaret() == strings.Join(strings.Fields(cellrange.Call("toString").String()), "")
 }
 
 func caretAtStartOfLine() bool {
