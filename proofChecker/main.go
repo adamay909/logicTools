@@ -13,6 +13,11 @@ import (
 	"honnef.co/go/js/dom/v2"
 )
 
+type console struct {
+	editor *editor.Editor
+	title  *editor.Editor
+}
+
 // set to true for debug log to stdout
 
 //go:embed assets/html/*
@@ -55,6 +60,7 @@ func main() {
 	setBasicInferenceRules()
 	setupPage()
 	setupJS()
+	checkForOldFormat()
 	loadHistory()
 	updatePageNumber()
 	//writeStateToHTML()

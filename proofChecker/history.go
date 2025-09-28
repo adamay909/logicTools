@@ -12,6 +12,8 @@ import (
 var history []string
 var historyPosition int
 
+const historyItemSeparator = `<!---->`
+
 func writeStateToHTML() {
 	cl := domDocument.Call("querySelector", "#consoleState").Get("classList")
 	if oPL {
@@ -73,14 +75,18 @@ func loadHistory() {
 	//	history = append(history, getCurrentConsoleState())
 	//	return
 
-	raw := js.Global().Get("localStorage").Call("getItem", "history")
+	raw := js.Global().Get("localStorage").Call("getItem", "history2")
 	if !raw.IsNull() {
-		temphistory := strings.Split(editor.StripWhiteSpaceFromHTML(raw.String()), `<div id="consoleState"`)
+		temphistory := strings.Split(editor.StripWhiteSpaceFromHTML(raw.String()), historyItemSeparator)
 		for i := range temphistory {
 			if len(temphistory[i]) == 0 {
 				continue
 			}
-			history = append(history, `<div id="consoleState"`+temphistory[i])
+			history = append(history, temphistory[i]+`<!---->`)
+		}
+		fmt.Println("history has ", len(history))
+		for i := range history {
+			fmt.Println(i, history[i])
 		}
 	} else {
 		fmt.Println("appending to history")
@@ -88,7 +94,7 @@ func loadHistory() {
 	}
 
 	var err error
-	historyPosition, err = strconv.Atoi(js.Global().Get("localStorage").Call("getItem", "historyPosition").String())
+	historyPosition, err = strconv.Atoi(js.Global().Get("localStorage").Call("getItem", "historyPosition2").String())
 	if err != nil {
 		historyPosition = 0
 	}
@@ -109,7 +115,7 @@ func moveInHistoryTo(pos int) {
 }
 
 func updatePageNumber() {
-	js.Global().Get("localStorage").Call("setItem", "historyPosition", strconv.Itoa(historyPosition))
+	js.Global().Get("localStorage").Call("setItem", "historyPosition2", strconv.Itoa(historyPosition))
 	domDocument.Call("querySelector", "#pagenumber").Set("innerHTML", strconv.Itoa(historyPosition+1)+"/"+strconv.Itoa(len(history)))
 }
 
@@ -118,10 +124,10 @@ func saveHistory() {
 		history = append(history, "")
 	}
 	saveSnapshot()
-	history[historyPosition] = getCurrentConsoleState()
+	history[historyPosition] = getCurrentConsoleState() + historyItemSeparator
 
-	js.Global().Get("localStorage").Call("setItem", "history", strings.Join(history, ""))
-	js.Global().Get("localStorage").Call("setItem", "historyPosition", strconv.Itoa(historyPosition))
+	js.Global().Get("localStorage").Call("setItem", "history2", strings.Join(history, ""))
+	js.Global().Get("localStorage").Call("setItem", "historyPosition2", strconv.Itoa(historyPosition))
 }
 
 func moveBackInHistory() {
