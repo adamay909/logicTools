@@ -34,10 +34,20 @@ func caretHandler(this js.Value, args ...any) {
 		ed.key = ""
 
 	case ed.key == "left":
+		if caretAtStartOfLine() && !onFirstLine() {
+			moveFocusToAboveOf(focusElement)
+			moveCaretToEndOfLine()
+			return
+		}
 		moveFocusToLeftOf(focusElement)
 		ed.key = ""
 
 	case ed.key == "right":
+		if caretAtEndOfLine() && !onLastLine() {
+			moveFocusToBelowOf(focusElement)
+			moveCaretToStartOfLine()
+			return
+		}
 		moveFocusToRightOf(focusElement)
 		ed.key = ""
 
@@ -53,7 +63,8 @@ func moveFocusToRightOf(e js.Value) {
 	if t.IsNull() {
 		return
 	}
-	if valOf(t, "class") == "dtstl" || valOf(t, "class") == "dsep" {
+	switch valOf(t, "class") {
+	case "dtstl", "dsep":
 		t = t.Get("nextElementSibling")
 	}
 	t.Call("focus")
@@ -179,6 +190,10 @@ func caretAtEndOfLine() bool {
 
 func onLastLine() bool {
 	return nextRowOfCaret().IsNull()
+}
+
+func onFirstLine() bool {
+	return previousRowOfCaret().IsNull()
 }
 
 func moveCaretToEndOfPreviousLine() {
