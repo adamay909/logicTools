@@ -174,6 +174,14 @@ func toggleTheorems() {
 	return
 }
 
+func setupGentzen() {
+	gentzen.SetPL(oPL)
+	setBasicInferenceRules()
+	if oTHM {
+		setupTheorems(oDR)
+	}
+}
+
 func togglePL() {
 	oPL = !oPL
 	logConstBindings = nil

@@ -43,6 +43,7 @@ func setStateFromHTML() {
 		oTHM = false
 	}
 	setupButtonLabels()
+	setupGentzen()
 }
 
 func getCurrentConsoleState() string {
@@ -68,6 +69,7 @@ func setCurrentConsoleState(html string) {
 	titleContent := dummy.Call("querySelector", "#title").Get("innerHTML").String()
 	dsp.editor.SetInnerHTML(editorContent)
 	dsp.title.SetInnerHTML(titleContent)
+	setupGentzen()
 }
 
 func loadHistory() {
