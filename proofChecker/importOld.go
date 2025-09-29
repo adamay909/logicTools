@@ -107,6 +107,11 @@ func convertOldHistoryHTML(input []inputLine) (html string) {
 
 		html = html + r
 	}
+
+	if len(input) == 0 {
+		dsp.editor.Clear()
+		return dsp.editor.GetInnerHTML()
+	}
 	html = `<div class="derivation">` + html + `</div>`
 	return editor.StripWhiteSpaceFromHTML(html)
 }
