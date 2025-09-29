@@ -121,15 +121,37 @@ img {
   height: auto;
 }
 
+div.buttonlike {
+ display: inline-block;
+ font-size: 1em;
+ text-align: center;
+ border: 1px solid;
+ background-color: lightgrey;
+ cursor: default;
+}
 
+div.buttonlike:hover{
+ display: inline-block;
+ color: black;
+ background-color: lightgreen;
+}
+#offset {
+ display: inline;
+}
 
- .button{
+#inputoffset {
+ display: none;
+ width: 3em;
+}
+
+.button{
  display: inline-block;
  font-size: 1em;
  text-align: center;
  border: 1px solid;
  background-color: lightgrey;
 }
+
 
 .button:hover{
  display: inline-block;
@@ -213,6 +235,11 @@ div.buttongroup > button {
     border-radius: 30px;
 }
 
+div.buttongroup > .buttonlike {
+    width: 80%;
+    margin: 0.2em;
+    border-radius: 30px;
+}
 
 h3 {
 width: 100%;
@@ -252,7 +279,7 @@ div:focus {
      display:grid;
      width: 100%;
      grid-template-columns: 3em minmax(40px, max-content) 3em minmax(40px, max-content) 3em minmax(40px, max-content);
-	 counter-reset: linecounter;
+	 counter-set: linecounter 0;
 }
 
 div.row {

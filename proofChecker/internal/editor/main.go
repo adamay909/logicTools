@@ -2,6 +2,7 @@ package editor
 
 import (
 	_ "embed" //embed template files
+	"strconv"
 	"strings"
 	"syscall/js"
 	"unicode"
@@ -88,6 +89,12 @@ func (e *Editor) GetInnerHTML() string {
 
 func (e *Editor) SetInnerHTML(s string) {
 	e.elem.Set("innerHTML", s)
+}
+
+func (e *Editor) SetOffset(v int) {
+	d := e.elem.Call("querySelector", ".derivation")
+	s := d.Get("style")
+	s.Call("setProperty", "counter-set", "linecounter "+strconv.Itoa(v-1))
 }
 
 func setupJSderivationEditor(e *Editor) {

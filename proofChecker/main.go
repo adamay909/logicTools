@@ -42,6 +42,7 @@ var (
 	oDR              = false
 	oTHM             = false
 	oDEBUG           = false
+	oOffset          = 1
 	logConstBindings [][3]string
 )
 
@@ -114,6 +115,8 @@ func setupJS() {
 	dsp.title = editor.NewSimpleEditor("title")
 	addEventListener(domDocument.Call("querySelector", "#editorWindow"), "editorinput", jsFuncSaveSnapshot)
 	addEventListener(domDocument.Call("querySelector", "#editorWindow"), "focus", cleanupEditorWindow)
+	addEventListener(domDocument.Call("querySelector", "#inputoffset"), "keydown", commitOffset)
+
 }
 
 func onClick() {
@@ -135,7 +138,9 @@ func onClick() {
 	case "toggleSystem":
 		togglePL()
 	case "setOffset":
-		setOffset()
+		inputOffset()
+	case "offset":
+		inputOffset()
 	case "toggleTheorem":
 		toggleTheorems()
 	case "newPage":
@@ -206,6 +211,7 @@ func setupButtonLabels() {
 	} else {
 		setTextByID("toggleTheorem", "Theorems")
 	}
+	setTextByID("offset", strconv.Itoa(oOffset))
 }
 
 func toggleHelp() {
@@ -222,21 +228,13 @@ func checkDeriv() {
 	return
 }
 
-func setOffset() {
-	/*
-	   		n, err := strconv.Atoi(js.Global().Call("prompt", "Number of first line", strconv.Itoa(dsp.offset)).String())
-	   		if err != nil {
-	   			return
-	   		}
-	   		dsp.setOffset(n)
-	   		setTextByID("setOffset", "First Line: "+strconv.Itoa(dsp.offset))
-	   	}
+func inputOffset() {
+	e := domDocument.Call("querySelector", "#inputoffset")
+	e.Set("value", strconv.Itoa(oOffset))
+	e.Call("focus")
+	toggleVisibilityInline("offset")
+	toggleVisibilityInline("inputoffset")
 
-	   func setTitle() {
-
-	   	title := js.Global().Call("prompt", "Title:").String()
-	   	dsp.title = convert(title)
-	*/
 }
 
 func convert(s string) string {
@@ -401,4 +399,30 @@ func printTree() string {
 		return err.Error()
 	}
 	return r
+}
+
+func commitOffset(e js.Value, args ...any) {
+	if e.Get("key").String() != "Enter" {
+		return
+	}
+	inputelem := domDocument.Call("querySelector", "#inputoffset")
+	v, err := strconv.Atoi(inputelem.Get("value").String())
+	if err != nil {
+		v = oOffset
+	}
+	if v < 1 || v > 999 {
+		v = oOffset
+	}
+	inputelem.Set("value", strconv.Itoa(v))
+	setOffset(v)
+	inputelem.Call("blur")
+	toggleVisibilityInline("offset")
+	toggleVisibilityInline("inputoffset")
+}
+
+func setOffset(v int) {
+	oOffset = v
+	dsp.editor.SetOffset(v)
+	domDocument.Call("querySelector", "#offset").Set("innerHTML", strconv.Itoa(v))
+	domDocument.Call("querySelector", "#consoleState").Call("setAttribute", "data-offset", strconv.Itoa(v))
 }

@@ -195,7 +195,9 @@ infer Γ, ∆ ⊢ ψ , provided κ does not appear in any of Γ, ∆ , and ψ.</
 	<div id="console">
 	 <div id="settingsMenu" style="display: none">
         <div class="buttongroup">
-<!--		  <button class="button" id="setOffset" tabindex="0">First Line: 1</button> --!>
+		  <div class="buttonlike" id="setOffset" tabindex="0">First Line:<div id="offset" style="display: inline-block; padding-left: 0.2em">1</div><input type="text" value="1" maxlength="3" id="inputoffset"/></div>
+		</div>
+        <div class="buttongroup">
 		  <button class="button" id="toggleTheorem" tabindex="0">Theorems</button>
 		  </div>
 		<div class="buttongroup">
@@ -207,7 +209,7 @@ infer Γ, ∆ ⊢ ψ , provided κ does not appear in any of Γ, ∆ , and ψ.</
 		</div>
       </div>
 	  <div id="editorWindow">
-	  <div id="consoleState" style="display: none">
+	  <div id="consoleState" hidden>
 	  </div>
 	  <div id="title" contenteditable="plaintext-only">
 	  </div>

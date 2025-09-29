@@ -26,6 +26,7 @@ func writeStateToHTML() {
 	} else {
 		cl.Call("remove", "oTHM")
 	}
+	setOffset(oOffset)
 	setupButtonLabels()
 }
 
@@ -41,6 +42,12 @@ func setStateFromHTML() {
 		oTHM = true
 	} else {
 		oTHM = false
+	}
+	v := domDocument.Call("querySelector", "#consoleState").Call("getAttribute", "data-offset")
+	if v.IsNull() {
+		oOffset = 1
+	} else {
+		oOffset, _ = strconv.Atoi(v.String())
 	}
 	setupButtonLabels()
 	setupGentzen()
@@ -64,11 +71,18 @@ func setCurrentConsoleState(html string) {
 	} else {
 		oTHM = false
 	}
+	v := dummy.Call("querySelector", "#consoleState").Call("getAttribute", "data-offset")
+	if v.IsNull() {
+		oOffset = 1
+	} else {
+		oOffset, _ = strconv.Atoi(v.String())
+	}
 	writeStateToHTML()
 	editorContent := dummy.Call("querySelector", "#editor").Get("innerHTML").String()
 	titleContent := dummy.Call("querySelector", "#title").Get("innerHTML").String()
 	dsp.editor.SetInnerHTML(editorContent)
 	dsp.title.SetInnerHTML(titleContent)
+	dsp.editor.SetOffset(oOffset)
 	setupGentzen()
 }
 
@@ -148,6 +162,7 @@ func moveForwardInHistory() {
 
 func newpage() {
 	saveHistory()
+	oOffset = 1
 	dsp.editor.Clear()
 	dsp.title.Clear()
 	writeStateToHTML()
@@ -177,6 +192,10 @@ func clearHistory() {
 	js.Global().Get("localStorage").Call("clear")
 	dsp.editor.Clear()
 	dsp.title.Clear()
+	oOffset = 1
+	oPL = false
+	oTHM = false
+	writeStateToHTML()
 	loadHistory()
 }
 
