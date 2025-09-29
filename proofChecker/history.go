@@ -1,403 +1,195 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
 	"syscall/js"
 
-	"honnef.co/go/js/dom/v2"
+	"github.com/adamay909/logicTools/proofChecker/internal/editor"
 )
 
 var history []string
 var historyPosition int
 
-var stash string
+const historyItemSeparator = `<!---->`
 
-func readHistoryFromFile() {
-	/**
-	blob := js.Global().Get("document").Call("getElementById", "inputfile").Get("files").Index(0).Call("text").Call("then").String()
-	**/
-
-}
-
-func insertEmptyHistoryItem() {
-
-	saveHistory()
-	if atHistoryEnd() {
-		h2 := ""
-		history = append(history, h2)
+func writeStateToHTML() {
+	cl := domDocument.Call("querySelector", "#consoleState").Get("classList")
+	if oPL {
+		cl.Call("add", "oPL")
 	} else {
-
-		h1 := history[:historyPosition]
-		h2 := history[historyPosition:]
-
-		history = nil
-
-		history = append(history, h1...)
-		history = append(history, "")
-		history = append(history, h2...)
+		cl.Call("remove", "oPL")
 	}
-
-	saveHistory()
-	forwardHistory()
-	return
-
+	if oTHM {
+		cl.Call("add", "oTHM")
+	} else {
+		cl.Call("remove", "oTHM")
+	}
+	setupButtonLabels()
 }
 
-func duplicateHistoryItem() {
-	insertEmptyHistoryItem()
-	history[historyPosition] = history[historyPosition-1]
-	saveHistory()
-	moveInHistory()
-	return
+func setStateFromHTML() {
+
+	cl := domDocument.Call("querySelector", "#consoleState").Get("classList")
+	if cl.Call("contains", "oPL").Bool() {
+		oPL = true
+	} else {
+		oPL = false
+	}
+	if cl.Call("contains", "oTHM").Bool() {
+		oTHM = true
+	} else {
+		oTHM = false
+	}
+	setupButtonLabels()
+	setupGentzen()
 }
 
-func saveHistory() {
+func getCurrentConsoleState() string {
+	return domDocument.Call("querySelector", "#editorWindow").Get("innerHTML").String()
+}
 
-	history[historyPosition] = dsp.marshalJson()
-
-	json := strings.Join(history, "\n")
-
-	js.Global().Get("localStorage").Call("setItem", "history", json)
-
+func setCurrentConsoleState(html string) {
+	dummy := domDocument.Call("createElement", "div")
+	dummy.Set("innerHTML", html)
+	state := dummy.Call("querySelector", "#consoleState").Get("classList")
+	if state.Call("contains", "oPL").Bool() {
+		oPL = true
+	} else {
+		oPL = false
+	}
+	if state.Call("contains", "oTHM").Bool() {
+		oTHM = true
+	} else {
+		oTHM = false
+	}
+	writeStateToHTML()
+	editorContent := dummy.Call("querySelector", "#editor").Get("innerHTML").String()
+	titleContent := dummy.Call("querySelector", "#title").Get("innerHTML").String()
+	dsp.editor.SetInnerHTML(editorContent)
+	dsp.title.SetInnerHTML(titleContent)
+	setupGentzen()
 }
 
 func loadHistory() {
-
 	history = nil
+	//	history = append(history, getCurrentConsoleState())
+	//	return
 
-	json := js.Global().Get("localStorage").Call("getItem", "history").String()
-
-	if json != "" {
-		history = strings.Split(json, "\n")
+	raw := js.Global().Get("localStorage").Call("getItem", "history2")
+	if !raw.IsNull() {
+		temphistory := strings.Split(editor.StripWhiteSpaceFromHTML(raw.String()), historyItemSeparator)
+		for i := range temphistory {
+			if len(temphistory[i]) == 0 {
+				continue
+			}
+			history = append(history, temphistory[i]+`<!---->`)
+		}
 	} else {
-		history = append(history, dsp.marshalJson())
+		fmt.Println("appending to history")
+		history = append(history, getCurrentConsoleState())
 	}
 
 	var err error
-
-	historyPosition, err = strconv.Atoi(js.Global().Get("localStorage").Call("getItem", "historyPosition").String())
-
+	historyPosition, err = strconv.Atoi(js.Global().Get("localStorage").Call("getItem", "historyPosition2").String())
 	if err != nil {
-		fmt.Println("could not read current position in history")
 		historyPosition = 0
-		moveInHistory()
+	}
+	snap := js.Global().Get("localStorage").Call("getItem", "snapshot")
+	if snap.IsNull() {
+		moveInHistoryTo(historyPosition)
 		return
 	}
-
-	history[historyPosition] = js.Global().Get("localStorage").Call("getItem", "current").String()
-	moveInHistory()
-
-}
-
-func jumpToHistoryEnd() {
-
-	historyPosition = len(history) - 1
-	moveInHistory()
-}
-
-func jumpToHistoryTop() {
-
-	historyPosition = 0
-	moveInHistory()
-
-}
-
-func backHistory() {
-
+	fmt.Println("restoring snapshot")
+	setCurrentConsoleState(snap.String())
 	saveHistory()
-
-	if atHistoryTop() {
-		return
-	}
-
-	historyPosition--
-
-	moveInHistory()
 }
 
-func forwardHistory() {
+func moveInHistoryTo(pos int) {
+	setCurrentConsoleState(history[pos])
+	historyPosition = pos
+	updatePageNumber()
+}
 
-	saveHistory()
+func updatePageNumber() {
+	js.Global().Get("localStorage").Call("setItem", "historyPosition2", strconv.Itoa(historyPosition))
+	domDocument.Call("querySelector", "#pagenumber").Set("innerHTML", strconv.Itoa(historyPosition+1)+"/"+strconv.Itoa(len(history)))
+}
 
-	if atHistoryEnd() {
+func saveHistory() {
+	if historyPosition == len(history) {
+		history = append(history, "")
+	}
+	saveSnapshot()
+	history[historyPosition] = getCurrentConsoleState() + historyItemSeparator
+
+	js.Global().Get("localStorage").Call("setItem", "history2", strings.Join(history, ""))
+	js.Global().Get("localStorage").Call("setItem", "historyPosition2", strconv.Itoa(historyPosition))
+}
+
+func moveBackInHistory() {
+	newpos := historyPosition - 1
+	if newpos < 0 {
 		return
 	}
+	saveHistory()
+	moveInHistoryTo(newpos)
+}
+
+func moveForwardInHistory() {
+	newpos := historyPosition + 1
+	if newpos > len(history)-1 {
+		return
+	}
+	saveHistory()
+	moveInHistoryTo(newpos)
+}
+
+func newpage() {
+	saveHistory()
+	dsp.editor.Clear()
+	dsp.title.Clear()
+	writeStateToHTML()
 
 	historyPosition++
-
-	moveInHistory()
-
-}
-
-func moveInHistory() {
-
-	js.Global().Get("localStorage").Call("setItem", "historyPosition", strconv.Itoa(historyPosition))
-
-	json.Unmarshal([]byte(history[historyPosition]), dsp)
-
-	dsp.xpos, dsp.ypos = 0, 0
-	dsp.overhang = false
-	dsp.modifier = ""
-
-	setBasicInferenceRules()
-	if oTHM != dsp.Theorems {
-		toggleTheorems()
-	}
-
-	if dsp.SystemPL != oPL { //need to do this after setting up inference rules
-		togglePL()
-	}
-
-	setTextByID("messages", "")
-	hide("messages")
-	if acceptInput {
-		setAttributeByID("display", "class", "active")
-	} else {
-		setAttributeByID("display", "class", "inactive")
-	}
-	saveState()
-	display()
-}
-
-func saveState() {
-
-	c := dsp.marshalJson()
-
-	js.Global().Get("localStorage").Call("setItem", "current", c)
-
-}
-
-func stashState() {
-
-	stash = dsp.marshalJson()
-
-}
-
-func reloadStash() {
-	if stash == "" {
-		return
-	}
-
-	json.Unmarshal([]byte(stash), dsp)
-	stash = ""
-	dsp.xpos, dsp.ypos = 0, 0
-	dsp.overhang = false
-	dsp.modifier = ""
-	if dsp.SystemPL != oPL {
-		togglePL()
-	}
-	setBasicInferenceRules()
-	if dsp.Theorems {
-		oTHM = false
-		toggleTheorems()
-	}
-
-	setTextByID("messages", "")
-	hide("messages")
-	display()
-
-}
-
-func recoverState() {
-
-	data := js.Global().Get("localStorage").Call("getItem", "current").String()
-
-	json.Unmarshal([]byte(data), dsp)
-
-	dsp.xpos, dsp.ypos = 0, 0
-	dsp.overhang = false
-	dsp.modifier = ""
-	if dsp.SystemPL != oPL {
-		togglePL()
-	}
-	setBasicInferenceRules()
-	if dsp.Theorems {
-		oTHM = false
-		toggleTheorems()
-	}
-
-	setTextByID("messages", "")
-	hide("messages")
-	display()
-}
-
-func rmFromHistory() {
-
-	if atHistoryEnd() {
-		if atHistoryTop() {
-			history = nil
-			dsp.clear()
-			history = append(history, dsp.marshalJson())
-		} else {
-			history = history[:len(history)-1]
-		}
-		jumpToHistoryEnd()
-		saveHistory()
-		display()
-		return
-	}
-
-	h1 := history[:historyPosition]
-	h2 := history[historyPosition+1:]
-
+	var hb, hf []string
+	hb = append(hb, history[:historyPosition]...)
+	hf = append(hf, history[historyPosition:]...)
 	history = nil
-
-	history = append(history, h1...)
-	history = append(history, h2...)
-
-	js.Global().Get("localStorage").Call("setItem", "history", strings.Join(history, "\n"))
-	saveState()
-	stashState()
-	moveInHistory()
+	history = append(history, hb...)
+	history = append(history, getCurrentConsoleState())
+	history = append(history, hf...)
+	saveSnapshot()
+	updatePageNumber()
 }
 
-func cleanHistory() {
-
-	if !atHistoryEnd() {
-		return
-	}
-
-	history = slicesCleanDuplicates(history)
-	//	return
-	var newhist []string
-	dummy := new(console)
-	dummy.Title = ""
-	line := inputLine([]string{""})
-	dummy.Input = []inputLine{line}
-
-	for _, j := range history {
-		json.Unmarshal([]byte(j), dummy)
-		if dummy.Title != "" {
-			newhist = append(newhist, j)
-			continue
-		}
-		if len(dummy.Input) != 0 {
-			newhist = append(newhist, j)
-			continue
-		}
-	}
-
-	history = nil
-	history = append(history, newhist...)
-
-	jumpToHistoryEnd()
-	saveHistory()
-}
-
-func exportHistory() {
-
-	obj := js.Global().Get("Blob").New([]any{strings.Join(history, "\n")})
-	url := js.Global().Get("URL").Call("createObjectURL", obj).String()
-
-	//obj2 := js.Global().Get("Blob").New([]any{historyToLatex()})
-	//url2 := js.Global().Get("URL").Call("createObjectURL", obj2).String()
-
-	stopInput()
-	hide("console")
-	hide("controls2")
-	show("extra")
-	hide("txtinput")
-	show("historyDialog")
-	show("backButton")
-	hide("console")
-
-	html := `<h3> Export History</h3>
-<a href="` + url + `">right-click to download history as JSON</a>`
-
-	/**+ "<br /><br />" + `<a href="` + url2 + `">right-click to download history as LaTeX</a></ br></ br>`**/
-
-	html = html + `<h3>Import History</h3>
-	Paste JSON into box.
-
-<textarea name="textarea" id="historyinputarea" rows="15" cols="40"></textarea>
-	 <button id="importHistory">Import</button>
-
-`
-	setTextByID("historyDialog", html)
-}
-
-func importHistory() {
-	stopInput()
-	hide("console")
-	hide("controls2")
-	show("extra")
-	hide("txtinput")
-	show("historyDialog")
-	show("backButton")
-	hide("console")
-
-	html := `<h3>Paste JSON</h3>
-<textarea name="textarea" id="historyinputarea" rows="15" cols="40"></textarea>
-	 <button id="importHistory">Import</button>
-
-	<input type="file" id="inputfile />
-	 `
-
-	setTextByID("historyDialog", html)
-}
-
-func rewriteHistory() {
-	stopInput()
-	input := dom.GetWindow().Document().GetElementByID("historyinputarea").(*dom.HTMLTextAreaElement).Value()
-	dom.GetWindow().Document().GetElementByID("historyinputarea").(*dom.HTMLTextAreaElement).SetValue("")
-
-	if len(strings.TrimSpace(input)) > 0 {
-		history = nil
-		history = strings.Split(input, "\n")
-	}
-	jumpToHistoryEnd()
-	cleanHistory()
-	printMessage("", !clean)
-	hide("messages")
-	hideExtra()
-	show("console")
-	stopInput()
-
-}
-
-func historyToLatex() string {
-	var out string
-
-	stashState()
-
-	for p := range history {
-
-		json.Unmarshal([]byte(history[p]), dsp)
-
-		out = out + latexOutput()
-
-	}
-
-	reloadStash()
-
-	return out
+func duplicateHistoryItem() {
+	p1 := dsp.editor.GetInnerHTML()
+	p2 := dsp.title.GetInnerHTML()
+	newpage()
+	dsp.editor.SetInnerHTML(p1)
+	dsp.title.SetInnerHTML(p2)
+	saveSnapshot()
 }
 
 func clearHistory() {
-	dsp.clear()
-	history = nil
-	stash = ""
-	historyPosition = len(history)
-	saveHistory()
-	display()
-	printMessage("", !clean)
-	hide("messages")
-	hideExtra()
-	show("console")
-	stopInput()
-	return
+	js.Global().Get("localStorage").Call("clear")
+	dsp.editor.Clear()
+	dsp.title.Clear()
+	loadHistory()
 }
 
-func atHistoryEnd() bool {
-
-	return historyPosition == len(history)-1
-
+func saveSnapshot() {
+	js.Global().Get("localStorage").Call("setItem", "snapshot", getCurrentConsoleState())
 }
 
-func atHistoryTop() bool {
-	return historyPosition == 0
+func jsFuncSaveSnapshot(this js.Value, args ...any) {
+	saveSnapshot()
+}
 
+func cleanupEditorWindow(this js.Value, args ...any) {
+	s := domDocument.Call("querySelector", "#editorWindow").Get("classList")
+	s.Call("remove", "fail")
+	s.Call("remove", "success")
 }

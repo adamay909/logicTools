@@ -2,20 +2,14 @@
 
 ### The proof system
 
-This proof checker is designed for working with the proof system Gentzen uses in his "Die Wiederspruchsfreiheit der reinen Zahlentheorie" (1936) that I use in my introductory formal logic course. The instruction material is available at [https://github.com/adamay909/logicbook](https://github.com/adamay909/logicbook). 
+This proof checker is designed for working with the proof system Gentzen uses in his "Die Wiederspruchsfreiheit der reinen Zahlentheorie" (1936) that I use in my introductory formal logic course. The textbook and other instruction material are available at [https://adamay909.github.io/logicbook/](https://adamay909.github.io/logicbook/).
 
-Here is the short version of the system. A proof is stated as a series of sequents where each sequent must have exactly one formula as its succedent. It can be trivially converted to proofs in the style of Lemmon's *Beginning Logic* as well others influenced by him (e.g., Allen and Hand, *Logic Primer*). E.g., the following proof:
-1. P ⊢ P
-2. Q ⊢ Q
-3. P,Q ⊢ P and Q
+Here is the short version of the system. A proof is stated as a series of sequents where each sequent must have exactly one formula as its succedent. Here is an inference using what is often called conjunction introduction:
+ 
+1. P ⊢ P...Assumption
+2. Q ⊢ Q...Assumption
+3. P,Q ⊢ P∧Q...1,2, Conjunction Introduction
 
-turns into the following in Lemmon's style:
-
-1 (1) P  
-2 (2) Q  
-1,2 (3) P and Q  
-
-What we do is replace the turnstile with the line  number, and replace formulas on the antecedent side of each sequent with the appropriate line numbers (of course, you need to add appropriate annotations). One thing Gentzen's allows is the use of placeholders on the antecedent side of a sequent which can be useful (there is an example of that below).
 
 The proof system has 9 inference rules for sentential logic. In the system, you may:
 - **Assumption Introduction (A)** Infer s ⊢ s.
@@ -132,7 +126,22 @@ The proof checker will recognize instances of theorems. Here is an example of a 
 7. ¬P ⊢ ¬P∨Q...6,∨I
 8. Γ ⊢ ¬P∨Q...2,5,7,∨E
 
+#### Relationship to Lemmon style proofs
 
+The derivations in this system can be  trivially converted to proofs in the style of Lemmon's *Beginning Logic* as well others influenced by him (e.g., Allen and Hand, *Logic Primer*). E.g., the following proof:
+
+1. P ⊢ P...Assumption
+2. Q ⊢ Q...Assumption
+3. P,Q ⊢ P∧Q...1,2, Conjunction Introduction
+
+turns into the following in Lemmon's style:
+
+1 (1) P  
+2 (2) Q  
+1,2 (3) P and Q 
+
+What we do is replace the turnstile with the line  number, and replace formulas on the antecedent side of each sequent with the appropriate line numbers (of course, you need to add appropriate annotations). One thing Gentzen's notation allows is the use of placeholders on the antecedent side of a sequent which can be useful.
+ 
 ### The Proof Checker
 
  The proof checker checks you whether each line is in accordance with the proof system. But it does not check whether you have managed to show what you set out to show. You'll have to check that yourself---usually a matter of inspecting the last line of your derivation, possibly in combination with the premises.
@@ -141,16 +150,14 @@ You may have to go through several rounds of checking and fixing a derivation be
 
 ### The Editor
 
-The editor is very primitive with limited functionality. It works like an old-school, keyboard-only editor. You can move the cursor around with the arrow keys, home and end for moving to the start or end of line, and delete and backspace should work more or less normally (sometimes more, sometimes less...). But no more advanced navigation around the input area, no positioning the cursor with your mouse,  and no copying and pasting and the like. Given the intended use, it should be enough (it works for me...). You do need a physical keyboard. 
+The editor is very primitive with limited functionality. You can move around the editor with the arrow keys as well position the cursor with your mouse. While it should work on touch devices (not extensively tested, though), using a physical keyboard is highly recommended. No pasting into the editor is allowed. 
 
 Apart from the above limitations, The editor is designed to be as transparent as possible: symbols should be easy to type and you should not have to worry about how what's on the screen corresponds to what you see in the course material. Some special key combinations are used for typing symbol like Greek characters and the turnstile. Check the help on how to input symbols. 
 
 
 ### Preservation of History
 
-The proof checker will attempt to store the current state of the editor so that when you open the proof checker again, you will be presented with the last state of things before you quit (or the program crashed). The proof checker will also store a series of snapshots of the editor. This last happens whenever you clear the screen or move to the next exercise. All history is stored in the browser's local cache so how much history is stored for how long depends on your browser settings and the like.
-
-You can go back and forth in history using 'back' and 'forward' buttons above the input area. You can see where you are in the lower right corner.
+The proof checker will attempt to store the current state of the editor so that when you open the proof checker again, you will be presented with the last state of things before you quit (or the program crashed). The proof checker will also store a series of snapshots of the editor. This last happens whenever you clear the screen or move to the next exercise. All history is stored in the browser's local cache so how much history is stored for how long depends on your browser settings and the like. You can go back and forth in history using 'back' and 'forward' buttons above the input area. You can see where you are in the lower right corner.
 
  
 ### Installation
@@ -162,20 +169,8 @@ It's in the subdirectory named proofChecker.
 
 This proof-checker is designed to run completely inside the browser so it is easy to host yourself so long as you are able to host static websites. The docs directory of the GitHub repository contains all the files you need.
 
-To compile from sources, you could run the following bash script in the directory containing the source files for the proof checker:
-```
-	cp README.md assets/markdown/README.md 
-	cd assets/markdown
-	for i in *.md; do md2html -o ../html/$${i%.md}.html $$i; done 
-	cd ../.. 
-	cd assets/html 
-	i=`cat version` 
-	let i++ 
-	echo $$i>version 
-	cd ../.. 
-	GOOS=js GOARCH=wasm go build  -o proofchecker.wasm 
-```
-and then copy the wasm binary, the index.html in assets/html subdirectory, and the wasm_exec.js (on my system, it's currently in /usr/lib/go/wasm/wasm_exec.js, but the location seems to change from time to time and system to system) to the directory you want to serve.
+There is also a Makefile with the source code that you can use to make life easier. The files needed for the proofchecker to work will be copied to ../docs/.
+
 ### Copyright
 
 The Go, HTML, and CSS sources for this proof checker written by Masahiro Yamada. Licensed under the MIT License. 
