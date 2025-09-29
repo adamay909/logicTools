@@ -107,8 +107,6 @@ func setupJSeditor(e *Editor) {
 	addEventListener(e.elem, "paste", pasteHandler, e)
 }
 
-var modifier string
-
 func keyHandler(this js.Value, args ...any) {
 	ed := args[0].(*Editor)
 	focusElement := domDocument.Get("activeElement")

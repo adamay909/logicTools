@@ -20,20 +20,6 @@ func findPos(v string, list []string) int {
 	return -1
 }
 
-/*
-// check if s1 is modal instance of s2 (i.e., s1 is s2 minus modal operator)
-func isModalInstanceOf(s1, s2 string) bool {
-
-		n1 := Parse(s1, !allowGreekUpper)
-		n2 := Parse(s2, !allowGreekUpper)
-
-		if !n2.Val.connective.isModalOperator() {
-			return false
-		}
-
-		return n2.Child(0).String() == n1.String()
-	}
-*/
 func replaceTerms(n *Node, old, subst string) *Node {
 
 	s := n.String()
@@ -43,25 +29,6 @@ func replaceTerms(n *Node, old, subst string) *Node {
 	return Parse(s, !allowGreekUpper)
 }
 
-/*
-func (n *Node) replaceTerm(p int, v string) (old, subst string) {
-
-		if p < 0 {
-
-			return
-		}
-
-		if len(n.term) <= p {
-			return
-		}
-
-		old = n.term[p]
-		subst = v
-		n.term[p] = v
-
-		return
-	}
-*/
 func renewRaw(n *Node) {
 
 	n.Val.raw = n.Val.predicateLetter

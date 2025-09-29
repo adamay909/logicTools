@@ -103,6 +103,8 @@ func setupPage() {
 	d, _ = assets.ReadFile("assets/html/version")
 	setTextByID("versionnumber", "v"+string(d)+"&emsp;&emsp;")
 
+	domDocument.Call("querySelector", "#description").Get("style").Call("setProperty", "color", "black")
+
 }
 
 func setupJS() {
@@ -122,11 +124,11 @@ func onClick() {
 	case "toggleSettings":
 		toggleSettingsMenu()
 	case "check":
-		checkDeriv()
+		checkDerivation()
 	case "toLatex":
-		toClipboardLatex()
+		copyToClipboard(latexOutput())
 	case "printTree":
-		//printTree()
+		copyToClipboard(printTree())
 	case "toggleHelp":
 		toggleHelp()
 
@@ -142,8 +144,6 @@ func onClick() {
 		moveBackInHistory()
 	case "forwardHistory":
 		moveForwardInHistory()
-	case "removeFromHistory":
-		//		rmFromHistory()
 	case "duplicateScreen":
 		duplicateHistoryItem()
 	case "clearHistory":
@@ -266,8 +266,6 @@ func convert(s string) string {
 
 func toClipboardLatex() {
 
-	//	copyToClipboard(latexOutput())
-
 	return
 }
 
@@ -389,4 +387,18 @@ func makeVisible(id string) {
 func hide(id string) {
 	s := domDocument.Call("querySelector", "#"+id).Get("style")
 	s.Call("setProperty", "display", "none")
+}
+
+func latexOutput() string {
+	arglines := dsp.editor.GetArglines()
+	return gentzen.PrintDerivation(arglines, 1, gentzen.O_ProofChecker, gentzen.O_Latex)
+}
+
+func printTree() string {
+	arglines := dsp.editor.GetArglines()
+	r, err := gentzen.PrintDerivationTree(arglines, gentzen.O_ProofChecker, 1)
+	if err != nil {
+		return err.Error()
+	}
+	return r
 }

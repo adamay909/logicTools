@@ -1,7 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Math&display=swap');
 
+@font-face {
+  font-family: "Greek";
+  src: local("Times New Roman");
+  unicode-range: U+0370-03FF;
+  size-adjust: 110%;
+}
+
 body {
-  font-family: "Noto Sans Math", sans-serif;
+  font-family:  "Greek", "Noto Sans Math";
   font-weight: 400;
   font-style: normal;
 }
@@ -9,6 +16,7 @@ body {
 #description{
  display: none;
  margin-top: 3em;
+ color: black;
 }
 
 #proofChecker{
@@ -72,7 +80,7 @@ body {
 
 #help{
  display:none;
- width: 15em;
+ width: 35vw;
  overflow: scroll;
 }
 

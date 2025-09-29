@@ -23,12 +23,16 @@ func (e *Editor) GetArglines() (lines []string) {
 		l = strings.ReplaceAll(l, "&nbsp;", "")
 		l = strings.ReplaceAll(l, turnstile, ":")
 		l = strings.ReplaceAll(l, ldots, ".")
+		l = strings.ReplaceAll(l, `<sub>`, "_")
+		l = strings.ReplaceAll(l, `</sub>`, "")
 		l = toascii(l)
 		l = strings.ReplaceAll(l, `\`, `/`)
 		if l == ":." {
 			l = ""
 		}
-		lines = append(lines, l)
+		dummy := domDocument.Call("createElement", "div")
+		dummy.Set("innerHTML", l)
+		lines = append(lines, StripWhiteSpaceFromHTML(dummy.Get("textContent").String()))
 		fmt.Println(l)
 	}
 	return

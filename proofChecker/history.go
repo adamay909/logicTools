@@ -86,10 +86,6 @@ func loadHistory() {
 			}
 			history = append(history, temphistory[i]+`<!---->`)
 		}
-		fmt.Println("history has ", len(history))
-		for i := range history {
-			fmt.Println(i, history[i])
-		}
 	} else {
 		fmt.Println("appending to history")
 		history = append(history, getCurrentConsoleState())

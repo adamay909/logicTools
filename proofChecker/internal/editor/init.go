@@ -10,7 +10,7 @@ const turnstile = "\u22a2"
 const ldots = "\u2026"
 
 func init() {
-	s := `0123456789()^>,-\=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ` + "\n"
+	s := `0123456789()^>,-\_=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ` + "\n"
 
 	for _, r := range s {
 		permittedChars = append(permittedChars, string(r))

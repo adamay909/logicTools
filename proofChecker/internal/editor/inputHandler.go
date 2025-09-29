@@ -3,9 +3,11 @@ package editor
 import (
 	_ "embed" //embed
 	"slices"
+	"strings"
 	"syscall/js"
 )
 
+var modifier string
 var simpleModifier string
 
 func dispatchEditEvent() {
@@ -96,7 +98,7 @@ func beforeInputHandler(this js.Value, args ...any) {
 		return
 	}
 
-	if char == `\` || char == `|` {
+	if char == `\` || char == `|` || char == `_` {
 		modifier = char
 		return
 	}
@@ -108,6 +110,10 @@ func beforeInputHandler(this js.Value, args ...any) {
 }
 
 func insertChar(c string) {
+	if strings.HasPrefix(c, "_") {
+		insertsubscript(c)
+		return
+	}
 	insertchar(c)
 }
 
@@ -118,6 +124,17 @@ func insertchar(c string) {
 	srange.Call("deleteContents")
 	srange.Call("insertNode", textNode)
 	srange.Call("setStartAfter", textNode)
+	selection.Call("addRange", srange)
+}
+
+func insertsubscript(c string) {
+	selection := domWindow.Call("getSelection")
+	srange := selection.Call("getRangeAt", 0)
+	span := domDocument.Call("createElement", "sub")
+	span.Set("innerHTML", strings.TrimPrefix(c, "_"))
+	srange.Call("deleteContents")
+	srange.Call("insertNode", span)
+	srange.Call("setStartAfter", span)
 	selection.Call("addRange", srange)
 }
 
@@ -138,6 +155,9 @@ func modCharOf(c string) string {
 	if ok {
 		return v
 	}
+	if modifier != "" {
+		return ""
+	}
 	return c
 }
 
@@ -149,6 +169,9 @@ func simpleModCharOf(c string) string {
 	v, ok = charMap[c]
 	if ok {
 		return v
+	}
+	if simpleModifier != "" {
+		return ""
 	}
 	return c
 }

@@ -68,6 +68,7 @@ func loadOldHistory() (oldhistory []string) {
 	}
 	oldhistory[oldhp] = cur.String()
 	js.Global().Get("localStorage").Call("setItem", "historyBackup1", strings.Join(oldhistory, "\n"))
+	js.Global().Get("localStorage").Call("removeItem", "history")
 	return
 }
 
