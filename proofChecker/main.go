@@ -116,6 +116,7 @@ func setupJS() {
 	addEventListener(domDocument.Call("querySelector", "#editorWindow"), "editorinput", jsFuncSaveSnapshot)
 	addEventListener(domDocument.Call("querySelector", "#editorWindow"), "focus", cleanupEditorWindow)
 	addEventListener(domDocument.Call("querySelector", "#inputoffset"), "keydown", commitOffset)
+	addEventListener(domDocument.Call("querySelector", "#inputoffset"), "blur", jswrapFunc(cancelInputOffset))
 
 }
 
@@ -235,6 +236,13 @@ func inputOffset() {
 	toggleVisibilityInline("inputoffset")
 	e.Call("focus")
 
+}
+
+func cancelInputOffset() {
+	e := domDocument.Call("querySelector", "#inputoffset")
+	e.Set("value", strconv.Itoa(oOffset))
+	toggleVisibilityInline("offset")
+	toggleVisibilityInline("inputoffset")
 }
 
 func convert(s string) string {
@@ -416,8 +424,6 @@ func commitOffset(e js.Value, args ...any) {
 	inputelem.Set("value", strconv.Itoa(v))
 	setOffset(v)
 	inputelem.Call("blur")
-	toggleVisibilityInline("offset")
-	toggleVisibilityInline("inputoffset")
 }
 
 func setOffset(v int) {

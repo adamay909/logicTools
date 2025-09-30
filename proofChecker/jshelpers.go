@@ -297,3 +297,10 @@ func writeConsoleLog(msg ...string) {
 
 	return
 }
+
+func jswrapFunc(f func()) func(js.Value, ...any) {
+	jsf := func(js.Value, ...any) {
+		f()
+	}
+	return jsf
+}
