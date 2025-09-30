@@ -231,9 +231,9 @@ func checkDeriv() {
 func inputOffset() {
 	e := domDocument.Call("querySelector", "#inputoffset")
 	e.Set("value", strconv.Itoa(oOffset))
-	e.Call("focus")
 	toggleVisibilityInline("offset")
 	toggleVisibilityInline("inputoffset")
+	e.Call("focus")
 
 }
 
