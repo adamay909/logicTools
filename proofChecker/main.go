@@ -10,7 +10,6 @@ import (
 
 	"github.com/adamay909/logicTools/gentzen"
 	"github.com/adamay909/logicTools/proofChecker/internal/editor"
-	"honnef.co/go/js/dom/v2"
 )
 
 type console struct {
@@ -28,13 +27,15 @@ var assets embed.FS
 
 var oPRIVATE = true
 
+/*
 var inputFunc,
+
 	mainEditorFunc,
 	titleEditorFunc,
 	clickFunc,
 	snapshotFunc,
 	loadFunc js.Value
-
+*/
 var indexHtml, helpHtml, styleCSS string
 
 var (
@@ -99,8 +100,7 @@ func setupPage() {
 	//load styles
 	d, _ := assets.ReadFile("assets/html/main.css")
 
-	dom.GetWindow().Document().GetElementsByTagName("style")[0].SetInnerHTML(string(d))
-
+	domDocument.Call("getElementsByTagName", "style").Call("item", 0).Set("innerHTML", string(d))
 	d, _ = assets.ReadFile("assets/html/version")
 	setTextByID("versionnumber", "v"+string(d)+"&emsp;&emsp;")
 
@@ -109,14 +109,13 @@ func setupPage() {
 }
 
 func setupJS() {
-	clickFunc = js.FuncOf(jsWrap(onClick)).Value
-	js.Global().Call("addEventListener", "click", clickFunc, true)
 	dsp.editor = editor.NewDerivationEditor("editor")
 	dsp.title = editor.NewSimpleEditor("title")
-	addEventListener(domDocument.Call("querySelector", "#editorWindow"), "editorinput", jsFuncSaveSnapshot)
-	addEventListener(domDocument.Call("querySelector", "#editorWindow"), "focus", cleanupEditorWindow)
+	addEventListener(domDocument, "click", jsWrap(onClick))
+	addEventListener(domDocument.Call("querySelector", "#editorWindow"), "editorinput", jsWrap(saveSnapshot))
+	addEventListener(domDocument.Call("querySelector", "#editorWindow"), "focus", jsWrap(cleanupEditorWindow))
 	addEventListener(domDocument.Call("querySelector", "#inputoffset"), "keydown", commitOffset)
-	addEventListener(domDocument.Call("querySelector", "#inputoffset"), "blur", jswrapFunc(cancelInputOffset))
+	addEventListener(domDocument.Call("querySelector", "#inputoffset"), "blur", jsWrap(cancelInputOffset))
 
 }
 
@@ -224,11 +223,6 @@ func toggleReadme() {
 	toggleVisibility("proofChecker")
 }
 
-func checkDeriv() {
-	checkDerivation()
-	return
-}
-
 func inputOffset() {
 	e := domDocument.Call("querySelector", "#inputoffset")
 	e.Set("value", strconv.Itoa(oOffset))
@@ -245,87 +239,13 @@ func cancelInputOffset() {
 	toggleVisibilityInline("inputoffset")
 }
 
-func convert(s string) string {
-
-	words := strings.Split(s, " ")
-
-	var wn []string
-	for _, w := range words {
-		r := ""
-		t := w
-		for i := 0; i < len(t); {
-			for _, e := range allBindings {
-				if strings.HasPrefix(string(t[i:]), e[tkraw]) {
-					r = r + e[tktxt]
-					i = i + len(e[tkraw]) - 1
-					break
-				}
-			}
-			i++
-		}
-		wn = append(wn, r)
-	}
-
-	return strings.Join(wn, " ")
-
-}
-
-func toClipboardLatex() {
-
-	return
-}
-
 func setTextByID(elem string, content string) {
-	dom.GetWindow().Document().GetElementByID(elem).SetInnerHTML(content)
-}
-
-func setAttributeByID(elem string, attrName, attrCont string) {
-	dom.GetWindow().Document().GetElementByID(elem).SetAttribute(attrName, attrCont)
-	return
-}
-
-func jsWrap(f func()) (fn func(this js.Value, args []js.Value) any) {
-
-	fn = func(this js.Value, args []js.Value) any {
-		f()
-		return true
-	}
-
-	return fn
-}
-
-func addClass(elem string, nc string) {
-	class := dom.GetWindow().Document().GetElementByID(elem).GetAttribute("class")
-	class = class + " " + nc
-	dom.GetWindow().Document().GetElementByID(elem).SetAttribute("class", class)
-}
-
-func removeClass(elem string, nc string) {
-	class := dom.GetWindow().Document().GetElementByID(elem).GetAttribute("class")
-	ic := strings.Split(class, " ")
-	class = ""
-	for _, c := range ic {
-		if c == nc {
-			continue
-		}
-		class = class + c
-	}
-	dom.GetWindow().Document().GetElementByID(elem).SetAttribute("class", class)
+	domDocument.Call("querySelector", "#"+elem).Set("innerHTML", content)
 }
 
 func copyToClipboard(s string) {
 	js.Global().Get("navigator").Get("clipboard").Call("writeText", s)
 	return
-}
-
-func hideExtra() {
-
-	hide("backButton")
-	hide("txtinput")
-	hide("exerciseList")
-	hide("historyDialog")
-	hide("readme")
-	hide("extra")
 }
 
 func sizeUp() {
@@ -348,20 +268,6 @@ func sizeDown() {
 	}
 	v = strconv.Itoa(iv-20) + "%"
 	s.Call("setProperty", "font-size", v)
-}
-
-var screenStash string
-
-func stashScreen() {
-
-	screenStash = dom.GetWindow().Document().GetElementsByTagName("body")[0].InnerHTML()
-
-}
-
-func restoreScreen() {
-
-	dom.GetWindow().Document().GetElementsByTagName("body")[0].SetInnerHTML(screenStash)
-
 }
 
 func toggleSettingsMenu() {

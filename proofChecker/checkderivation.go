@@ -3,13 +3,12 @@ package main
 import (
 	"fmt"
 	"strings"
-	"syscall/js"
 
 	"github.com/adamay909/logicTools/gentzen"
 )
 
 func checkDerivation() {
-	cleanupEditorWindow(js.ValueOf(nil))
+	cleanupEditorWindow()
 	arglines := dsp.editor.GetArglines()
 	gentzen.ClearLog()
 	makeVisible("messages")

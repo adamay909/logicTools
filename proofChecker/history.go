@@ -203,11 +203,7 @@ func saveSnapshot() {
 	js.Global().Get("localStorage").Call("setItem", "snapshot", getCurrentConsoleState())
 }
 
-func jsFuncSaveSnapshot(this js.Value, args ...any) {
-	saveSnapshot()
-}
-
-func cleanupEditorWindow(this js.Value, args ...any) {
+func cleanupEditorWindow() {
 	s := domDocument.Call("querySelector", "#editorWindow").Get("classList")
 	s.Call("remove", "fail")
 	s.Call("remove", "success")
