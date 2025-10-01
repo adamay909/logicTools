@@ -14,40 +14,62 @@ var historyPosition int
 
 const historyItemSeparator = `<!---->`
 
+// we store state information about the proof checker (dsp values) as
+// value data-* attributes of #consoleState which is a subelement
+// of #editorWindow. We store the the innerHTML of #editorWindow as
+// snapshots.
 func writeStateToHTML() {
-	cl := domDocument.Call("querySelector", "#consoleState").Get("classList")
-	if oPL {
-		cl.Call("add", "oPL")
+	cs := domDocument.Call("querySelector", "#consoleState")
+	if dsp.oPL {
+		cs.Get("dataset").Set("opl", "true")
 	} else {
-		cl.Call("remove", "oPL")
+		cs.Get("dataset").Delete("opl")
 	}
-	if oTHM {
-		cl.Call("add", "oTHM")
+	if dsp.oTHM {
+		cs.Get("dataset").Set("othm", "true")
 	} else {
-		cl.Call("remove", "oTHM")
+		cs.Get("dataset").Delete("othm")
 	}
-	setOffset(oOffset)
+
+	cs.Get("dataset").Set("offset", strconv.Itoa(dsp.oOffset))
 	setupButtonLabels()
 }
 
-func setStateFromHTML() {
+// elem is the element from which to read the proofchecker state
+func setStateFromHTML(elem js.Value) {
 
-	cl := domDocument.Call("querySelector", "#consoleState").Get("classList")
-	if cl.Call("contains", "oPL").Bool() {
-		oPL = true
-	} else {
-		oPL = false
+	cl := elem.Call("querySelector", "#consoleState").Get("classList")
+	if cl.Get("length").Int() != 0 {
+		if cl.Call("contains", "oPL").Bool() {
+			dsp.oPL = true
+			cl.Call("remove", "oPL")
+		} else {
+			dsp.oPL = false
+		}
+		if cl.Call("contains", "oTHM").Bool() {
+			dsp.oTHM = true
+			cl.Call("remove", "oTHM")
+		} else {
+			dsp.oTHM = false
+		}
+		return
 	}
-	if cl.Call("contains", "oTHM").Bool() {
-		oTHM = true
+	cs := elem.Call("querySelector", "#consoleState")
+	if cs.Get("dataset").Get("opl").String() == "true" {
+		dsp.oPL = true
 	} else {
-		oTHM = false
+		dsp.oPL = false
 	}
-	v := domDocument.Call("querySelector", "#consoleState").Call("getAttribute", "data-offset")
-	if v.IsNull() {
-		oOffset = 1
+	if cs.Get("dataset").Get("othm").String() == "true" {
+		dsp.oTHM = true
 	} else {
-		oOffset, _ = strconv.Atoi(v.String())
+		dsp.oTHM = false
+	}
+	v, err := strconv.Atoi(cs.Get("dataset").Get("offset").String())
+	if err != nil {
+		dsp.oOffset = 1
+	} else {
+		dsp.oOffset = v
 	}
 	setupButtonLabels()
 	setupGentzen()
@@ -60,36 +82,18 @@ func getCurrentConsoleState() string {
 func setCurrentConsoleState(html string) {
 	dummy := domDocument.Call("createElement", "div")
 	dummy.Set("innerHTML", html)
-	state := dummy.Call("querySelector", "#consoleState").Get("classList")
-	if state.Call("contains", "oPL").Bool() {
-		oPL = true
-	} else {
-		oPL = false
-	}
-	if state.Call("contains", "oTHM").Bool() {
-		oTHM = true
-	} else {
-		oTHM = false
-	}
-	v := dummy.Call("querySelector", "#consoleState").Call("getAttribute", "data-offset")
-	if v.IsNull() {
-		oOffset = 1
-	} else {
-		oOffset, _ = strconv.Atoi(v.String())
-	}
+	setStateFromHTML(dummy)
 	writeStateToHTML()
 	editorContent := dummy.Call("querySelector", "#editor").Get("innerHTML").String()
 	titleContent := dummy.Call("querySelector", "#title").Get("innerHTML").String()
 	dsp.editor.SetInnerHTML(editorContent)
 	dsp.title.SetInnerHTML(titleContent)
-	dsp.editor.SetOffset(oOffset)
+	dsp.editor.SetOffset(dsp.oOffset)
 	setupGentzen()
 }
 
 func loadHistory() {
 	history = nil
-	//	history = append(history, getCurrentConsoleState())
-	//	return
 
 	raw := js.Global().Get("localStorage").Call("getItem", "history2")
 	if !raw.IsNull() {
@@ -162,7 +166,7 @@ func moveForwardInHistory() {
 
 func newpage() {
 	saveHistory()
-	oOffset = 1
+	dsp.oOffset = 1
 	dsp.editor.Clear()
 	dsp.title.Clear()
 	writeStateToHTML()
@@ -192,9 +196,9 @@ func clearHistory() {
 	js.Global().Get("localStorage").Call("clear")
 	dsp.editor.Clear()
 	dsp.title.Clear()
-	oOffset = 1
-	oPL = false
-	oTHM = false
+	dsp.oOffset = 1
+	dsp.oPL = false
+	dsp.oTHM = false
 	writeStateToHTML()
 	loadHistory()
 }

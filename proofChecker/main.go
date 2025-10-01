@@ -1,9 +1,7 @@
 package main
 
 import (
-	"embed"
 	_ "embed"
-	"os"
 	"strconv"
 	"strings"
 	"syscall/js"
@@ -12,52 +10,22 @@ import (
 	"github.com/adamay909/logicTools/proofChecker/internal/editor"
 )
 
+// console is a struct for holding global variables that control
+// state of the proof checker window. You could have multiple proof
+// checker windows.
 type console struct {
 	editor *editor.Editor
 	title  *editor.Editor
+	oPL,
+	oDR,
+	oTHM bool
+	oOffset int
 }
-
-// set to true for debug log to stdout
-
-//go:embed assets/html/*
-var assets embed.FS
-
-// Enable some features for personal teaching material.
-// Not useful for general consumption.
-
-var oPRIVATE = true
-
-/*
-var inputFunc,
-
-	mainEditorFunc,
-	titleEditorFunc,
-	clickFunc,
-	snapshotFunc,
-	loadFunc js.Value
-*/
-var indexHtml, helpHtml, styleCSS string
-
-var (
-	oPL              = false
-	oDR              = false
-	oTHM             = false
-	oDEBUG           = false
-	oOffset          = 1
-	logConstBindings [][3]string
-)
-
-const (
-	oLatexOutput = 1
-	oTextOutput  = 0
-	oJsonOutput  = 2
-)
 
 var dsp *console
 
 func main() {
 	dsp = new(console)
-	initMessages()
 	gentzen.SetSpecialConn(true)
 	setBasicInferenceRules()
 	setupPage()
@@ -65,44 +33,20 @@ func main() {
 	checkForOldFormat()
 	loadHistory()
 	updatePageNumber()
-	//writeStateToHTML()
-	//	loadHistory()
 	<-make(chan bool)
 }
 
-func initMessages() {
-	toggleDebug()
-	debug("You can toggle verbose logging with CTRL-ALT-v in the editor.")
-	toggleDebug()
-	return
-}
+//go:embed assets/html/main.css
+var styleCSS string
 
-func toggleDebug() {
-	oDEBUG = !oDEBUG
-	gentzen.SetDebug(oDEBUG)
-	if oDEBUG {
-		gentzen.SetDebuglog(os.Stdout)
-	}
-	return
-}
-
-func debug(m ...any) {
-	if !oDEBUG {
-		return
-	}
-	dm := []any{"PC: "}
-	m = append(dm, m...)
-	gentzen.Debug(m...)
-}
+//go:embed assets/html/version
+var vnum string
 
 func setupPage() {
 
-	//load styles
-	d, _ := assets.ReadFile("assets/html/main.css")
+	domDocument.Call("getElementsByTagName", "style").Call("item", 0).Set("innerHTML", styleCSS)
 
-	domDocument.Call("getElementsByTagName", "style").Call("item", 0).Set("innerHTML", string(d))
-	d, _ = assets.ReadFile("assets/html/version")
-	setTextByID("versionnumber", "v"+string(d)+"&emsp;&emsp;")
+	setTextByID("versionnumber", "v"+vnum+"&emsp;&emsp;")
 
 	domDocument.Call("querySelector", "#description").Get("style").Call("setProperty", "color", "black")
 
@@ -170,48 +114,44 @@ func onClick() {
 
 func toggleTheorems() {
 
-	oTHM = !oTHM
+	dsp.oTHM = !dsp.oTHM
 
 	setBasicInferenceRules()
-	if oTHM {
-		setupTheorems(oDR)
+	if dsp.oTHM {
+		setupTheorems(dsp.oDR)
 	}
+	writeStateToHTML()
 	return
 }
 
 func setupGentzen() {
-	gentzen.SetPL(oPL)
+	gentzen.SetPL(dsp.oPL)
 	setBasicInferenceRules()
-	if oTHM {
-		setupTheorems(oDR)
+	if dsp.oTHM {
+		setupTheorems(dsp.oDR)
 	}
 }
 
 func togglePL() {
-	oPL = !oPL
-	logConstBindings = nil
-	if oPL {
-		logConstBindings = append(connBindings, plBindings...)
-	} else {
-		logConstBindings = connBindings
-	}
-	gentzen.SetPL(oPL)
+	dsp.oPL = !dsp.oPL
+	gentzen.SetPL(dsp.oPL)
+	writeStateToHTML()
 	return
 }
 
 func setupButtonLabels() {
-	if oPL {
+	if dsp.oPL {
 		setTextByID("toggleSystem", "Predicate Logic")
 	} else {
 		setTextByID("toggleSystem", "Sentential Logic")
 	}
-	if oTHM {
-		setupTheorems(oDR)
+	if dsp.oTHM {
+		setupTheorems(dsp.oDR)
 		setTextByID("toggleTheorem", "Theorems ✓")
 	} else {
 		setTextByID("toggleTheorem", "Theorems")
 	}
-	setTextByID("offset", strconv.Itoa(oOffset))
+	setTextByID("offset", strconv.Itoa(dsp.oOffset))
 }
 
 func toggleHelp() {
@@ -225,7 +165,7 @@ func toggleReadme() {
 
 func inputOffset() {
 	e := domDocument.Call("querySelector", "#inputoffset")
-	e.Set("value", strconv.Itoa(oOffset))
+	e.Set("value", strconv.Itoa(dsp.oOffset))
 	toggleVisibilityInline("offset")
 	toggleVisibilityInline("inputoffset")
 	e.Call("focus")
@@ -234,7 +174,7 @@ func inputOffset() {
 
 func cancelInputOffset() {
 	e := domDocument.Call("querySelector", "#inputoffset")
-	e.Set("value", strconv.Itoa(oOffset))
+	e.Set("value", strconv.Itoa(dsp.oOffset))
 	toggleVisibilityInline("offset")
 	toggleVisibilityInline("inputoffset")
 }
@@ -322,19 +262,19 @@ func commitOffset(e js.Value, args ...any) {
 	inputelem := domDocument.Call("querySelector", "#inputoffset")
 	v, err := strconv.Atoi(inputelem.Get("value").String())
 	if err != nil {
-		v = oOffset
+		v = dsp.oOffset
 	}
 	if v < 1 || v > 999 {
-		v = oOffset
+		v = dsp.oOffset
 	}
 	inputelem.Set("value", strconv.Itoa(v))
 	setOffset(v)
+	writeStateToHTML()
 	inputelem.Call("blur")
 }
 
 func setOffset(v int) {
-	oOffset = v
+	dsp.oOffset = v
 	dsp.editor.SetOffset(v)
 	domDocument.Call("querySelector", "#offset").Set("innerHTML", strconv.Itoa(v))
-	domDocument.Call("querySelector", "#consoleState").Call("setAttribute", "data-offset", strconv.Itoa(v))
 }

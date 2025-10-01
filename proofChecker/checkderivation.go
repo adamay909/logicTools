@@ -15,7 +15,7 @@ func checkDerivation() {
 	for i := range arglines {
 		fmt.Println(arglines[i])
 	}
-	showSuccess(gentzen.CheckDerivation(arglines, gentzen.O_ProofChecker, oOffset))
+	showSuccess(gentzen.CheckDerivation(arglines, gentzen.O_ProofChecker, dsp.oOffset))
 	return
 }
 

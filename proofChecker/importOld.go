@@ -43,8 +43,8 @@ func importOldHistory() {
 		inputlines := convertOldHistoryHTML(page.Input)
 		dsp.editor.SetInnerHTML(inputlines)
 		dsp.title.SetInnerHTML(page.Title)
-		oPL = page.SystemPL
-		oTHM = page.Theorems
+		dsp.oPL = page.SystemPL
+		dsp.oTHM = page.Theorems
 		writeStateToHTML()
 		saveSnapshot()
 	}
