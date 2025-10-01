@@ -82,7 +82,7 @@ func beforeInputHandler(this js.Value, args ...any) {
 
 	case "insertLineBreak":
 		this.Call("preventDefault")
-		insertNewRow()
+		insertNewRow(args[0].(*Editor))
 		return
 
 	}
@@ -138,10 +138,10 @@ func insertsubscript(c string) {
 	selection.Call("addRange", srange)
 }
 
-func insertNewRow() {
+func insertNewRow(e *Editor) {
 	r := domDocument.Call("createElement", "div")
 	cellAtCaret().Get("parentElement").Call("after", r)
-	r.Set("outerHTML", rowTemplate)
+	r.Set("outerHTML", e.rowTemplate)
 	moveFocusToBelowOf(cellAtCaret())
 	moveCaretToStartOfLine()
 }

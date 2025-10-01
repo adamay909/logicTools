@@ -30,6 +30,7 @@ func main() {
 	setBasicInferenceRules()
 	setupPage()
 	setupJS()
+	editor.AddCSS()
 	checkForOldFormat()
 	loadHistory()
 	updatePageNumber()

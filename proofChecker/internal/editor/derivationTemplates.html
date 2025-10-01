@@ -1,0 +1,91 @@
+
+
+<div id="ndseqcalctemplate">
+
+ <style id="ndSequentCalculus">
+
+ div.derivation.ndseqcalc {
+     display:grid;
+     width: 100%;
+	 counter-reset: linecounter;
+     grid-template-columns: 3em minmax(40px, max-content) 3em minmax(40px, max-content) 3em minmax(40px, max-content);
+}
+
+
+div.row.ndseqcalc {
+ 	 display:grid;
+	 grid-column: 1/7;
+     grid-template-columns: subgrid;
+     width: 100%;
+	 height: 1.4em;
+}
+
+.row.ndseqcalc::before{
+	 counter-increment: linecounter;
+	 content: counter(linecounter) ".\2003";
+	 color: black;
+	 text-align: right;
+}
+
+</style>
+<div class="derivation ndseqcalc">
+<div class="row ndseqcalc"> 
+<div class="ddat" contenteditable="plaintext-only">
+</div>
+<div class="dtstl" contenteditable="false">
+&vdash;
+</div>
+<div class="dsucc" contenteditable="plaintext-only">
+</div>
+<div class="dsep" contenteditable="false">
+&#x2026;
+</div>
+<div class="dannot" contenteditable="plaintext-only">
+</div>
+</div>
+</div>
+
+</div>
+
+
+<div id="axiomatictemplate">
+
+ <style id="axiomatic">
+div.derivation.axiomatic {
+     grid-template-columns: 3em minmax(40px, max-content) 3em minmax(40px, max-content);
+     display:grid;
+     width: 100%;
+	 counter-reset: linecounter;
+}
+
+div.row.axiomatic {
+ 	 display:grid;
+     grid-template-columns: subgrid;
+     width: 100%;
+	 height: 1.4em;
+	 grid-column: 1/5;
+}
+
+div.row.axiomatic::before{
+	 counter-increment: linecounter;
+	 content: counter(linecounter) ".\2003";
+	 color: black;
+	 text-align: right;
+}
+
+</style>
+
+
+<div class="derivation axiomatic">
+<div class="row axiomatic"> 
+<div class="dsucc" contenteditable="plaintext-only">
+</div>
+<div class="dsep" contenteditable="false">
+&#x2026;
+</div>
+<div class="dannot" contenteditable="plaintext-only">
+</div>
+</div>
+</div>
+
+</div>

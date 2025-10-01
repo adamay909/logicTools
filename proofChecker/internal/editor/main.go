@@ -2,6 +2,7 @@ package editor
 
 import (
 	_ "embed" //embed template files
+	"fmt"
 	"strconv"
 	"strings"
 	"syscall/js"
@@ -11,24 +12,33 @@ import (
 const (
 	simpleeditor int = iota
 	derivationeditor
+	axiomaticeditor
 )
 
 type Editor struct {
-	id         string
-	elem       js.Value
-	key        string
-	editorType int
+	id            string
+	elem          js.Value
+	key           string
+	editorType    int
+	rowTemplate   string
+	derivTemplate string
 }
 
-//go:embed editorTemplate.txt
-var edTempl string
+//go:embed derivationTemplates.html
+var mainTemplate string
 
-//go:embed rowTemplate.txt
-var rowTemplate string
+/* AddCSS adds the CSS stylesheets needed for all the derivation formats as internal style sheets to the end of the head element. Should be called after any other manipulation of style sheets.
+ */
+func AddCSS() {
+	dummy := domDocument.Call("createElement", "div")
 
-func init() {
-	rowTemplate = StripWhiteSpaceFromHTML(rowTemplate)
-	edTempl = StripWhiteSpaceFromHTML(edTempl)
+	dummy.Set("innerHTML", mainTemplate)
+	styleSheets := dummy.Call("getElementsByTagName", "style")
+
+	for i := range styleSheets.Get("length").Int() {
+		fmt.Println(styleSheets.Call("item", i).Get("outerHTML").String())
+		domDocument.Get("head").Call("appendChild", styleSheets.Call("item", i).Call("cloneNode", "deep"))
+	}
 }
 
 /*
@@ -43,10 +53,31 @@ func NewDerivationEditor(id string) *Editor {
 	e.editorType = derivationeditor
 	e.id = id
 	e.elem, _ = getElementByID(id)
-	html := StripWhiteSpaceFromHTML(edTempl)
-	e.elem.Set("innerHTML", html)
-	deriv := e.elem.Get("firstChild")
-	deriv.Set("innerHTML", rowTemplate)
+
+	e.setupEditorTemplates("ndseqcalc")
+
+	setupJSderivationEditor(e)
+
+	sel := domWindow.Call("getSelection")
+	sel.Call("empty")
+	return e
+}
+
+/*
+NewAxiomaticEditor makes the element with the given id into a
+natural deduction style sequent calculus editor. The element itself
+should not be content editable. Approriate sublements will be
+set up automatically.
+Edits do not fire input events. Instead a custom event of type "editorinput" is fired that bubbles up and can be used by event listeners.
+*/
+func NewAxiomaticEditor(id string) *Editor {
+	e := new(Editor)
+	e.editorType = axiomaticeditor
+	e.id = id
+	e.elem, _ = getElementByID(id)
+
+	e.setupEditorTemplates("axiomatic")
+
 	setupJSderivationEditor(e)
 	sel := domWindow.Call("getSelection")
 	sel.Call("empty")
@@ -66,21 +97,25 @@ func NewSimpleEditor(id string) *Editor {
 	return e
 }
 
+/*name is the CSS selector for the relevant portion of mainTemplate. The function looks for .derivation.{name} and .row.{name}.
+ */
+func (e *Editor) setupEditorTemplates(name string) {
+
+	templ := domDocument.Call("createElement", "html")
+	templ.Set("innerHTML", mainTemplate)
+	e.derivTemplate = StripWhiteSpaceFromHTML(templ.Call("querySelector", ".derivation."+name).Get("outerHTML").String())
+	e.rowTemplate = StripWhiteSpaceFromHTML(templ.Call("querySelector", ".row."+name).Get("outerHTML").String())
+
+	e.elem.Set("innerHTML", e.derivTemplate)
+}
 func (e *Editor) AddEventListener(event string, f func(this js.Value, args ...any), params ...any) {
 	addEventListener(e.elem, event, f, params...)
 }
 
 func (e *Editor) Clear() {
-	switch e.editorType {
 
-	case simpleeditor:
-		e.elem.Set("innerHTML", "")
+	e.elem.Set("innerHTML", e.derivTemplate)
 
-	case derivationeditor:
-		e.elem.Set("innerHTML", edTempl)
-		deriv := e.elem.Get("firstChild")
-		deriv.Set("innerHTML", rowTemplate)
-	}
 }
 
 func (e *Editor) GetInnerHTML() string {

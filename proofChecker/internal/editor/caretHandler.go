@@ -158,7 +158,7 @@ func lineEmptyToRight(e js.Value) bool {
 
 func cellAtCaret() js.Value {
 	e := domDocument.Get("activeElement")
-	if e.Get("parentElement").Get("className").String() == "row" {
+	if e.Get("parentElement").Get("classList").Call("contains", "row").Bool() {
 		return e
 	}
 	return e.Get("parentElement")
