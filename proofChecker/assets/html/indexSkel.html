@@ -9,14 +9,14 @@
       <meta name="copyright" content="© Masahiro Yamada" />
 	  <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon" />
       <style></style>
+   </head>
+ <body>
+#BODY#
       <script src="assets/wasm_exec.js"></script>
       <script>
          const go = new Go();
          WebAssembly.instantiateStreaming(fetch("assets/proofchecker.wasm"), go.importObject).then((result) => {go.run(result.instance);});
       </script>
-   </head>
- <body>
-#BODY#
  </body>
 </html>
 
