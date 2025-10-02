@@ -96,7 +96,7 @@ func loadHistory() {
 	dsp.historyItems = dsp.history.Get("children")
 
 	var err error
-	dsp.historyPosition, err = strconv.Atoi(js.Global().Get("localStorage").Call("getItem", "dsp.historyPosition2").String())
+	dsp.historyPosition, err = strconv.Atoi(js.Global().Get("localStorage").Call("getItem", "historyPosition2").String())
 	if err != nil {
 		dsp.historyPosition = 0
 	}
@@ -115,7 +115,7 @@ func saveHistory() {
 	dsp.historyItems.Call("item", dsp.historyPosition).Set("outerHTML", getCurrentConsoleState())
 	//	Call("replaceWith", dsp.window.Call("cloneNode", "deep"))
 	js.Global().Get("localStorage").Call("setItem", "history3", dsp.history.Get("innerHTML"))
-	js.Global().Get("localStorage").Call("setItem", "dsp.historyPosition2", strconv.Itoa(dsp.historyPosition))
+	js.Global().Get("localStorage").Call("setItem", "historyPosition2", strconv.Itoa(dsp.historyPosition))
 }
 
 func moveInHistoryTo(pos int) {
@@ -125,7 +125,7 @@ func moveInHistoryTo(pos int) {
 }
 
 func updatePageNumber() {
-	js.Global().Get("localStorage").Call("setItem", "dsp.historyPosition2", strconv.Itoa(dsp.historyPosition))
+	js.Global().Get("localStorage").Call("setItem", "historyPosition2", strconv.Itoa(dsp.historyPosition))
 	domDocument.Call("querySelector", "#pagenumber").Set("innerHTML", strconv.Itoa(dsp.historyPosition+1)+"/"+strconv.Itoa(dsp.historyItems.Get("length").Int()))
 }
 

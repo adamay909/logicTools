@@ -36,8 +36,31 @@ func checkForOldFormat() {
 
 func updateHistory2() {
 
-	raw := strings.ReplaceAll(js.Global().Get("localStorage").Call("getItem", "history2").String(), `<!---->`, "")
-	js.Global().Get("localStorage").Call("setItem", "history3", raw)
+	oldItems := strings.Split(js.Global().Get("localStorage").Call("getItem", "history2").String(), `<!---->`)
+	for i := range oldItems {
+		if len(oldItems[i]) == 0 {
+			continue
+		}
+		oldItems[i] = `<div id="editorWindow">` + oldItems[i] + `</div>`
+	}
+
+	historyPosition, err := strconv.Atoi(js.Global().Get("localStorage").Call("getItem", "historyPosition2").String())
+	if err != nil {
+		fmt.Println("couldn't find old position")
+		historyPosition = 0
+	}
+	snap := js.Global().Get("localStorage").Call("getItem", "snapshot")
+	if snap.IsNull() {
+		return
+	}
+	snapStr := `<div id="editorWindow">` + snap.String() + `</div>`
+	if historyPosition == len(oldItems) {
+		oldItems = append(oldItems, snapStr)
+	} else {
+		oldItems[historyPosition] = snapStr
+	}
+
+	js.Global().Get("localStorage").Call("setItem", "history3", strings.Join(oldItems, ""))
 	js.Global().Get("localStorage").Call("removeItem", "history2")
 }
 
