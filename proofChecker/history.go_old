@@ -1,13 +1,18 @@
 package main
 
 import (
+	"fmt"
 	"strconv"
+	"strings"
 	"syscall/js"
+
+	"github.com/adamay909/logicTools/proofChecker/internal/editor"
 )
 
-var history js.Value
-var historyItems js.Value
+var history []string
 var historyPosition int
+
+const historyItemSeparator = `<!---->`
 
 // we store state information about the proof checker (dsp values) as
 // value data-* attributes of #consoleState which is a subelement
@@ -28,7 +33,6 @@ func writeStateToHTML() {
 
 	cs.Get("dataset").Set("offset", strconv.Itoa(dsp.oOffset))
 	setupButtonLabels()
-	saveSnapshot()
 }
 
 // elem is the element from which to read the proofchecker state
@@ -72,7 +76,7 @@ func setStateFromHTML(elem js.Value) {
 }
 
 func getCurrentConsoleState() string {
-	return dsp.window.Get("outerHTML").String()
+	return domDocument.Call("querySelector", "#editorWindow").Get("innerHTML").String()
 }
 
 func setCurrentConsoleState(html string) {
@@ -89,16 +93,21 @@ func setCurrentConsoleState(html string) {
 }
 
 func loadHistory() {
-	history = domDocument.Call("createElement", "div")
+	history = nil
 
 	raw := js.Global().Get("localStorage").Call("getItem", "history2")
 	if !raw.IsNull() {
-		history.Set("innerHTML", raw.String())
+		temphistory := strings.Split(editor.StripWhiteSpaceFromHTML(raw.String()), historyItemSeparator)
+		for i := range temphistory {
+			if len(temphistory[i]) == 0 {
+				continue
+			}
+			history = append(history, temphistory[i]+`<!---->`)
+		}
 	} else {
-		history.Call("append", dsp.window.Call("cloneNode", "deep"))
+		fmt.Println("appending to history")
+		history = append(history, getCurrentConsoleState())
 	}
-
-	historyItems = history.Get("children")
 
 	var err error
 	historyPosition, err = strconv.Atoi(js.Global().Get("localStorage").Call("getItem", "historyPosition2").String())
@@ -110,27 +119,31 @@ func loadHistory() {
 		moveInHistoryTo(historyPosition)
 		return
 	}
+	fmt.Println("restoring snapshot")
 	setCurrentConsoleState(snap.String())
 	saveHistory()
 }
 
-func saveHistory() {
-	saveSnapshot()
-
-	historyItems.Call("item", historyPosition).Set("outerHTML", getCurrentConsoleState())
-	//	Call("replaceWith", dsp.window.Call("cloneNode", "deep"))
-	js.Global().Get("localStorage").Call("setItem", "history2", history.Get("innerHTML"))
-	js.Global().Get("localStorage").Call("setItem", "historyPosition2", strconv.Itoa(historyPosition))
-}
 func moveInHistoryTo(pos int) {
-	setCurrentConsoleState(historyItems.Call("item", pos).Get("innerHTML").String())
+	setCurrentConsoleState(history[pos])
 	historyPosition = pos
 	updatePageNumber()
 }
 
 func updatePageNumber() {
 	js.Global().Get("localStorage").Call("setItem", "historyPosition2", strconv.Itoa(historyPosition))
-	domDocument.Call("querySelector", "#pagenumber").Set("innerHTML", strconv.Itoa(historyPosition+1)+"/"+strconv.Itoa(historyItems.Get("length").Int()))
+	domDocument.Call("querySelector", "#pagenumber").Set("innerHTML", strconv.Itoa(historyPosition+1)+"/"+strconv.Itoa(len(history)))
+}
+
+func saveHistory() {
+	if historyPosition == len(history) {
+		history = append(history, "")
+	}
+	saveSnapshot()
+	history[historyPosition] = getCurrentConsoleState() + historyItemSeparator
+
+	js.Global().Get("localStorage").Call("setItem", "history2", strings.Join(history, ""))
+	js.Global().Get("localStorage").Call("setItem", "historyPosition2", strconv.Itoa(historyPosition))
 }
 
 func moveBackInHistory() {
@@ -144,7 +157,7 @@ func moveBackInHistory() {
 
 func moveForwardInHistory() {
 	newpos := historyPosition + 1
-	if newpos > historyItems.Get("length").Int()-1 {
+	if newpos > len(history)-1 {
 		return
 	}
 	saveHistory()
@@ -158,18 +171,25 @@ func newpage() {
 	dsp.title.Clear()
 	writeStateToHTML()
 
-	historyItems.Call("item", historyPosition).Call("after", dsp.window.Call("cloneNode", "deep"))
-
 	historyPosition++
+	var hb, hf []string
+	hb = append(hb, history[:historyPosition]...)
+	hf = append(hf, history[historyPosition:]...)
+	history = nil
+	history = append(history, hb...)
+	history = append(history, getCurrentConsoleState())
+	history = append(history, hf...)
 	saveSnapshot()
 	updatePageNumber()
 }
 
 func duplicateHistoryItem() {
-	historyItems.Call("item", historyPosition).Call("after", dsp.window.Call("cloneNode", "deep"))
-	historyPosition++
+	p1 := dsp.editor.GetInnerHTML()
+	p2 := dsp.title.GetInnerHTML()
+	newpage()
+	dsp.editor.SetInnerHTML(p1)
+	dsp.title.SetInnerHTML(p2)
 	saveSnapshot()
-	updatePageNumber()
 }
 
 func clearHistory() {

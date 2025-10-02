@@ -108,6 +108,7 @@ func (e *Editor) setupEditorTemplates(name string) {
 
 	e.elem.Set("innerHTML", e.derivTemplate)
 }
+
 func (e *Editor) AddEventListener(event string, f func(this js.Value, args ...any), params ...any) {
 	addEventListener(e.elem, event, f, params...)
 }

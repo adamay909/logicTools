@@ -14,6 +14,7 @@ import (
 // state of the proof checker window. You could have multiple proof
 // checker windows.
 type console struct {
+	window js.Value //DOM element that holds the editor, title, etc.
 	editor *editor.Editor
 	title  *editor.Editor
 	oPL,
@@ -54,11 +55,12 @@ func setupPage() {
 }
 
 func setupJS() {
+	dsp.window = domDocument.Call("querySelector", "#editorWindow")
 	dsp.editor = editor.NewDerivationEditor("editor")
 	dsp.title = editor.NewSimpleEditor("title")
 	addEventListener(domDocument, "click", jsWrap(onClick))
-	addEventListener(domDocument.Call("querySelector", "#editorWindow"), "editorinput", jsWrap(saveSnapshot))
-	addEventListener(domDocument.Call("querySelector", "#editorWindow"), "focus", jsWrap(cleanupEditorWindow))
+	addEventListener(dsp.window, "editorinput", jsWrap(saveSnapshot))
+	addEventListener(dsp.window, "focus", jsWrap(cleanupEditorWindow))
 	addEventListener(domDocument.Call("querySelector", "#inputoffset"), "keydown", commitOffset)
 	addEventListener(domDocument.Call("querySelector", "#inputoffset"), "blur", jsWrap(cancelInputOffset))
 
@@ -110,7 +112,6 @@ func onClick() {
 		toggleReadme()
 	}
 	writeStateToHTML()
-	saveSnapshot()
 }
 
 func toggleTheorems() {
