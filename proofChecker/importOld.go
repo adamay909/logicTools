@@ -43,9 +43,9 @@ func updateHistory2() {
 
 func importOldHistory() {
 
-	dsp.historyItems = history.Get("children")
+	dsp.historyItems = dsp.history.Get("children")
 	oldhistory := loadOldHistory()
-	historyPosition = 0
+	dsp.historyPosition = 0
 	for i := range oldhistory {
 		page := new(oldconsole)
 		err := json.Unmarshal([]byte(oldhistory[i]), page)

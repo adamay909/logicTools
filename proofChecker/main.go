@@ -20,9 +20,10 @@ type console struct {
 	oPL,
 	oDR,
 	oTHM bool
-	oOffset      int
-	history      js.Value
-	historyItems js.Value
+	oOffset         int
+	history         js.Value
+	historyItems    js.Value
+	historyPosition int
 }
 
 var dsp *console
