@@ -26,11 +26,24 @@ func checkForOldFormat() {
 	if !js.Global().Get("localStorage").Call("getItem", "history").IsNull() {
 		fmt.Println("detected material from previous version. Importing.")
 		importOldHistory()
+		return
 	}
+	if !js.Global().Get("localStorage").Call("getItem", "history2").IsNull() {
+		fmt.Println("detected material from previous version. Importing.")
+		updateHistory2()
+	}
+}
+
+func updateHistory2() {
+
+	raw := strings.ReplaceAll(js.Global().Get("localStorage").Call("getItem", "history2").String(), `<!---->`, "")
+	js.Global().Get("localStorage").Call("setItem", "history3", raw)
+	js.Global().Get("localStorage").Call("removeItem", "history2")
 }
 
 func importOldHistory() {
 
+	dsp.historyItems = history.Get("children")
 	oldhistory := loadOldHistory()
 	historyPosition = 0
 	for i := range oldhistory {
@@ -46,8 +59,8 @@ func importOldHistory() {
 		dsp.oPL = page.SystemPL
 		dsp.oTHM = page.Theorems
 		writeStateToHTML()
-		saveSnapshot()
 	}
+	saveHistory()
 }
 
 func loadOldHistory() (oldhistory []string) {

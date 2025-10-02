@@ -89,16 +89,15 @@ func setCurrentConsoleState(html string) {
 }
 
 func loadHistory() {
-	history = domDocument.Call("createElement", "div")
 
-	raw := js.Global().Get("localStorage").Call("getItem", "history2")
+	raw := js.Global().Get("localStorage").Call("getItem", "history3")
 	if !raw.IsNull() {
-		history.Set("innerHTML", raw.String())
+		dsp.history.Set("innerHTML", raw.String())
 	} else {
-		history.Call("append", dsp.window.Call("cloneNode", "deep"))
+		dsp.history.Call("append", dsp.window.Call("cloneNode", "deep"))
 	}
 
-	historyItems = history.Get("children")
+	dsp.historyItems = history.Get("children")
 
 	var err error
 	historyPosition, err = strconv.Atoi(js.Global().Get("localStorage").Call("getItem", "historyPosition2").String())
@@ -117,11 +116,12 @@ func loadHistory() {
 func saveHistory() {
 	saveSnapshot()
 
-	historyItems.Call("item", historyPosition).Set("outerHTML", getCurrentConsoleState())
+	dsp.historyItems.Call("item", historyPosition).Set("outerHTML", getCurrentConsoleState())
 	//	Call("replaceWith", dsp.window.Call("cloneNode", "deep"))
-	js.Global().Get("localStorage").Call("setItem", "history2", history.Get("innerHTML"))
+	js.Global().Get("localStorage").Call("setItem", "history3", history.Get("innerHTML"))
 	js.Global().Get("localStorage").Call("setItem", "historyPosition2", strconv.Itoa(historyPosition))
 }
+
 func moveInHistoryTo(pos int) {
 	setCurrentConsoleState(historyItems.Call("item", pos).Get("innerHTML").String())
 	historyPosition = pos

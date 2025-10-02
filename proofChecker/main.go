@@ -20,7 +20,9 @@ type console struct {
 	oPL,
 	oDR,
 	oTHM bool
-	oOffset int
+	oOffset      int
+	history      js.Value
+	historyItems js.Value
 }
 
 var dsp *console
@@ -58,6 +60,7 @@ func setupJS() {
 	dsp.window = domDocument.Call("querySelector", "#editorWindow")
 	dsp.editor = editor.NewDerivationEditor("editor")
 	dsp.title = editor.NewSimpleEditor("title")
+	dsp.history = domDocument.Call("createElement", "div")
 	addEventListener(domDocument, "click", jsWrap(onClick))
 	addEventListener(dsp.window, "editorinput", jsWrap(saveSnapshot))
 	addEventListener(dsp.window, "focus", jsWrap(cleanupEditorWindow))
