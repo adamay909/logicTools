@@ -24,16 +24,16 @@ func caretHandler(this js.Value, args ...any) {
 	rejectSelection()
 	this.Call("preventDefault")
 
-	switch {
-	case ed.key == "up":
+	switch ed.key {
+	case "up":
 		moveFocusToAboveOf(focusElement)
 		ed.key = ""
 
-	case ed.key == "down":
+	case "down":
 		moveFocusToBelowOf(focusElement)
 		ed.key = ""
 
-	case ed.key == "left":
+	case "left":
 		if caretAtStartOfLine() && !onFirstLine() {
 			moveFocusToAboveOf(focusElement)
 			moveCaretToEndOfLine()
@@ -42,7 +42,7 @@ func caretHandler(this js.Value, args ...any) {
 		moveFocusToLeftOf(focusElement)
 		ed.key = ""
 
-	case ed.key == "right":
+	case "right":
 		if caretAtEndOfLine() && !onLastLine() {
 			moveFocusToBelowOf(focusElement)
 			moveCaretToStartOfLine()
@@ -51,9 +51,19 @@ func caretHandler(this js.Value, args ...any) {
 		moveFocusToRightOf(focusElement)
 		ed.key = ""
 
-	case cellIsEmpty(focusElement) && cellToLeftEmpty(focusElement):
-		moveFocusToLeftOf(focusElement)
+	case "home":
+		moveCaretToStartOfLine()
 
+	case "ctrlHome":
+		moveCaretToFirstLine()
+		moveCaretToStartOfLine()
+
+	case "end":
+		moveCaretToEndOfLine()
+
+	case "ctrlEnd":
+		moveCaretToLastLine()
+		moveCaretToEndOfLine()
 	}
 
 }
@@ -85,6 +95,21 @@ func moveFocusToLeftOf(e js.Value) {
 func moveCaretToEndOfCell() {
 	sel := domWindow.Call("getSelection")
 	sel.Call("modify", "move", "forward", "line")
+}
+
+func lineOfCaret() (r js.Value) {
+	e := cellAtCaret()
+	return e.Get("parentElement")
+}
+
+func moveCaretToFirstLine() {
+	for ; !onFirstLine(); moveFocusToAboveOf(cellAtCaret()) {
+	}
+}
+
+func moveCaretToLastLine() {
+	for ; !onLastLine(); moveFocusToBelowOf(cellAtCaret()) {
+	}
 }
 
 func moveFocusToAboveOf(e js.Value) {
@@ -158,10 +183,12 @@ func lineEmptyToRight(e js.Value) bool {
 
 func cellAtCaret() js.Value {
 	e := domDocument.Get("activeElement")
-	if e.Get("parentElement").Get("classList").Call("contains", "row").Bool() {
-		return e
+	for f := e; !f.IsNull(); f = e.Get("parentElement") {
+		if f.Get("parentElement").Get("classList").Call("contains", "row").Bool() {
+			return f
+		}
 	}
-	return e.Get("parentElement")
+	return js.ValueOf(nil)
 }
 
 func caretAtStartOfCell() bool {
