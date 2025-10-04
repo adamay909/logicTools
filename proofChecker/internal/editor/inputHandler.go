@@ -18,7 +18,8 @@ func dispatchEditEvent() {
 func simpleInputHandler(this js.Value, args ...any) {
 
 	defer func() {
-		dispatchEditEvent()
+		ev := js.Global().Get("CustomEvent").New("editorinput", map[string]any{"bubbles": true})
+		domDocument.Get("activeElement").Call("dispatchEvent", ev)
 	}()
 
 	inputType := this.Get("inputType").String()
@@ -29,14 +30,13 @@ func simpleInputHandler(this js.Value, args ...any) {
 	this.Call("preventDefault")
 	char := this.Get("data").String()
 
-	if char == `\` || char == `|` {
-		if simpleModifier == "" {
-			simpleModifier = char
-			return
-		}
+	if char == `\` || char == `|` || char == `_` {
+		simpleModifier = char
+		return
 	}
+
 	char = simpleModifier + char
-	insertChar(simpleModCharOf(char))
+	insertChar(modCharOf(char))
 	simpleModifier = ""
 
 }
@@ -54,8 +54,9 @@ func beforeInputHandler(this js.Value, args ...any) {
 		if caretAtStartOfLine() {
 			moveCaretToEndOfPreviousLine()
 			n := nextRowOfCaret()
-			if isEmptyRow(n) {
+			if rowIsEmpty(n) {
 				n.Call("remove")
+				this.Call("preventDefault")
 			}
 			return
 		}
@@ -71,8 +72,9 @@ func beforeInputHandler(this js.Value, args ...any) {
 			moveFocusToBelowOf(cellAtCaret())
 			moveCaretToStartOfLine()
 			p := previousRowOfCaret()
-			if isEmptyRow(p) {
+			if rowIsEmpty(p) {
 				p.Call("remove")
+				this.Call("preventDefault")
 			}
 			return
 		}
@@ -155,9 +157,6 @@ func modCharOf(c string) string {
 	if ok {
 		return v
 	}
-	if modifier != "" {
-		return ""
-	}
 	return c
 }
 
@@ -169,9 +168,6 @@ func simpleModCharOf(c string) string {
 	v, ok = charMap[c]
 	if ok {
 		return v
-	}
-	if simpleModifier != "" {
-		return ""
 	}
 	return c
 }

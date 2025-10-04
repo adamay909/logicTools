@@ -7,7 +7,7 @@ import (
 
 func (e *Editor) GetArglines() (lines []string) {
 
-	if e.editorType != derivationeditor {
+	if e.editorType != derivationeditor && e.editorType != axiomaticeditor {
 		return
 	}
 
@@ -27,10 +27,18 @@ func (e *Editor) GetArglines() (lines []string) {
 		l = strings.ReplaceAll(l, `</sub>`, "")
 		l = toascii(l)
 		l = strings.ReplaceAll(l, `\`, `/`)
+		dummy := domDocument.Call("createElement", "div")
+		dummy.Set("innerHTML", l)
+		for c := dummy.Get("children"); c.Get("length").Int() != 0; c = dummy.Get("children") {
+			c.Call("item", 0).Call("remove")
+		}
+		l = dummy.Get("textContent").String()
+		if e.editorType == axiomaticeditor {
+			l = ":" + l
+		}
 		if l == ":." {
 			l = ""
 		}
-		dummy := domDocument.Call("createElement", "div")
 		dummy.Set("innerHTML", l)
 		lines = append(lines, StripWhiteSpaceFromHTML(dummy.Get("textContent").String()))
 		fmt.Println(l)

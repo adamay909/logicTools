@@ -2,6 +2,7 @@ package main
 
 import (
 	_ "embed"
+	"fmt"
 	"strconv"
 	"strings"
 	"syscall/js"
@@ -19,7 +20,8 @@ type console struct {
 	title  *editor.Editor
 	oPL,
 	oDR,
-	oTHM bool
+	oTHM,
+	oAxiomatic bool
 	oOffset         int
 	history         js.Value
 	historyItems    js.Value
@@ -77,23 +79,27 @@ func onClick() {
 
 	case "toggleSettings":
 		toggleSettingsMenu()
-	case "check":
-		checkDerivation()
-	case "toLatex":
-		copyToClipboard(latexOutput())
-	case "printTree":
-		copyToClipboard(printTree())
-	case "toggleHelp":
-		toggleHelp()
-
-	case "toggleSystem":
-		togglePL()
 	case "setOffset":
 		inputOffset()
 	case "offset":
 		inputOffset()
 	case "toggleTheorem":
 		toggleTheorems()
+	case "toLatex":
+		copyToClipboard(latexOutput())
+	case "printTree":
+		copyToClipboard(printTree())
+	case "clearHistory":
+		clearHistory()
+	case "toggleAdvanced":
+		toggleAdvanced()
+	case "toggleAxiomatic":
+		toggleAxiomatic()
+
+	case "toggleSystem":
+		togglePL()
+	case "check":
+		checkDerivation()
 	case "newPage":
 		newpage()
 	case "backHistory":
@@ -102,15 +108,16 @@ func onClick() {
 		moveForwardInHistory()
 	case "duplicateScreen":
 		duplicateHistoryItem()
-	case "clearHistory":
-		clearHistory()
-	case "backButton":
-		toggleReadme()
-
 	case "sizeUp":
 		sizeUp()
 	case "sizeDown":
 		sizeDown()
+	case "toggleHelp":
+		toggleHelp()
+
+	case "backButton":
+		toggleReadme()
+
 	}
 	if target.Get("classList").Call("contains", "togglereadme").Bool() {
 		toggleReadme()
@@ -132,7 +139,12 @@ func toggleTheorems() {
 
 func setupGentzen() {
 	gentzen.SetPL(dsp.oPL)
-	setBasicInferenceRules()
+	switch {
+	case dsp.oAxiomatic:
+		setAxiomaticRules()
+	default:
+		setBasicInferenceRules()
+	}
 	if dsp.oTHM {
 		setupTheorems(dsp.oDR)
 	}
@@ -145,6 +157,31 @@ func togglePL() {
 	return
 }
 
+func toggleAxiomatic() {
+	dsp.oAxiomatic = !dsp.oAxiomatic
+	newpage()
+	if dsp.oAxiomatic {
+		dsp.editor = editor.NewAxiomaticEditor("editor")
+	} else {
+		dsp.editor = editor.NewDerivationEditor("editor")
+	}
+}
+
+func updateDisplay() {
+	setupButtonLabels()
+	updatePageNumber()
+}
+
+func setupEditorStyle() {
+	if dsp.oAxiomatic {
+		dsp.editor.MakeAxiomaticEditor()
+		fmt.Println("set editor to axiomatic")
+	} else {
+		dsp.editor.MakeDerivationEditor()
+		fmt.Println("set editor to natural deduction")
+	}
+}
+
 func setupButtonLabels() {
 	if dsp.oPL {
 		setTextByID("toggleSystem", "Predicate Logic")
@@ -152,10 +189,16 @@ func setupButtonLabels() {
 		setTextByID("toggleSystem", "Sentential Logic")
 	}
 	if dsp.oTHM {
-		setupTheorems(dsp.oDR)
 		setTextByID("toggleTheorem", "Theorems ✓")
 	} else {
 		setTextByID("toggleTheorem", "Theorems")
+	}
+	if dsp.oAxiomatic {
+		setTextByID("toggleAxiomatic", "axiomatic system ✓")
+		sys := domDocument.Call("querySelector", "#toggleSystem").Get("textContent").String() + " AXIOMATIC"
+		setTextByID("toggleSystem", sys)
+	} else {
+		setTextByID("toggleAxiomatic", "axiomatic system")
 	}
 	setTextByID("offset", strconv.Itoa(dsp.oOffset))
 }
@@ -283,4 +326,8 @@ func setOffset(v int) {
 	dsp.oOffset = v
 	dsp.editor.SetOffset(v)
 	domDocument.Call("querySelector", "#offset").Set("innerHTML", strconv.Itoa(v))
+}
+
+func toggleAdvanced() {
+	domDocument.Call("querySelector", "#advancedOptions").Get("classList").Call("toggle", "hidden")
 }

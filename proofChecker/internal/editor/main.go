@@ -2,7 +2,6 @@ package editor
 
 import (
 	_ "embed" //embed template files
-	"fmt"
 	"strconv"
 	"strings"
 	"syscall/js"
@@ -36,7 +35,6 @@ func AddCSS() {
 	styleSheets := dummy.Call("getElementsByTagName", "style")
 
 	for i := range styleSheets.Get("length").Int() {
-		fmt.Println(styleSheets.Call("item", i).Get("outerHTML").String())
 		domDocument.Get("head").Call("appendChild", styleSheets.Call("item", i).Call("cloneNode", "deep"))
 	}
 }
@@ -50,16 +48,10 @@ Edits do not fire input events. Instead a custom event of type "editorinput" is 
 */
 func NewDerivationEditor(id string) *Editor {
 	e := new(Editor)
-	e.editorType = derivationeditor
 	e.id = id
-	e.elem, _ = getElementByID(id)
+	e.MakeDerivationEditor()
+	e.elem.Set("innerHTML", e.derivTemplate)
 
-	e.setupEditorTemplates("ndseqcalc")
-
-	setupJSderivationEditor(e)
-
-	sel := domWindow.Call("getSelection")
-	sel.Call("empty")
 	return e
 }
 
@@ -72,15 +64,9 @@ Edits do not fire input events. Instead a custom event of type "editorinput" is 
 */
 func NewAxiomaticEditor(id string) *Editor {
 	e := new(Editor)
-	e.editorType = axiomaticeditor
 	e.id = id
-	e.elem, _ = getElementByID(id)
-
-	e.setupEditorTemplates("axiomatic")
-
-	setupJSderivationEditor(e)
-	sel := domWindow.Call("getSelection")
-	sel.Call("empty")
+	e.MakeAxiomaticEditor()
+	e.elem.Set("innerHTML", e.derivTemplate)
 	return e
 }
 
@@ -92,9 +78,37 @@ func NewSimpleEditor(id string) *Editor {
 	e := new(Editor)
 	e.editorType = simpleeditor
 	e.id = id
-	e.elem, _ = getElementByID(id)
+	e.removeEventListeners()
 	setupJSeditor(e)
 	return e
+}
+
+// MakeDerivationEditor turns e into a derivation editor but leaves its contents intact.
+// So do not use this if you need to set up the markup of the inside of the editor.
+func (e *Editor) MakeDerivationEditor() {
+	e.editorType = derivationeditor
+	e.removeEventListeners()
+	e.setupEditorTemplates("ndseqcalc")
+	setupJSderivationEditor(e)
+	sel := domWindow.Call("getSelection")
+	sel.Call("empty")
+}
+
+func (e *Editor) removeEventListeners() {
+	elem, _ := getElementByID(e.id)
+	cloneElem := elem.Call("cloneNode", "true")
+	elem.Call("replaceWith", cloneElem)
+	e.elem = cloneElem
+	elem.Set("outerHTML", "")
+}
+
+func (e *Editor) MakeAxiomaticEditor() {
+	e.editorType = axiomaticeditor
+	e.removeEventListeners()
+	e.setupEditorTemplates("axiomatic")
+	setupJSderivationEditor(e)
+	sel := domWindow.Call("getSelection")
+	sel.Call("empty")
 }
 
 /*name is the CSS selector for the relevant portion of mainTemplate. The function looks for .derivation.{name} and .row.{name}.
@@ -106,7 +120,6 @@ func (e *Editor) setupEditorTemplates(name string) {
 	e.derivTemplate = StripWhiteSpaceFromHTML(templ.Call("querySelector", ".derivation."+name).Get("outerHTML").String())
 	e.rowTemplate = StripWhiteSpaceFromHTML(templ.Call("querySelector", ".row."+name).Get("outerHTML").String())
 
-	e.elem.Set("innerHTML", e.derivTemplate)
 }
 
 func (e *Editor) AddEventListener(event string, f func(this js.Value, args ...any), params ...any) {

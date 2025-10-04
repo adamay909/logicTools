@@ -245,6 +245,8 @@ func moveCaretToEndOfLine() {
 
 func moveCaretToStartOfLine() {
 	e := cellAtCaret().Get("parentElement").Get("firstElementChild")
+	for ; e.Get("contentEditable").String() != "plaintext-only"; e = e.Get("nextElementSibling") {
+	}
 	e.Call("focus")
 }
 
@@ -288,27 +290,25 @@ func charCountToCaret() int {
 }
 
 func textOfLine() string {
+
 	t := cellAtCaret().Get("parentElement").Get("textContent").String()
 	return strings.Join(strings.Fields(t), "")
 }
 
-func lineIsEmpty() bool {
-	return textOfLine() == turnstile+ldots
-}
-
-func nextLineIsEmpty() bool {
-	r := cellAtCaret().Get("parentElement").Get("nextElementSibling")
-	if r.IsNull() {
-		return false
+func rowIsEmpty(r js.Value) bool {
+	fmt.Println("check if empty:", r.Get("outerHTML").String())
+	c := r.Get("children")
+	for i := range c.Get("length").Int() {
+		e := c.Call("item", i)
+		if !e.Get("isContentEditable").Bool() {
+			continue
+		}
+		if strings.Join(strings.Fields(e.Get("textContent").String()), "") != "" {
+			fmt.Println(e.Get("outerHTML").String(), "is not empty")
+			return false
+		}
 	}
-	return strings.Join(strings.Fields(r.Get("textContent").String()), "") == turnstile+ldots
-}
-
-func isEmptyRow(r js.Value) bool {
-	if r.IsNull() {
-		return false
-	}
-	return strings.Join(strings.Fields(r.Get("textContent").String()), "") == turnstile+ldots
+	return true
 }
 
 func nextRowOfCaret() js.Value {

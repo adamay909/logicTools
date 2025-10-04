@@ -306,3 +306,102 @@ func setupTheorems(derived bool) {
 		gentzen.DeclareInferenceRule(nr)
 	}
 }
+
+func setAxiomaticRules() {
+	var infrules = []gentzen.InfRuleTemplate{
+		gentzen.InfRuleTemplate{
+			Name:     "MP",
+			FullName: "Modus Ponens",
+			Patterns: [][]string{
+				[]string{
+					"/L_1:>s_1s_2",
+					"/L_2:s_1",
+					"/L_1,/L_2:s_2",
+				},
+			},
+		},
+
+		gentzen.InfRuleTemplate{
+			Name: "A1",
+			Patterns: [][]string{
+				[]string{
+					":>s_1>s_2^s_1s_2",
+				},
+			},
+		},
+		gentzen.InfRuleTemplate{
+			Name: "A2",
+			Patterns: [][]string{
+				[]string{
+					":>^s_1s_2s_1",
+				},
+				[]string{
+					":>^s_1s_2s_2",
+				},
+			},
+		},
+
+		gentzen.InfRuleTemplate{
+			Name: "A3",
+			Patterns: [][]string{
+				[]string{
+					":>s_1vs_1s_2",
+				},
+				[]string{
+					":>s_1vs_2s_1",
+				},
+			},
+		},
+
+		gentzen.InfRuleTemplate{
+			Name: "A4",
+			Patterns: [][]string{
+				[]string{
+					":>vs_1s_2>>s_1s_3>>s_2s_3s_3",
+				},
+			},
+		},
+
+		gentzen.InfRuleTemplate{
+			Name: "A5",
+			Patterns: [][]string{
+				[]string{
+					":>>s_1s_2>>s_1-s_2-s_1",
+				},
+			},
+		},
+
+		gentzen.InfRuleTemplate{
+			Name: "A6",
+			Patterns: [][]string{
+				[]string{
+					":>--ss",
+				},
+			},
+		},
+
+		gentzen.InfRuleTemplate{
+			Name: "A7",
+			Patterns: [][]string{
+				[]string{
+					":>>s_1>s_2s_3>>s_1s_2>s_1s_3",
+				},
+			},
+		},
+
+		gentzen.InfRuleTemplate{
+			Name: "A8",
+			Patterns: [][]string{
+				[]string{
+					":>s_1>s_2s_1",
+				},
+			},
+		},
+	}
+
+	gentzen.ClearInferenceRules()
+
+	for i := range infrules {
+		gentzen.DeclareInferenceRule(infrules[i])
+	}
+}

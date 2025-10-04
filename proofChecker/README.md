@@ -159,7 +159,33 @@ Apart from the above limitations, The editor is designed to be as transparent as
 
 The proof checker will attempt to store the current state of the editor so that when you open the proof checker again, you will be presented with the last state of things before you quit (or the program crashed). The proof checker will also store a series of snapshots of the editor. This last happens whenever you clear the screen or move to the next exercise. All history is stored in the browser's local cache so how much history is stored for how long depends on your browser settings and the like. You can go back and forth in history using 'back' and 'forward' buttons above the input area. You can see where you are in the lower right corner.
 
- 
+## EXPERIMENTAL: Axiomatic System
+
+You can find the option to switch to an axiomatic proof system under the advanced option in the settings under the gear icon. The axiomatic system looks as follows: 
+
+#### Axioms
+
+All instances of the following schemata are axioms:
+
+- **A1.** s1⊃[s2⊃(s1∧s2)]
+- **A2.** (s1∧s2)⊃s1 as well as (s1∧s2)⊃s2
+- **A3.** s1⊃(s1∨s2) as well as s1⊃(s2∨s1)
+- **A4.** (s1∨s2) ⊃ {(s1⊃s3)⊃[(s2⊃s3)⊃s3]}
+- **A5.** (s1⊃s2)⊃[(s1⊃¬s2)⊃¬s1]
+- **A6.** ¬¬s⊃s
+- **A7.** [s1⊃(s2⊃s3)]⊃[(s1⊃s2)⊃(s1⊃s3)]
+- **A8.** s1⊃(s2⊃s1)
+
+(notice that A2 and A3 each combine two schemata for ease of use)
+
+There is a single inference rule:
+
+- **Modus Ponens (MP).** From s1⊃s2 and s1, infer s2.
+
+The system is strict and *only allows direct proofs*. That is: no indirect proofs because there is no way to make assumptions; and no conditional proofs, either.  
+
+The editor window looks a little different since each line only needs a formula and an annotation. Use the abbreviations above in the annotations.
+
 ### Installation
 
 You can get the source code at:

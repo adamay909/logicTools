@@ -205,9 +205,8 @@ button.linklike {
 background-color: white;
 }
 
-div#extra {
+.hidden {
  display: none;
- margin: 2em;
 }
 
 button#backButton { 

@@ -5,6 +5,42 @@ import (
 	"syscall/js"
 )
 
+func saveHistory() {
+	saveSnapshot()
+	//guard against possibility history was not saved in time
+	if dsp.historyPosition > dsp.historyItems.Get("length").Int()-1 {
+		dsp.history.Call("append", dsp.window.Call("cloneNode", "deep"))
+	}
+	dsp.historyItems.Call("item", dsp.historyPosition).Set("outerHTML", getCurrentConsoleState())
+	js.Global().Get("localStorage").Call("setItem", "history3", dsp.history.Get("innerHTML"))
+	js.Global().Get("localStorage").Call("setItem", "historyPosition2", strconv.Itoa(dsp.historyPosition))
+}
+
+func loadHistory() {
+	dsp.history.Set("innerHTML", "")
+	raw := js.Global().Get("localStorage").Call("getItem", "history3")
+	if !raw.IsNull() {
+		dsp.history.Set("innerHTML", raw.String())
+	} else {
+		dsp.history.Call("append", dsp.window.Call("cloneNode", "deep"))
+	}
+
+	dsp.historyItems = dsp.history.Get("children")
+	var err error
+	dsp.historyPosition, err = strconv.Atoi(js.Global().Get("localStorage").Call("getItem", "historyPosition2").String())
+	if err != nil {
+		dsp.historyPosition = 0
+	}
+	snap := js.Global().Get("localStorage").Call("getItem", "snapshot")
+	if snap.IsNull() {
+		moveInHistoryTo(dsp.historyPosition)
+		return
+	}
+	setCurrentConsoleState(snap.String())
+	saveHistory()
+	setupEditorStyle()
+}
+
 // we store state information about the proof checker (dsp values) as
 // value data-* attributes of #consoleState which is a subelement
 // of #editorWindow. We store the the innerHTML of #editorWindow as
@@ -21,9 +57,15 @@ func writeStateToHTML() {
 	} else {
 		cs.Get("dataset").Delete("othm")
 	}
+	if dsp.oAxiomatic {
+		cs.Get("dataset").Set("oaxiomatic", "true")
+	} else {
+		cs.Get("dataset").Delete("oaxiomatic")
+	}
 
 	cs.Get("dataset").Set("offset", strconv.Itoa(dsp.oOffset))
-	setupButtonLabels()
+	setupGentzen()
+	updateDisplay()
 	saveSnapshot()
 }
 
@@ -47,24 +89,17 @@ func setStateFromHTML(elem js.Value) {
 		return
 	}
 	cs := elem.Call("querySelector", "#consoleState")
-	if cs.Get("dataset").Get("opl").String() == "true" {
-		dsp.oPL = true
-	} else {
-		dsp.oPL = false
-	}
-	if cs.Get("dataset").Get("othm").String() == "true" {
-		dsp.oTHM = true
-	} else {
-		dsp.oTHM = false
-	}
+
+	dsp.oPL = cs.Get("dataset").Get("opl").String() == "true"
+	dsp.oTHM = cs.Get("dataset").Get("othm").String() == "true"
+	dsp.oAxiomatic = cs.Get("dataset").Get("oaxiomatic").String() == "true"
+
 	v, err := strconv.Atoi(cs.Get("dataset").Get("offset").String())
 	if err != nil {
 		dsp.oOffset = 1
 	} else {
 		dsp.oOffset = v
 	}
-	setupButtonLabels()
-	setupGentzen()
 }
 
 func getCurrentConsoleState() string {
@@ -81,47 +116,14 @@ func setCurrentConsoleState(html string) {
 	dsp.editor.SetInnerHTML(editorContent)
 	dsp.title.SetInnerHTML(titleContent)
 	dsp.editor.SetOffset(dsp.oOffset)
+	updateDisplay()
 	setupGentzen()
 }
 
-func loadHistory() {
-
-	raw := js.Global().Get("localStorage").Call("getItem", "history3")
-	if !raw.IsNull() {
-		dsp.history.Set("innerHTML", raw.String())
-	} else {
-		dsp.history.Call("append", dsp.window.Call("cloneNode", "deep"))
-	}
-
-	dsp.historyItems = dsp.history.Get("children")
-
-	var err error
-	dsp.historyPosition, err = strconv.Atoi(js.Global().Get("localStorage").Call("getItem", "historyPosition2").String())
-	if err != nil {
-		dsp.historyPosition = 0
-	}
-	snap := js.Global().Get("localStorage").Call("getItem", "snapshot")
-	if snap.IsNull() {
-		moveInHistoryTo(dsp.historyPosition)
-		return
-	}
-	setCurrentConsoleState(snap.String())
-	saveHistory()
-}
-
-func saveHistory() {
-	saveSnapshot()
-
-	dsp.historyItems.Call("item", dsp.historyPosition).Set("outerHTML", getCurrentConsoleState())
-	//	Call("replaceWith", dsp.window.Call("cloneNode", "deep"))
-	js.Global().Get("localStorage").Call("setItem", "history3", dsp.history.Get("innerHTML"))
-	js.Global().Get("localStorage").Call("setItem", "historyPosition2", strconv.Itoa(dsp.historyPosition))
-}
-
 func moveInHistoryTo(pos int) {
-	setCurrentConsoleState(dsp.historyItems.Call("item", pos).Get("innerHTML").String())
 	dsp.historyPosition = pos
-	updatePageNumber()
+	setCurrentConsoleState(dsp.historyItems.Call("item", pos).Get("innerHTML").String())
+	setupEditorStyle()
 }
 
 func updatePageNumber() {
@@ -155,17 +157,18 @@ func newpage() {
 	writeStateToHTML()
 
 	dsp.historyItems.Call("item", dsp.historyPosition).Call("after", dsp.window.Call("cloneNode", "deep"))
-
 	dsp.historyPosition++
 	saveSnapshot()
-	updatePageNumber()
+	setupEditorStyle()
+	updateDisplay()
+	saveHistory()
 }
 
 func duplicateHistoryItem() {
 	dsp.historyItems.Call("item", dsp.historyPosition).Call("after", dsp.window.Call("cloneNode", "deep"))
 	dsp.historyPosition++
 	saveSnapshot()
-	updatePageNumber()
+	updateDisplay()
 }
 
 func clearHistory() {
@@ -175,8 +178,8 @@ func clearHistory() {
 	dsp.oOffset = 1
 	dsp.oPL = false
 	dsp.oTHM = false
-	writeStateToHTML()
 	loadHistory()
+	writeStateToHTML()
 }
 
 func saveSnapshot() {
