@@ -99,7 +99,8 @@ func (e *Editor) removeEventListeners() {
 	cloneElem := elem.Call("cloneNode", "true")
 	elem.Call("replaceWith", cloneElem)
 	e.elem = cloneElem
-	elem.Set("outerHTML", "")
+	//	elem.Set("outerHTML", "")
+
 }
 
 func (e *Editor) MakeAxiomaticEditor() {

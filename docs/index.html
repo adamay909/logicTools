@@ -2,7 +2,7 @@
 <html>
    <head>
 	<meta http-equiv='cache-control' content='no-cache'>
-	<title>Proof checker</title>
+	<title>Proof Checker</title>
       <meta charset="utf-8" />
       <meta name="description" content="Proof checker" />
       <meta name="author" content="Masahiro Yamada" />
@@ -162,6 +162,27 @@ infer Γ, ∆ ⊢ ψ , provided κ does not appear in any of Γ, ∆ , and ψ.</
 <p>Apart from the above limitations, The editor is designed to be as transparent as possible: symbols should be easy to type and you should not have to worry about how what's on the screen corresponds to what you see in the course material. Some special key combinations are used for typing symbol like Greek characters and the turnstile. Check the help on how to input symbols.</p>
 <h3>Preservation of History</h3>
 <p>The proof checker will attempt to store the current state of the editor so that when you open the proof checker again, you will be presented with the last state of things before you quit (or the program crashed). The proof checker will also store a series of snapshots of the editor. This last happens whenever you clear the screen or move to the next exercise. All history is stored in the browser's local cache so how much history is stored for how long depends on your browser settings and the like. You can go back and forth in history using 'back' and 'forward' buttons above the input area. You can see where you are in the lower right corner.</p>
+<h2>EXPERIMENTAL: Axiomatic System</h2>
+<p>You can find the option to switch to an axiomatic proof system under the advanced option in the settings under the gear icon. The axiomatic system looks as follows:</p>
+<h4>Axioms</h4>
+<p>All instances of the following schemata are axioms:</p>
+<ul>
+<li><strong>A1.</strong> s1⊃[s2⊃(s1∧s2)]</li>
+<li><strong>A2.</strong> (s1∧s2)⊃s1 as well as (s1∧s2)⊃s2</li>
+<li><strong>A3.</strong> s1⊃(s1∨s2) as well as s1⊃(s2∨s1)</li>
+<li><strong>A4.</strong> (s1∨s2) ⊃ {(s1⊃s3)⊃[(s2⊃s3)⊃s3]}</li>
+<li><strong>A5.</strong> (s1⊃s2)⊃[(s1⊃¬s2)⊃¬s1]</li>
+<li><strong>A6.</strong> ¬¬s⊃s</li>
+<li><strong>A7.</strong> [s1⊃(s2⊃s3)]⊃[(s1⊃s2)⊃(s1⊃s3)]</li>
+<li><strong>A8.</strong> s1⊃(s2⊃s1)</li>
+</ul>
+<p>(notice that A2 and A3 each combine two schemata for ease of use)</p>
+<p>There is a single inference rule:</p>
+<ul>
+<li><strong>Modus Ponens (MP).</strong> From s1⊃s2 and s1, infer s2.</li>
+</ul>
+<p>The system is strict and <em>only allows direct proofs</em>. That is: no indirect proofs because there is no way to make assumptions; and no conditional proofs, either.</p>
+<p>The editor window looks a little different since each line only needs a formula and an annotation. Use the abbreviations above in the annotations.</p>
 <h3>Installation</h3>
 <p>You can get the source code at:
 <a href="https://github.com/adamay909/logicTools">https://github.com/adamay909/logicTools</a></p>
@@ -203,8 +224,8 @@ infer Γ, ∆ ⊢ ψ , provided κ does not appear in any of Γ, ∆ , and ψ.</
           <button class="button" id="clearHistory" tabindex="0">clear history</button>
 		</div>
 		<div class="buttongroup">
-		<button class="button" id="toggleAdvanced" tabindex="0">advanced options</button>
-		<div class="buttongroup advanced">
+		<button class="button" id="toggleAdvanced" tabindex="0">show advanced options</button>
+		<div class="buttongroup hidden" id="advancedOptions">
 		<button class="button" id="toggleAxiomatic" tabindex="0">axiomatic system</button>
 		</div>
 		</div>
