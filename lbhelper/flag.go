@@ -34,6 +34,7 @@ var (
 	tableau    = flag.Bool("tableau", false, "print semantic tableaux (output is LaTeX code)")
 	proof      = flag.Bool("proof", false, "print outline of proof")
 	dest       = flag.String("dest", "", "write output to named file (defaults to stdout)")
+	vim        = flag.Bool("vim", false, "start as helper program for lbhelpervim vim plugin; overriddes all other flags")
 )
 
 func init() {

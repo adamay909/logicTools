@@ -17,10 +17,13 @@ var parser func(string, bool) (*gentzen.Node, error)
 
 func main() {
 
+	if *vim {
+		vimhmain()
+		return
+	}
+
 	if *cmpl || *standalone {
-
 		processFile()
-
 		return
 
 	}
@@ -28,13 +31,9 @@ func main() {
 	var outputDest *os.File
 
 	if *dest == "" {
-
 		outputDest = os.Stdout
-
 	} else {
-
 		*dest = filepath.Clean(*dest)
-
 		outputDest = fileops.CreateFile(*dest)
 	}
 

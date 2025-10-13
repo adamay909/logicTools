@@ -2,7 +2,6 @@ package gentzen
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 	"strings"
 )
@@ -21,7 +20,7 @@ const (
 
 // Parse should only be used when s is known to be well-formed. It will panic
 // otherwise. permitGreekUpper controls whether to allow upper Greek letters as sentence or predicate letters.
-func Parse[S ~string](s S, permitGreekUpper bool) *Node {
+func Parse(s string, permitGreekUpper bool) *Node {
 
 	n, err := ParseStrict(s, permitGreekUpper)
 
@@ -32,12 +31,11 @@ func Parse[S ~string](s S, permitGreekUpper bool) *Node {
 }
 
 // ParseStrict parses s and returns the top node of the resulting tree. err is non-nil iff. s is not a wff. permitGreekUpper controls whether to allow upper Greek letters as sentence or predicate letters.
-func ParseStrict[str ~string](s str, permitGreekUpper bool) (n *Node, err error) {
+func ParseStrict(s string, permitGreekUpper bool) (n *Node, err error) {
 
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Println("can't parse:", s)
-			fmt.Println(r)
+			err = errors.New("can't parse:" + s)
 			return
 		}
 	}()
