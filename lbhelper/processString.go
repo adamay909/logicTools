@@ -136,7 +136,8 @@ func encloseMath(s string, enclose bool) string {
 	if !enclose {
 		return s
 	}
-	return `\p{` + s + `}`
+	//return `\p{` + s + `}`
+	return `$` + s + `$`
 }
 
 func sequentString(s string, mode gentzen.PrintMode) (r string, err error) {

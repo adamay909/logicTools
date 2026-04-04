@@ -363,7 +363,7 @@ func printTruthTableLatex(tt *TruthTable, rowsep bool) string {
 	out = out + "}" + "\n"
 
 	for i, f := range tt.ColumnTitles {
-		out = out + `\p{` + StringF(Parse(f, !allowGreekUpper), O_Latex) + `}`
+		out = out + `$` + StringF(Parse(f, !allowGreekUpper), O_Latex) + `$`
 		if i != len(tt.ColumnTitles)-1 {
 			out = out + ` & `
 		}

@@ -246,13 +246,13 @@ func printTableau(t *tablNode) string {
 
 	ingressFunc := func(n *tablNode) {
 
-		w.WriteString(`[ \p{`)
+		w.WriteString(`[ $`)
 		w.WriteString(StringF(Parse(n.Val.str, !allowGreekUpper), O_Latex))
-		w.WriteString(`} `)
+		w.WriteString(`$ `)
 		w.WriteString("\n")
 
 		if n.HasFlag(closedtblNode) {
-			w.WriteString(`[ \p{\otimes} ]`)
+			w.WriteString(`[ $\otimes$ ]`)
 			w.WriteString("\n")
 			w.WriteString(` ] `)
 			w.WriteString("\n")

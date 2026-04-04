@@ -15,13 +15,13 @@ func ltree(n *Node, simple bool) string {
 
 	ingressFunc := func(m *Node) {
 
-		w.WriteString(`[\p{`)
+		w.WriteString(`$`)
 		if simple {
 			w.WriteString(disp(m))
 		} else {
 			w.WriteString(StringF(Parse(m.String(), !allowGreekUpper), O_Latex))
 		}
-		w.WriteString(`} `)
+		w.WriteString(`$ `)
 		w.WriteString("\n")
 	}
 

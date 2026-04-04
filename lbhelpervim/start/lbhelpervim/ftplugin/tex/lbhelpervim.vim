@@ -24,7 +24,7 @@ if !exists("g:lbh_delimend")
  g:lbh_delimend = ";"
 endif
 
-var searchpat = g:lbh_delimstart .. '\(.\{-}\)' .. g:lbh_delimend
+var searchpat = escape(g:lbh_delimstart, "\$^") .. '\(.\{-}\)' .. escape(g:lbh_delimend, "\$^")
 
 var converter = job_start(g:lbh_program)
 

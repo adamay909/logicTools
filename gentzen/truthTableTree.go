@@ -304,7 +304,7 @@ func printTruthTableNarrowLatex(tt *TruthTable, rowsep bool) string {
 
 	for i, f := range tt.ColumnTitles {
 
-		w.WriteString(`\p{` + f + `}`)
+		w.WriteString(`$` + f + `$`)
 
 		if i < len(tt.ColumnTitles)-1 {
 			w.WriteString(` & `)

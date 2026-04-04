@@ -674,9 +674,9 @@ func PrintDerivationTree(s []string, mode PrintMode, offset int) (string, error)
 
 	ingressFunc := func(e *derivationNode) {
 
-		w.WriteString(`[ \p{`)
+		w.WriteString(`[ $`)
 		w.WriteString(e.Val.seq.stringF(O_Latex))
-		w.WriteString(`}`)
+		w.WriteString(`$`)
 		w.WriteString("\n")
 	}
 
